@@ -1319,7 +1319,20 @@
     <url-pattern>/selectLocale</url-pattern>
   </servlet-mapping>
 
-    
+  <servlet>
+    <description>Create and Link a resource by DOI</description>
+    <servlet-name>createAndLinkByDoi</servlet-name>
+    <servlet-class>org.vivoweb.webapp.controller.freemarker.CreateAndLinkResourceByDOIController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>createAndLinkByDoi</servlet-name>
+    <url-pattern>/createAndLinkByDoi</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>createAndLinkByDoi</servlet-name>
+    <url-pattern>/createAndLinkByDoi/*</url-pattern>
+  </servlet-mapping>
+
   <!-- ============================== servlet-mappings ======================== -->
    <servlet-mapping>
     <servlet-name>mailusers</servlet-name>
@@ -1354,7 +1367,7 @@
   <servlet-mapping>
     <servlet-name>individual</servlet-name>
     <url-pattern>/display/*</url-pattern>
-  </servlet-mapping>    
+  </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>authenticate</servlet-name>
