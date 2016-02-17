@@ -251,9 +251,21 @@ public class CreateAndLinkResourceByDOIController extends FreemarkerHttpServlet 
                     }
 
                     if (authorStr != null) {
+                        String authorStrLwr = authorStr.toLowerCase();
+                        String authorStrUpr = authorStr.toUpperCase();
                         for (Citation.Author author : citation.authors) {
                             if (author.name != null) {
                                 if (author.name.startsWith(authorStr) || authorStr.startsWith(author.name)) {
+                                    author.proposed = true;
+                                    break;
+                                }
+
+                                if (author.name.startsWith(authorStrUpr) || authorStrUpr.startsWith(author.name)) {
+                                    author.proposed = true;
+                                    break;
+                                }
+
+                                if (author.name.startsWith(authorStrLwr) || authorStrLwr.startsWith(author.name)) {
                                     author.proposed = true;
                                     break;
                                 }
@@ -422,7 +434,7 @@ public class CreateAndLinkResourceByDOIController extends FreemarkerHttpServlet 
         if (!defaultNamespace.endsWith("/")) {
             defaultNamespace += "/";
         }
-        String vivoUri = defaultNamespace + "doi/" + message.DOI;
+        String vivoUri = defaultNamespace + "doi/" + message.DOI.toLowerCase();
 
         Resource work = model.createResource(vivoUri);
 
@@ -433,7 +445,7 @@ public class CreateAndLinkResourceByDOIController extends FreemarkerHttpServlet 
         }
 
         work.addProperty(RDFS.label, message.title[0]);
-        work.addProperty(model.createProperty(BIBO_DOI), message.DOI);
+        work.addProperty(model.createProperty(BIBO_DOI), message.DOI.toLowerCase());
 
         if (message.ISSN != null && message.ISSN.length > 0) {
             String journalName = null;
@@ -934,12 +946,11 @@ public class CreateAndLinkResourceByDOIController extends FreemarkerHttpServlet 
 
     private String normalizeDOI(String doi) {
         if (doi != null) {
-            String doiTrimmed = doi.trim();
-            String doiLowerCase = doiTrimmed.toLowerCase();
+            String doiTrimmed = doi.trim().toLowerCase();
 
-            if (doiLowerCase.startsWith("https://dx.doi.org/")) {
+            if (doiTrimmed.startsWith("https://dx.doi.org/")) {
                 return doiTrimmed.substring(19);
-            } else if (doiLowerCase.startsWith("http://dx.doi.org/")) {
+            } else if (doiTrimmed.startsWith("http://dx.doi.org/")) {
                 return doiTrimmed.substring(18);
             }
 
