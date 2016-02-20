@@ -39,7 +39,7 @@
     <form method="post">
         Is this your paper?<br />
         <br />
-        <input type="hidden" name="doi" value="${citation.DOI!}" />
+        <input type="hidden" name="externalId" value="${citation.externalId!}" />
         <!-- Output Citation -->
         <#if citation.alreadyClaimed>
             <div class="citation_claimed">
@@ -54,7 +54,7 @@
                             <span>${author.name!}</span>
                         <#else>
                             <#if !author.linked>
-                                <input type="radio" id="author${author?counter}" name="contributor${citation.DOI}" value="author${author?counter}" <#if author.proposed>checked</#if> class="radioWithLabel" />
+                                <input type="radio" id="author${author?counter}" name="contributor${citation.externalId}" value="author${author?counter}" <#if author.proposed>checked</#if> class="radioWithLabel" />
                                 <label for="author${author?counter}" class="labelForRadio">${author.name!}</label>
                                 <#if author.proposed><#assign proposedAuthor=true /></#if>
                             <#else>
@@ -71,19 +71,19 @@
         <#if citation.alreadyClaimed>
             <span class="claimed">You have already claimed this work.</span>
         <#else>
-            <input type="radio" id="author" name="contributor${citation.DOI}" value="author" <#if !proposedAuthor>checked</#if> class="radioWithLabel" /><label for="author" class="labelForRadio"> Author</label><br />
-            <input type="radio" id="editor" name="contributor${citation.DOI}" value="editor" class="radioWithLabel" /><label for="editor" class="labelForRadio"> Editor</label><br />
-            <input type="radio" id="notmine" name="contributor${citation.DOI}" value="notmine" class="radioWithLabel" /><label for="notmine" class="labelForRadio"> This is not my work</label><br />
+            <input type="radio" id="author" name="contributor${citation.externalId}" value="author" <#if !proposedAuthor>checked</#if> class="radioWithLabel" /><label for="author" class="labelForRadio"> Author</label><br />
+            <input type="radio" id="editor" name="contributor${citation.externalId}" value="editor" class="radioWithLabel" /><label for="editor" class="labelForRadio"> Editor</label><br />
+            <input type="radio" id="notmine" name="contributor${citation.externalId}" value="notmine" class="radioWithLabel" /><label for="notmine" class="labelForRadio"> This is not my work</label><br />
         </#if>
-        <input type="hidden" name="json${citation.DOI}"    value="${json!}" />
-        <input type="hidden" name="vivoUri${citation.DOI}" value="${vivoUri!}" />
+        <input type="hidden" name="externalResource${citation.externalId}" value="${externalResource!}" />
+        <input type="hidden" name="vivoUri${citation.externalId}" value="${vivoUri!}" />
         <#if citation.alreadyClaimed>
             </div>
         </#if>
         <div style="clear: both;"></div>
         <!-- End Citation -->
         <div class="buttons">
-            <input type="hidden" name="action" value="confirmDOI" />
+            <input type="hidden" name="action" value="confirmID" />
             <input type="submit" value="Confirm" />
         </div>
     </form>

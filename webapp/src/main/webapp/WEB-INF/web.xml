@@ -1321,16 +1321,16 @@
 
   <servlet>
     <description>Create and Link a resource by DOI</description>
-    <servlet-name>createAndLinkByDoi</servlet-name>
-    <servlet-class>org.vivoweb.webapp.controller.freemarker.CreateAndLinkResourceByDOIController</servlet-class>
+    <servlet-name>createAndLinkResource</servlet-name>
+    <servlet-class>org.vivoweb.webapp.controller.freemarker.CreateAndLinkResourceController</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>createAndLinkByDoi</servlet-name>
-    <url-pattern>/createAndLinkByDoi</url-pattern>
+    <servlet-name>createAndLinkResource</servlet-name>
+    <url-pattern>/createAndLink</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>createAndLinkByDoi</servlet-name>
-    <url-pattern>/createAndLinkByDoi/*</url-pattern>
+    <servlet-name>createAndLinkResource</servlet-name>
+    <url-pattern>/createAndLink/*</url-pattern>
   </servlet-mapping>
 
   <!-- ============================== servlet-mappings ======================== -->

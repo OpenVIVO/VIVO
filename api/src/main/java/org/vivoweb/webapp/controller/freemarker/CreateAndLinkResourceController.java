@@ -2,8 +2,6 @@
 
 package org.vivoweb.webapp.controller.freemarker;
 
-import com.google.gson.Gson;
-import com.google.gson.annotations.SerializedName;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -32,31 +30,30 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
-import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.vivoweb.webapp.crossref.JSONModel;
+import org.vivoweb.webapp.createandlink.Citation;
+import org.vivoweb.webapp.createandlink.CreateAndLinkResourceProvider;
+import org.vivoweb.webapp.createandlink.CreateAndLinkUtils;
+import org.vivoweb.webapp.createandlink.ExternalIdentifiers;
+import org.vivoweb.webapp.createandlink.ResourceModel;
+import org.vivoweb.webapp.createandlink.crossref.CrossrefCreateAndLinkResourceProvider;
+import org.vivoweb.webapp.createandlink.pubmed.PubMedCreateAndLinkResourceProvider;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CreateAndLinkResourceByDOIController extends FreemarkerHttpServlet {
+public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
     public static final AuthorizationRequest REQUIRED_ACTIONS = SimplePermission.EDIT_OWN_ACCOUNT.ACTION;
 
-    private static final String CROSSREF_API = "http://api.crossref.org/works/";
+    private static final Map<String, String> typeToClassMap = new HashMap<String, String>();
 
-    private static final Map<String, String> typeToClassMapp = new HashMap<String, String>();
+    private static final Map<String, CreateAndLinkResourceProvider> providers = new HashMap<String, CreateAndLinkResourceProvider>();
 
     public static final String BIBO_ARTICLE = "http://purl.org/ontology/bibo/Article";
     public static final String BIBO_DOI = "http://purl.org/ontology/bibo/doi";
@@ -90,11 +87,14 @@ public class CreateAndLinkResourceByDOIController extends FreemarkerHttpServlet 
     public static final String VCARD_NAME = "http://www.w3.org/2006/vcard/ns#Name";
 
     static {
-        typeToClassMapp.put("journal-article", "http://purl.org/ontology/bibo/AcademicArticle");
-        typeToClassMapp.put("book", "http://purl.org/ontology/bibo/Book");
-        typeToClassMapp.put("book-chapter", "http://purl.org/ontology/bibo/BookSection");
-        typeToClassMapp.put("proceedings-article", "http://vivoweb.org/ontology/core#ConferencePaper");
-        typeToClassMapp.put("dataset", "http://vivoweb.org/ontology/core#Dataset");
+        typeToClassMap.put("journal-article", "http://purl.org/ontology/bibo/AcademicArticle");
+        typeToClassMap.put("book", "http://purl.org/ontology/bibo/Book");
+        typeToClassMap.put("book-chapter", "http://purl.org/ontology/bibo/BookSection");
+        typeToClassMap.put("proceedings-article", "http://vivoweb.org/ontology/core#ConferencePaper");
+        typeToClassMap.put("dataset", "http://vivoweb.org/ontology/core#Dataset");
+
+        providers.put("doi",  new CrossrefCreateAndLinkResourceProvider());
+        providers.put("pmid", new PubMedCreateAndLinkResourceProvider());
     }
 
     @Override
@@ -104,6 +104,29 @@ public class CreateAndLinkResourceByDOIController extends FreemarkerHttpServlet 
 
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
+        String requestURI = vreq.getRequestURI();
+
+        CreateAndLinkResourceProvider provider = null;
+
+        int typePos = requestURI.indexOf("/createAndLink") + 15;
+        if (typePos < requestURI.length()) {
+            String type;
+            if (requestURI.lastIndexOf('/') > typePos) {
+                type = requestURI.substring(typePos, requestURI.lastIndexOf('/') - 1);
+            } else {
+                type = requestURI.substring(typePos);
+            }
+
+            type = type.trim().toLowerCase();
+            if (providers.containsKey(type)) {
+                provider = providers.get(type);
+            }
+        }
+
+        if (provider == null) {
+            return new TemplateResponseValues("unknownResourceType.ftl");
+        }
+
         String action = vreq.getParameter("action");
         if (action == null) {
             action = "";
@@ -121,88 +144,75 @@ public class CreateAndLinkResourceByDOIController extends FreemarkerHttpServlet 
         }
 
         switch (action) {
-            case "confirmDOI": {
-                String doi = normalizeDOI(vreq.getParameter("doi"));
+            case "confirmID": {
+                String externslId = provider.normalize(vreq.getParameter("externalId"));
 
-                Model existingModel = getExistingResource(vreq, vreq.getParameter("vivoUri" + doi));
+                Model existingModel = getExistingResource(vreq, vreq.getParameter("vivoUri" + externslId));
 
                 Model updatedModel = ModelFactory.createDefaultModel();
                 updatedModel.add(existingModel);
 
-                // link person to vivoUri
-                processConfirmationforDOI(vreq, updatedModel, profileUri, doi);
-
-                Model removeModel = existingModel.difference(updatedModel);
-                Model addModel = updatedModel.difference(existingModel);
-
-                if (!addModel.isEmpty() || !removeModel.isEmpty()) {
-                    InputStream addStream = null;
-                    InputStream removeStream = null;
-
-                    InputStream is = makeN3InputStream(updatedModel);
-                    ChangeSet changeSet = vreq.getRDFService().manufactureChangeSet();
-
-                    if (!addModel.isEmpty()) {
-                        addStream = makeN3InputStream(addModel);
-                        changeSet.addAddition(addStream, RDFService.ModelSerializationFormat.N3, ModelNames.ABOX_ASSERTIONS);
-                    }
-
-                    if (!removeModel.isEmpty()) {
-                        removeStream = makeN3InputStream(removeModel);
-                        changeSet.addRemoval(removeStream, RDFService.ModelSerializationFormat.N3, ModelNames.ABOX_ASSERTIONS);
-                    }
-
-                    try {
-                        vreq.getRDFService().changeSetUpdate(changeSet);
-                    } catch (RDFServiceException e) {
-                    } finally {
-                        if (addStream != null) {
-                            try { addStream.close(); } catch (IOException e) { }
-                        }
-
-                        if (removeStream != null) {
-                            try { removeStream.close(); } catch (IOException e) { }
+                String vivoUri = vreq.getParameter("vivoUri" + externslId);
+                if (!"notmine".equalsIgnoreCase(vreq.getParameter("contributor" + externslId))) {
+                    if (StringUtils.isEmpty(vivoUri)) {
+                        ResourceModel resourceModel = provider.makeResourceModel(vreq.getParameter("externalResource" + externslId));
+                        if (resourceModel != null) {
+                            vivoUri = createVIVOObject(vreq, updatedModel, resourceModel);
                         }
                     }
+
+                    // link person to vivoUri
+                    processRelationships(vreq, updatedModel, vivoUri, profileUri, vreq.getParameter("contributor" + externslId));
                 }
 
-                return new TemplateResponseValues("createAndLinkResourceEnterDOI.ftl");
+                writeChanges(vreq.getRDFService(), existingModel, updatedModel);
+
+                Map<String, Object> templateValues = new HashMap<>();
+                templateValues.put("link", profileUri);
+                templateValues.put("label", provider.getLabel());
+                return new TemplateResponseValues("createAndLinkResourceEnterID.ftl", templateValues);
             }
 
-            case "findDOI": {
-                String doi = normalizeDOI(vreq.getParameter("doi"));
+            case "findID": {
+                String externalId = provider.normalize(vreq.getParameter("externalId"));
 
                 Citation citation = new Citation();
+                citation.externalId = externalId;
 
                 String vivoUri = null;
-                String json = null;
+                String externalResource = null;
 
-                vivoUri = findInVIVO(vreq, doi, profileUri, citation);
+                vivoUri = findInVIVO(vreq, provider.allExternalIDsForFind(externalId), profileUri, citation);
                 if (StringUtils.isEmpty(vivoUri)) {
-                    json = findInCrossref(doi, citation);
+                    externalResource = provider.findInExternal(externalId, citation);
                 }
 
                 proposeAuthorToLink(vreq, citation, profileUri);
 
                 Map<String, Object> templateValues = new HashMap<>();
 
-                templateValues.put("citation", citation);
                 if (vivoUri != null) {
+                    templateValues.put("citation", citation);
                     templateValues.put("vivoUri", vivoUri);
-                    return new TemplateResponseValues("createAndLinkResourceConfirmDOI.ftl", templateValues);
-                } else if (json != null) {
-                    templateValues.put("json", json);
-                    return new TemplateResponseValues("createAndLinkResourceConfirmDOI.ftl", templateValues);
+                    return new TemplateResponseValues("createAndLinkResourceConfirm.ftl", templateValues);
+                } else if (externalResource != null) {
+                    templateValues.put("citation", citation);
+                    templateValues.put("externalResource", externalResource);
+                    return new TemplateResponseValues("createAndLinkResourceConfirm.ftl", templateValues);
                 }
 
-                return new TemplateResponseValues("createAndLinkResourceEnterDOI.ftl");
+                templateValues.put("notfound", true);
+                templateValues.put("label", provider.getLabel());
+                return new TemplateResponseValues("createAndLinkResourceEnterID.ftl", templateValues);
             }
 
             default:
                 break;
         }
 
-        return new TemplateResponseValues("createAndLinkResourceEnterDOI.ftl");
+        Map<String, Object> templateValues = new HashMap<>();
+        templateValues.put("label", provider.getLabel());
+        return new TemplateResponseValues("createAndLinkResourceEnterID.ftl", templateValues);
     }
 
     protected void proposeAuthorToLink(VitroRequest vreq, final Citation citation, String profileUri) {
@@ -228,9 +238,9 @@ public class CreateAndLinkResourceByDOIController extends FreemarkerHttpServlet 
                     String authorStr = null;
                     if (familyName != null) {
                         if (givenName != null) {
-                            authorStr = formatAuthorString(familyName.getString(), givenName.getString());
+                            authorStr = CreateAndLinkUtils.formatAuthorString(familyName.getString(), givenName.getString());
                         } else {
-                            authorStr = formatAuthorString(familyName.getString(), null);
+                            authorStr = CreateAndLinkUtils.formatAuthorString(familyName.getString(), null);
                         }
                     } else if (label != null) {
                         authorStr = label.getString();
@@ -342,28 +352,8 @@ public class CreateAndLinkResourceByDOIController extends FreemarkerHttpServlet 
         return model;
     }
 
-    protected void processConfirmationforDOI(VitroRequest vreq, Model model, String userUri, String doi) {
-        String vivoUri = vreq.getParameter("vivoUri" + doi);
-        String json = vreq.getParameter("json" + doi);
-
-        String contributor = vreq.getParameter("contributor" + doi);
-
-        if (contributor.equalsIgnoreCase("notmine")) {
-            return;
-        }
-
-        if (StringUtils.isEmpty(vivoUri)) {
-            // create object from json and set vivoUri
-            Gson gson = new Gson();
-            CrossrefResponse response = gson.fromJson(json, CrossrefResponse.class);
-            if (response == null || response.message == null) {
-                return;
-            }
-
-            vivoUri = createVIVOObject(vreq, model, response.message);
-        }
-
-        if (contributor.startsWith("author")) {
+    protected void processRelationships(VitroRequest vreq, Model model, String vivoUri, String userUri, String relationship) {
+        if (relationship.startsWith("author")) {
             Resource authorship = model.createResource(getUnusedUri(vreq));
             authorship.addProperty(RDF.type, model.getResource(VIVO_AUTHORSHIP));
 
@@ -373,8 +363,8 @@ public class CreateAndLinkResourceByDOIController extends FreemarkerHttpServlet 
             model.getResource(vivoUri).addProperty(model.createProperty(VIVO_RELATEDBY), authorship);
             model.getResource(userUri).addProperty(model.createProperty(VIVO_RELATEDBY), authorship);
 
-            if (contributor.length() > 6) {
-                String posStr = contributor.substring(6);
+            if (relationship.length() > 6) {
+                String posStr = relationship.substring(6);
                 int rank = Integer.parseInt(posStr, 10);
                 removeAuthorship(model, rank);
                 try {
@@ -382,7 +372,7 @@ public class CreateAndLinkResourceByDOIController extends FreemarkerHttpServlet 
                 } catch (NumberFormatException nfe) {
                 }
             }
-        } else if (contributor.startsWith("editor")) {
+        } else if (relationship.startsWith("editor")) {
             Resource editorship = model.createResource(getUnusedUri(vreq));
             editorship.addProperty(RDF.type, model.getResource(VIVO_EDITORSHIP));
 
@@ -429,35 +419,40 @@ public class CreateAndLinkResourceByDOIController extends FreemarkerHttpServlet 
         }
     }
 
-    protected String createVIVOObject(VitroRequest vreq, Model model, JSONModel message) {
+    protected String createVIVOObject(VitroRequest vreq, Model model, ResourceModel resourceModel) {
+        String vivoUri = null;
         String defaultNamespace = vreq.getUnfilteredWebappDaoFactory().getDefaultNamespace();
         if (!defaultNamespace.endsWith("/")) {
             defaultNamespace += "/";
         }
-        String vivoUri = defaultNamespace + "doi/" + message.DOI.toLowerCase();
+
+        if (!StringUtils.isEmpty(resourceModel.DOI)) {
+            vivoUri = defaultNamespace + "doi/" + resourceModel.DOI.toLowerCase();
+        } else {
+            vivoUri = getUnusedUri(vreq);
+        }
 
         Resource work = model.createResource(vivoUri);
 
-        if (typeToClassMapp.containsKey(message.type)) {
-            work.addProperty(RDF.type, model.getResource(typeToClassMapp.get(message.type)));
+        if (typeToClassMap.containsKey(resourceModel.type)) {
+            work.addProperty(RDF.type, model.getResource(typeToClassMap.get(resourceModel.type)));
         } else {
             work.addProperty(RDF.type, model.getResource(BIBO_ARTICLE));
         }
 
-        work.addProperty(RDFS.label, message.title[0]);
-        work.addProperty(model.createProperty(BIBO_DOI), message.DOI.toLowerCase());
+        if (!StringUtils.isEmpty(resourceModel.title)) {
+            work.addProperty(RDFS.label, resourceModel.title);
+        }
 
-        if (message.ISSN != null && message.ISSN.length > 0) {
-            String journalName = null;
-            for (String container : message.containerTitle) {
-                if (journalName == null || container.length() > journalName.length()) {
-                    journalName = container;
-                }
-            }
-            Resource journal = model.createResource(defaultNamespace + "issn/" + message.ISSN[0]);
-            journal.addProperty(RDFS.label, journalName);
+        if (!StringUtils.isEmpty(resourceModel.DOI)) {
+            work.addProperty(model.createProperty(BIBO_DOI), resourceModel.DOI.toLowerCase());
+        }
+
+        if (resourceModel.ISSN != null && resourceModel.ISSN.length > 0) {
+            Resource journal = model.createResource(defaultNamespace + "issn/" + resourceModel.ISSN[0]);
+            journal.addProperty(RDFS.label, resourceModel.containerTitle);
             journal.addProperty(RDF.type, model.getResource(BIBO_JOURNAL));
-            for (String issn : message.ISSN) {
+            for (String issn : resourceModel.ISSN) {
                 journal.addProperty(model.getProperty(BIBO_ISSN), issn);
             }
             journal.addProperty(model.getProperty(VIVO_PUBLICATIONVENUEFOR), work);
@@ -465,32 +460,27 @@ public class CreateAndLinkResourceByDOIController extends FreemarkerHttpServlet 
 
         }
 
-        if (!StringUtils.isEmpty(message.volume)) {
-            work.addProperty(model.createProperty(BIBO_VOLUME), message.volume);
+        if (!StringUtils.isEmpty(resourceModel.volume)) {
+            work.addProperty(model.createProperty(BIBO_VOLUME), resourceModel.volume);
         }
 
-        if (!StringUtils.isEmpty(message.issue)) {
-            work.addProperty(model.createProperty(BIBO_ISSUE), message.issue);
+        if (!StringUtils.isEmpty(resourceModel.issue)) {
+            work.addProperty(model.createProperty(BIBO_ISSUE), resourceModel.issue);
         }
 
-        if (!StringUtils.isEmpty(message.page)) {
-            if (message.page.contains("-")) {
-                int hyphen = message.page.indexOf('-');
-                work.addProperty(model.createProperty(BIBO_PAGE_START), message.page.substring(0, hyphen - 1));
-                work.addProperty(model.createProperty(BIBO_PAGE_END), message.page.substring(hyphen + 1));
-            } else {
-                work.addProperty(model.createProperty(BIBO_PAGE_START), message.page);
-            }
-        } else if (!StringUtils.isEmpty(message.articleNumber)) {
-            work.addProperty(model.createProperty(BIBO_PAGE_START), message.articleNumber);
+        if (!StringUtils.isEmpty(resourceModel.pageStart)) {
+            work.addProperty(model.createProperty(BIBO_PAGE_START), resourceModel.pageStart);
+        }
+        if (!StringUtils.isEmpty(resourceModel.pageEnd)) {
+            work.addProperty(model.createProperty(BIBO_PAGE_END), resourceModel.pageEnd);
         }
 
-        if (!addDateToResource(vreq, work, message.publishedPrint)) {
-            addDateToResource(vreq, work, message.publishedOnline);
+        if (!addDateToResource(vreq, work, resourceModel.publishedPrint)) {
+            addDateToResource(vreq, work, resourceModel.publishedOnline);
         }
 
         int rank = 1;
-        for (JSONModel.Author author : message.author) {
+        for (ResourceModel.Author author : resourceModel.author) {
             Resource vcard = model.createResource(getVCardURI(vreq, author.family, author.given));
             vcard.addProperty(RDF.type, model.getResource(VCARD_INDIVIDUAL));
 
@@ -545,31 +535,27 @@ public class CreateAndLinkResourceByDOIController extends FreemarkerHttpServlet 
         return getUnusedUri(vreq);
     }
 
-    protected boolean addDateToResource(VitroRequest vreq, Resource work, JSONModel.DateField date) {
+    protected boolean addDateToResource(VitroRequest vreq, Resource work, ResourceModel.DateField date) {
         Model model = work.getModel();
 
-        if (date == null || date.dateParts == null || date.dateParts.length == 0) {
+        if (date == null || date.year == null) {
             return false;
         }
 
         String formattedDate = null;
         String precision = null;
 
-        switch (date.dateParts.length) {
-            case 1:
-                formattedDate = String.format("%04d-01-01T00:00:00", date.dateParts[0]);
-                precision = "http://vivoweb.org/ontology/core#yearPrecision";
-                break;
-
-            case 2:
-                formattedDate = String.format("%04d-%02d-01T00:00:00", date.dateParts[0], date.dateParts[1]);
-                precision = "http://vivoweb.org/ontology/core#monthPrecision";
-                break;
-
-            default:
-                formattedDate = String.format("%04d-%02d-%02dT00:00:00", date.dateParts[0], date.dateParts[1], date.dateParts[2]);
+        if (date.month != null) {
+            if (date.day != null) {
+                formattedDate = String.format("%04d-%02d-%02dT00:00:00", date.year, date.month, date.day);
                 precision = "http://vivoweb.org/ontology/core#dayPrecision";
-                break;
+            } else {
+                formattedDate = String.format("%04d-%02d-01T00:00:00", date.year, date.month);
+                precision = "http://vivoweb.org/ontology/core#monthPrecision";
+            }
+        } else {
+            formattedDate = String.format("%04d-01-01T00:00:00", date.year);
+            precision = "http://vivoweb.org/ontology/core#yearPrecision";
         }
 
         String dateUri = vreq.getUnfilteredWebappDaoFactory().getDefaultNamespace();
@@ -603,32 +589,47 @@ public class CreateAndLinkResourceByDOIController extends FreemarkerHttpServlet 
         return null;
     }
 
-    protected String findInVIVO(VitroRequest vreq, String doi, String profileUri, Citation citation) {
-        String query = "SELECT ?work\n" +
-                "WHERE\n" +
-                "{\n" +
-                "  {\n" +
-                "  \t?work <http://purl.org/ontology/bibo/doi> \"" + doi + "\" .\n" +
-                "  }\n" +
-                "}\n";
+    private String getVIVOUriForDOI(RDFService rdfService, String doi) {
+        if (!StringUtils.isEmpty(doi)) {
+            final List<String> works = new ArrayList<String>();
+            String query = "SELECT ?work\n" +
+                    "WHERE\n" +
+                    "{\n" +
+                    "  {\n" +
+                    "  \t?work <http://purl.org/ontology/bibo/doi> \"" + doi + "\" .\n" +
+                    "  }\n" +
+                    "}\n";
 
-        final List<String> works = new ArrayList<String>();
-        try {
-            vreq.getRDFService().sparqlSelectQuery(query, new ResultSetConsumer() {
-                @Override
-                protected void processQuerySolution(QuerySolution qs) {
-                    Resource work = qs.getResource("work");
-                    if (work != null) {
-                        works.add(work.getURI());
+            try {
+                rdfService.sparqlSelectQuery(query, new ResultSetConsumer() {
+                    @Override
+                    protected void processQuerySolution(QuerySolution qs) {
+                        Resource work = qs.getResource("work");
+                        if (work != null) {
+                            works.add(work.getURI());
+                        }
                     }
-                }
-            });
-        } catch (RDFServiceException e) {
+                });
+            } catch (RDFServiceException e) {
+            }
+
+            if (works.size() == 1) {
+                return works.get(0);
+            }
         }
 
-        if (works.size() == 1) {
-            String vivoUri = works.get(0);
+        return null;
+    }
 
+    protected String findInVIVO(VitroRequest vreq, ExternalIdentifiers ids, String profileUri, Citation citation) {
+        String vivoUri = null;
+
+        vivoUri = getVIVOUriForDOI(vreq.getRDFService(), ids.DOI);
+        if (StringUtils.isEmpty(vivoUri)) {
+//            vivoUri = getVIVOUriForPubMedID(vreq.getRDFService(), ids.PubMedID);
+        }
+
+        if (!StringUtils.isEmpty(vivoUri)) {
             Model model = getExistingResource(vreq, vivoUri);
 
             Resource work = model.getResource(vivoUri);
@@ -734,9 +735,9 @@ public class CreateAndLinkResourceByDOIController extends FreemarkerHttpServlet 
                                 if (familyName != null) {
                                     newAuthor = new Citation.Author();
                                     if (givenName != null) {
-                                        newAuthor.name = formatAuthorString(familyName.getString(), givenName.getString());
+                                        newAuthor.name = CreateAndLinkUtils.formatAuthorString(familyName.getString(), givenName.getString());
                                     } else {
-                                        newAuthor.name = formatAuthorString(familyName.getString(), null);
+                                        newAuthor.name = CreateAndLinkUtils.formatAuthorString(familyName.getString(), null);
                                     }
                                     newAuthor.linked = linked;
                                 }
@@ -763,8 +764,6 @@ public class CreateAndLinkResourceByDOIController extends FreemarkerHttpServlet 
                 }
             }
 
-//            citation.journal;
-//
             if (!StringUtils.isEmpty(pageStart)) {
                 if (!StringUtils.isEmpty(pageEnd)) {
                     citation.pagination = pageStart + "-" + pageEnd;
@@ -789,8 +788,6 @@ public class CreateAndLinkResourceByDOIController extends FreemarkerHttpServlet 
                 citation.authors = rankedAuthors;
             }
 
-            citation.DOI = doi;
-
             return vivoUri;
         }
 
@@ -813,227 +810,39 @@ public class CreateAndLinkResourceByDOIController extends FreemarkerHttpServlet 
         return false;
     }
 
-    protected String findInCrossref(String doi, Citation citation) {
-        String json = readUrl(CROSSREF_API + doi);
+    protected void writeChanges(RDFService rdfService, Model existingModel, Model updatedModel) {
+        Model removeModel = existingModel.difference(updatedModel);
+        Model addModel = updatedModel.difference(existingModel);
 
-        Gson gson = new Gson();
-        CrossrefResponse response = gson.fromJson(json, CrossrefResponse.class);
-        if (response == null || response.message == null) {
-            return null;
-        }
+        if (!addModel.isEmpty() || !removeModel.isEmpty()) {
+            InputStream addStream = null;
+            InputStream removeStream = null;
 
-        if (!doi.equalsIgnoreCase(response.message.DOI)) {
-            return null;
-        }
+            InputStream is = makeN3InputStream(updatedModel);
+            ChangeSet changeSet = rdfService.manufactureChangeSet();
 
-        citation.DOI = doi;
+            if (!addModel.isEmpty()) {
+                addStream = makeN3InputStream(addModel);
+                changeSet.addAddition(addStream, RDFService.ModelSerializationFormat.N3, ModelNames.ABOX_ASSERTIONS);
+            }
 
-        if (!ArrayUtils.isEmpty(response.message.title)) {
-            citation.title = response.message.title[0];
-        }
+            if (!removeModel.isEmpty()) {
+                removeStream = makeN3InputStream(removeModel);
+                changeSet.addRemoval(removeStream, RDFService.ModelSerializationFormat.N3, ModelNames.ABOX_ASSERTIONS);
+            }
 
-        if (!ArrayUtils.isEmpty(response.message.containerTitle)) {
-            for (String journal : response.message.containerTitle) {
-                if (citation.journal == null || citation.journal.length() < journal.length()) {
-                    citation.journal = journal;
+            try {
+                rdfService.changeSetUpdate(changeSet);
+            } catch (RDFServiceException e) {
+            } finally {
+                if (addStream != null) {
+                    try { addStream.close(); } catch (IOException e) { }
+                }
+
+                if (removeStream != null) {
+                    try { removeStream.close(); } catch (IOException e) { }
                 }
             }
         }
-
-        List<Citation.Author> authors = new ArrayList<>();
-        for (JSONModel.Author author : response.message.author ) {
-            Citation.Author citationAuthor = new Citation.Author();
-            citationAuthor.name = formatAuthorString(author.family, author.given);
-            authors.add(citationAuthor);
-        }
-        citation.authors = authors.toArray(new Citation.Author[authors.size()]);
-
-        citation.volume = response.message.volume;
-        citation.issue = response.message.issue;
-        citation.pagination = response.message.page;
-        if (citation.pagination == null) {
-            citation.pagination = response.message.articleNumber;
-        }
-
-        citation.publicationYear = extractYearFromDateField(response.message.publishedPrint);
-        if (citation.publicationYear == null) {
-            citation.publicationYear = extractYearFromDateField(response.message.publishedOnline);
-        }
-
-
-//        messageMap.get("ISSN"); // List -> String
-//        messageMap.get("type"); // String
-
-        return json;
-    }
-
-    private String formatAuthorString(String familyName, String givenName) {
-        StringBuilder authorBuilder = new StringBuilder(familyName);
-
-        if (!StringUtils.isEmpty(givenName)) {
-            authorBuilder.append(", ");
-            boolean addToAuthor = true;
-            for (char ch : givenName.toCharArray()) {
-                if (addToAuthor) {
-                    if (Character.isAlphabetic(ch)) {
-                        authorBuilder.append(Character.toUpperCase(ch));
-                        addToAuthor = false;
-                    }
-                } else {
-                    if (!Character.isAlphabetic(ch)) {
-                        addToAuthor = true;
-                    }
-                }
-            }
-        }
-
-        return authorBuilder.toString();
-    }
-
-    private Integer extractYearFromDateField(JSONModel.DateField date) {
-        if (date == null) {
-            return null;
-        }
-
-        if (ArrayUtils.isEmpty(date.dateParts)) {
-            return null;
-        }
-
-        return date.dateParts[0][0];
-    }
-
-    protected String readUrl(String url) {
-        try {
-            HttpClient client = HttpClientFactory.getHttpClient();
-            HttpGet request = new HttpGet(url);
-            HttpResponse response = client.execute(request);
-            try (InputStream in = response.getEntity().getContent()) {
-                StringWriter writer = new StringWriter();
-                IOUtils.copy(in, writer, "UTF-8");
-                return writer.toString();
-            }
-        } catch (IOException e) {
-        }
-
-        return null;
-    }
-
-
-    private String extractAuthorFromJSON(Map author) {
-        StringBuilder authorBuilder = new StringBuilder((String)author.get("family"));
-
-        String given  = (String)author.get("given");
-
-        if (!StringUtils.isEmpty(given)) {
-            authorBuilder.append(", ");
-            boolean addToAuthor = true;
-            for (char ch : given.toCharArray()) {
-                if (addToAuthor) {
-                    if (Character.isAlphabetic(ch)) {
-                        authorBuilder.append(Character.toUpperCase(ch));
-                        addToAuthor = false;
-                    }
-                } else {
-                    if (!Character.isAlphabetic(ch)) {
-                        addToAuthor = true;
-                    }
-                }
-            }
-        }
-
-        return authorBuilder.toString();
-    }
-
-    private String normalizeDOI(String doi) {
-        if (doi != null) {
-            String doiTrimmed = doi.trim().toLowerCase();
-
-            if (doiTrimmed.startsWith("https://dx.doi.org/")) {
-                return doiTrimmed.substring(19);
-            } else if (doiTrimmed.startsWith("http://dx.doi.org/")) {
-                return doiTrimmed.substring(18);
-            }
-
-            return doiTrimmed;
-        }
-
-        return null;
-    }
-
-    public static class Citation {
-        public String title;
-        public Author[] authors;
-        public String journal;
-        public String volume;
-        public String issue;
-        public String pagination;
-        public Integer publicationYear;
-        public String DOI;
-
-        public boolean alreadyClaimed = false;
-
-        public String getTitle() {
-            return title;
-        }
-
-        public Author[] getAuthors() {
-            return authors;
-        }
-
-        public String getJournal() {
-            return journal;
-        }
-
-        public String getVolume() {
-            return volume;
-        }
-
-        public String getIssue() {
-            return issue;
-        }
-
-        public String getPagination() {
-            return pagination;
-        }
-
-        public Integer getPublicationYear() {
-            return publicationYear;
-        }
-
-        public String getDOI() {
-            return DOI;
-        }
-
-        public boolean getAlreadyClaimed() { return alreadyClaimed; }
-
-        public static class Author {
-            public String name;
-            public boolean linked = false;
-            public boolean proposed = false;
-
-            public String getName() {
-                return name;
-            }
-
-            public boolean getLinked() {
-                return linked;
-            }
-
-            public boolean getProposed() {
-                return proposed;
-            }
-        }
-    }
-
-    private static class CrossrefResponse {
-        public JSONModel message;
-
-        @SerializedName("message-type")
-        public String messageType;
-
-        @SerializedName("message-version")
-        public String messageVersion;
-
-        public String status;
     }
 }

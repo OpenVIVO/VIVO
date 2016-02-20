@@ -1,27 +1,31 @@
-package org.vivoweb.webapp.crossref;
+package org.vivoweb.webapp.createandlink.crossref;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Date;
-import java.util.List;
 
 public class JSONModel {
     public String DOI;
     public String[] ISSN;
     public String URL;
 
-    @SerializedName("alternative-id")
-    public String[] alternativeId;
-
     public Author[] author;
 
+//    @SerializedName("alternative-id")
+//    public String[] alternativeId;
+
     @SerializedName("container-title")
-    public String[] containerTitle;
+    public String containerTitle;
     public DateField created;
     public DateField deposited;
     public DateField indexed;
     public String issue;
     public DateField issued;
+
+    // TODO
+    // license
+    // link
+
     public String member;
     public String page;
     public String prefix;
@@ -40,17 +44,18 @@ public class JSONModel {
     @SerializedName("reference-count")
     public Integer referenceCount;
     public Double score;
+    public String source;
     public String[] subject;
     public String[] subtitle;
-    public String[] title;
+    public String title;
     public String type;
     public String volume;
-
 
     public static class Author {
         public String[] affiliation;
         public String family;
         public String given;
+        public String literal;
     }
 
     public static class DateField {
