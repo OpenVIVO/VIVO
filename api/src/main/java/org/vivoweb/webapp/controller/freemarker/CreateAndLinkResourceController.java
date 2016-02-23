@@ -475,8 +475,8 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
             work.addProperty(model.createProperty(BIBO_PMID), resourceModel.PubMedID.toLowerCase());
         }
 
-        if (!StringUtils.isEmpty(resourceModel.PubMedID)) {
-            work.addProperty(model.createProperty(VIVO_PMCID), resourceModel.PubMedID.toLowerCase());
+        if (!StringUtils.isEmpty(resourceModel.PubMedCentralID)) {
+            work.addProperty(model.createProperty(VIVO_PMCID), resourceModel.PubMedCentralID.toLowerCase());
         }
 
         if (resourceModel.ISSN != null && resourceModel.ISSN.length > 0) {
