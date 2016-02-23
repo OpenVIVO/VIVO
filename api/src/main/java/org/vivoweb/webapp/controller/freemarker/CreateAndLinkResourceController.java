@@ -62,6 +62,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
     public static final String BIBO_JOURNAL = "http://purl.org/ontology/bibo/Journal";
     public static final String BIBO_PAGE_START = "http://purl.org/ontology/bibo/pageStart";
     public static final String BIBO_PAGE_END = "http://purl.org/ontology/bibo/pageEnd";
+    public static final String BIBO_PMID = "http://purl.org/ontology/bibo/pmid";
     public static final String BIBO_VOLUME = "http://purl.org/ontology/bibo/volume";
 
     public static final String FOAF_FIRSTNAME = "http://xmlns.com/foaf/0.1/firstName";
@@ -75,6 +76,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
     public static final String VIVO_DATETIMEVALUE = "http://vivoweb.org/ontology/core#dateTimeValue";
     public static final String VIVO_EDITORSHIP = "http://vivoweb.org/ontology/core#Editorship";
     public static final String VIVO_HASPUBLICATIONVENUE = "http://vivoweb.org/ontology/core#hasPublicationVenue";
+    public static final String VIVO_PMCID = "http://vivoweb.org/ontology/core#pmcid";
     public static final String VIVO_PUBLICATIONVENUEFOR = "http://vivoweb.org/ontology/core#publicationVenueFor";
     public static final String VIVO_RANK = "http://vivoweb.org/ontology/core#rank";
     public static final String VIVO_RELATEDBY = "http://vivoweb.org/ontology/core#relatedBy";
@@ -108,18 +110,18 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
 
         CreateAndLinkResourceProvider provider = null;
 
+        String externalProvider = null;
         int typePos = requestURI.indexOf("/createAndLink") + 15;
         if (typePos < requestURI.length()) {
-            String type;
             if (requestURI.lastIndexOf('/') > typePos) {
-                type = requestURI.substring(typePos, requestURI.lastIndexOf('/') - 1);
+                externalProvider = requestURI.substring(typePos, requestURI.lastIndexOf('/') - 1);
             } else {
-                type = requestURI.substring(typePos);
+                externalProvider = requestURI.substring(typePos);
             }
 
-            type = type.trim().toLowerCase();
-            if (providers.containsKey(type)) {
-                provider = providers.get(type);
+            externalProvider = externalProvider.trim().toLowerCase();
+            if (providers.containsKey(externalProvider)) {
+                provider = providers.get(externalProvider);
             }
         }
 
@@ -145,24 +147,30 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
 
         switch (action) {
             case "confirmID": {
-                String externslId = provider.normalize(vreq.getParameter("externalId"));
+                String externalId = provider.normalize(vreq.getParameter("externalId"));
 
-                Model existingModel = getExistingResource(vreq, vreq.getParameter("vivoUri" + externslId));
+                Model existingModel = getExistingResource(vreq, vreq.getParameter("vivoUri" + externalId));
 
                 Model updatedModel = ModelFactory.createDefaultModel();
                 updatedModel.add(existingModel);
 
-                String vivoUri = vreq.getParameter("vivoUri" + externslId);
-                if (!"notmine".equalsIgnoreCase(vreq.getParameter("contributor" + externslId))) {
+                String vivoUri = vreq.getParameter("vivoUri" + externalId);
+                if (!"notmine".equalsIgnoreCase(vreq.getParameter("contributor" + externalId))) {
                     if (StringUtils.isEmpty(vivoUri)) {
-                        ResourceModel resourceModel = provider.makeResourceModel(vreq.getParameter("externalResource" + externslId));
+                        ResourceModel resourceModel = null;
+                        String resourceProvider = vreq.getParameter("externalProvider" + externalId);
+                        if (providers.containsKey(resourceProvider)) {
+                            resourceModel = providers.get(resourceProvider).makeResourceModel(externalId, vreq.getParameter("externalResource" + externalId));
+                        } else {
+                            resourceModel = provider.makeResourceModel(externalId, vreq.getParameter("externalResource" + externalId));
+                        }
                         if (resourceModel != null) {
                             vivoUri = createVIVOObject(vreq, updatedModel, resourceModel);
                         }
                     }
 
                     // link person to vivoUri
-                    processRelationships(vreq, updatedModel, vivoUri, profileUri, vreq.getParameter("contributor" + externslId));
+                    processRelationships(vreq, updatedModel, vivoUri, profileUri, vreq.getParameter("contributor" + externalId));
                 }
 
                 writeChanges(vreq.getRDFService(), existingModel, updatedModel);
@@ -182,9 +190,22 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                 String vivoUri = null;
                 String externalResource = null;
 
-                vivoUri = findInVIVO(vreq, provider.allExternalIDsForFind(externalId), profileUri, citation);
+                ExternalIdentifiers allExternalIds = provider.allExternalIDsForFind(externalId);
+                vivoUri = findInVIVO(vreq, allExternalIds, profileUri, citation);
                 if (StringUtils.isEmpty(vivoUri)) {
-                    externalResource = provider.findInExternal(externalId, citation);
+                    if (!StringUtils.isEmpty(allExternalIds.DOI)) {
+                        CreateAndLinkResourceProvider doiProvider = providers.get("doi");
+                        if (doiProvider != null) {
+                            externalResource = doiProvider.findInExternal(allExternalIds.DOI, citation);
+                            if (!StringUtils.isEmpty(externalResource)) {
+                                externalProvider = "doi";
+                            }
+                        }
+                    }
+
+                    if (StringUtils.isEmpty(externalResource)) {
+                        externalResource = provider.findInExternal(externalId, citation);
+                    }
                 }
 
                 proposeAuthorToLink(vreq, citation, profileUri);
@@ -198,6 +219,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                 } else if (externalResource != null) {
                     templateValues.put("citation", citation);
                     templateValues.put("externalResource", externalResource);
+                    templateValues.put("externalProvider", externalProvider);
                     return new TemplateResponseValues("createAndLinkResourceConfirm.ftl", templateValues);
                 }
 
@@ -231,9 +253,9 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
             vreq.getRDFService().sparqlSelectQuery(query, new ResultSetConsumer() {
                 @Override
                 protected void processQuerySolution(QuerySolution qs) {
-                    Literal familyName = qs.getLiteral("familyName");
-                    Literal givenName  = qs.getLiteral("givenName");
-                    Literal label      = qs.getLiteral("label");
+                    Literal familyName = qs.contains("famileName") ? qs.getLiteral("familyName") : null;
+                    Literal givenName  = qs.contains("givenName") ? qs.getLiteral("givenName") : null;
+                    Literal label      = qs.contains("label") ? qs.getLiteral("label") : null;
 
                     String authorStr = null;
                     if (familyName != null) {
@@ -250,6 +272,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                                 if (Character.isAlphabetic(authorStr.charAt(endIdx))) {
                                     break;
                                 }
+                                endIdx++;
                             }
 
                             if (endIdx < authorStr.length()) {
@@ -448,6 +471,14 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
             work.addProperty(model.createProperty(BIBO_DOI), resourceModel.DOI.toLowerCase());
         }
 
+        if (!StringUtils.isEmpty(resourceModel.PubMedID)) {
+            work.addProperty(model.createProperty(BIBO_PMID), resourceModel.PubMedID.toLowerCase());
+        }
+
+        if (!StringUtils.isEmpty(resourceModel.PubMedID)) {
+            work.addProperty(model.createProperty(VIVO_PMCID), resourceModel.PubMedID.toLowerCase());
+        }
+
         if (resourceModel.ISSN != null && resourceModel.ISSN.length > 0) {
             Resource journal = model.createResource(defaultNamespace + "issn/" + resourceModel.ISSN[0]);
             journal.addProperty(RDFS.label, resourceModel.containerTitle);
@@ -621,12 +652,44 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
         return null;
     }
 
+    private String getVIVOUriForPubMedID(RDFService rdfService, String pmid) {
+        if (!StringUtils.isEmpty(pmid)) {
+            final List<String> works = new ArrayList<String>();
+            String query = "SELECT ?work\n" +
+                    "WHERE\n" +
+                    "{\n" +
+                    "  {\n" +
+                    "  \t?work <http://purl.org/ontology/bibo/pmid> \"" + pmid + "\" .\n" +
+                    "  }\n" +
+                    "}\n";
+
+            try {
+                rdfService.sparqlSelectQuery(query, new ResultSetConsumer() {
+                    @Override
+                    protected void processQuerySolution(QuerySolution qs) {
+                        Resource work = qs.getResource("work");
+                        if (work != null) {
+                            works.add(work.getURI());
+                        }
+                    }
+                });
+            } catch (RDFServiceException e) {
+            }
+
+            if (works.size() == 1) {
+                return works.get(0);
+            }
+        }
+
+        return null;
+    }
+
     protected String findInVIVO(VitroRequest vreq, ExternalIdentifiers ids, String profileUri, Citation citation) {
         String vivoUri = null;
 
         vivoUri = getVIVOUriForDOI(vreq.getRDFService(), ids.DOI);
         if (StringUtils.isEmpty(vivoUri)) {
-//            vivoUri = getVIVOUriForPubMedID(vreq.getRDFService(), ids.PubMedID);
+            vivoUri = getVIVOUriForPubMedID(vreq.getRDFService(), ids.PubMedID);
         }
 
         if (!StringUtils.isEmpty(vivoUri)) {
@@ -779,7 +842,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                     newAuthors[i] = rankedAuthors[i];
                     i++;
                 }
-                while (i < unrankedAuthors.size()) {
+                while (i < newAuthors.length && unrankedAuthors.size() > 0) {
                     newAuthors[i] = unrankedAuthors.remove(0);
                     i++;
                 }

@@ -76,6 +76,7 @@
             <input type="radio" id="notmine" name="contributor${citation.externalId}" value="notmine" class="radioWithLabel" /><label for="notmine" class="labelForRadio"> This is not my work</label><br />
         </#if>
         <input type="hidden" name="externalResource${citation.externalId}" value="${externalResource!}" />
+        <input type="hidden" name="externalProvider${citation.externalId}" value="${externalProvider!}" />
         <input type="hidden" name="vivoUri${citation.externalId}" value="${vivoUri!}" />
         <#if citation.alreadyClaimed>
             </div>

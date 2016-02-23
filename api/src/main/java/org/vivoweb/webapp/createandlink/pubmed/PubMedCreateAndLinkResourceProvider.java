@@ -1,6 +1,9 @@
 package org.vivoweb.webapp.createandlink.pubmed;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
 import org.apache.axis.utils.StringUtils;
 import org.apache.commons.io.IOUtils;
@@ -12,7 +15,6 @@ import org.vivoweb.webapp.createandlink.Citation;
 import org.vivoweb.webapp.createandlink.CreateAndLinkResourceProvider;
 import org.vivoweb.webapp.createandlink.ExternalIdentifiers;
 import org.vivoweb.webapp.createandlink.ResourceModel;
-import org.vivoweb.webapp.createandlink.crossref.CrossrefCreateAndLinkResourceProvider;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +22,8 @@ import java.io.StringWriter;
 
 public class PubMedCreateAndLinkResourceProvider implements CreateAndLinkResourceProvider {
     public final static String PUBMED_ID_API = "http://www.ncbi.nlm.nih.gov/pmc/utils/idconv/v1.0/?format=json&ids=";
+    public final static String PUBMED_SUMMARY_API = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&tool=my_tool&email=my_email@example.com&id=";
+
     @Override
     public String normalize(String id) {
         return id.trim();
@@ -48,12 +52,33 @@ public class PubMedCreateAndLinkResourceProvider implements CreateAndLinkResourc
 
     @Override
     public String findInExternal(String id, Citation citation) {
-        ExternalIdentifiers ids = allExternalIDsForFind(id);
-        if (ids != null && !StringUtils.isEmpty(ids.DOI)) {
-            CreateAndLinkResourceProvider crossrefProvider = new CrossrefCreateAndLinkResourceProvider();
-            String result = crossrefProvider.findInExternal(ids.DOI, citation);
-            if (!StringUtils.isEmpty(result)) {
-                return result;
+        String json = readUrl(PUBMED_SUMMARY_API + id);
+
+        Gson gson = new Gson();
+        JsonParser parser = new JsonParser();
+        JsonElement tree = parser.parse(json);
+        if (tree != null) {
+            JsonObject object = tree.getAsJsonObject();
+            JsonObject result = object.getAsJsonObject("result");
+            JsonObject data = result.getAsJsonObject(id);
+
+            PubMedSummaryResponse response = gson.fromJson(data, PubMedSummaryResponse.class);
+            if (response != null) {
+                citation.title = response.title;
+                citation.authors = new Citation.Author[response.authors.length];
+                for (int idx = 0; idx < response.authors.length; idx++) {
+                    citation.authors[idx] = new Citation.Author();
+                    citation.authors[idx].name = response.authors[idx].name;
+                }
+                citation.journal = response.fulljournalname;
+                citation.volume = response.volume;
+                citation.issue = response.issue;
+                citation.pagination = response.pages;
+                if (!StringUtils.isEmpty(response.pubdate) && response.pubdate.length() >= 4) {
+                    citation.publicationYear = Integer.parseInt(response.pubdate.substring(0, 4), 10);
+                }
+
+                return json;
             }
         }
 
@@ -61,9 +86,76 @@ public class PubMedCreateAndLinkResourceProvider implements CreateAndLinkResourc
     }
 
     @Override
-    public ResourceModel makeResourceModel(String externalResource) {
-        CreateAndLinkResourceProvider crossrefProvider = new CrossrefCreateAndLinkResourceProvider();
-        return crossrefProvider.makeResourceModel(externalResource);
+    public ResourceModel makeResourceModel(String externalId, String externalResource) {
+        Gson gson = new Gson();
+        JsonParser parser = new JsonParser();
+        JsonElement tree = parser.parse(externalResource);
+        if (tree != null) {
+            JsonObject object = tree.getAsJsonObject();
+            JsonObject result = object.getAsJsonObject("result");
+            JsonObject data = result.getAsJsonObject(externalId);
+
+            PubMedSummaryResponse response = gson.fromJson(data, PubMedSummaryResponse.class);
+            if (response != null) {
+                ResourceModel resourceModel = new ResourceModel();
+                resourceModel.PubMedID = externalId;
+                resourceModel.title = response.title;
+                resourceModel.author = new ResourceModel.Author[response.authors.length];
+                for (int idx = 0; idx < response.authors.length; idx++) {
+                    resourceModel.author[idx] = new ResourceModel.Author();
+                    if (response.authors[idx].name.lastIndexOf(' ') > 0) {
+                        resourceModel.author[idx].family = response.authors[idx].name.substring(0, response.authors[idx].name.lastIndexOf(' '));
+                        resourceModel.author[idx].given = response.authors[idx].name.substring(response.authors[idx].name.lastIndexOf(' ') + 1);
+                    } else {
+                        resourceModel.author[idx].family = response.authors[idx].name;
+                    }
+                }
+
+                resourceModel.containerTitle = response.fulljournalname;
+                if (!StringUtils.isEmpty(response.issn)) {
+                    resourceModel.ISSN = new String[1];
+                    resourceModel.ISSN[0] = response.issn;
+                }
+
+                resourceModel.volume = response.volume;
+                resourceModel.issue = response.issue;
+                if (response.pages.contains("-")) {
+                    int hyphen = response.pages.indexOf('-');
+                    resourceModel.pageStart = response.pages.substring(0, hyphen - 1);
+                    resourceModel.pageEnd = response.pages.substring(hyphen + 1);
+                } else {
+                    resourceModel.pageStart = response.pages;
+                }
+
+                if (!StringUtils.isEmpty(response.pubdate) && response.pubdate.length() >= 4) {
+                    resourceModel.publishedPrint = new ResourceModel.DateField();
+                    resourceModel.publishedPrint.year = Integer.parseInt(response.pubdate.substring(0, 4), 10);
+                }
+
+                if (response.articleids != null) {
+                    for (PubMedSummaryResponse.ArticleID articleID : response.articleids) {
+                        if ("doi".equalsIgnoreCase(articleID.idtype)) {
+                            resourceModel.DOI = articleID.value;
+                        } else if ("pmc".equalsIgnoreCase(articleID.idtype)) {
+                            resourceModel.PubMedCentralID = articleID.idtype;
+                        }
+                    }
+                }
+
+                resourceModel.type = "journal-article";
+
+/*
+    public String DOI;
+    public DateField created;
+    public String publisher;
+    public String[] subject;
+    public String type;
+ */
+                return resourceModel;
+            }
+        }
+
+        return null;
     }
 
     private String readUrl(String url) {
@@ -96,6 +188,70 @@ public class PubMedCreateAndLinkResourceProvider implements CreateAndLinkResourc
             String doi;
 
             // Don't need versions
+        }
+    }
+
+    private static class PubMedSummaryResponse {
+        public String uid;
+        public String pubdate;
+        public String epubdate;
+        public String source;
+        public Author[] authors;
+        public String lastauthor;
+        public String title;
+        public String sorttitle;
+        public String volume;
+        public String issue;
+        public String pages;
+        public String[] lang;
+        public String nlmuniqueid;
+        public String issn;
+        public String eissn;
+        public String[] pubtype;
+        public String recordstatus;
+        public String pubstatus;
+        public ArticleID[] articleids;
+        public History[] history;
+        //public String[] references;
+        public String[] attributes;
+        public Integer pmcrefcount;
+        public String fulljournalname;
+        public String elocationid;
+        public Integer viewcount;
+        public String doctype;
+        //public String[] srccontriblist;
+        public String booktitle;
+        public String medium;
+        public String edition;
+        public String publisherlocation;
+        public String publishername;
+        public String srcdate;
+        public String reportnumber;
+        public String availablefromurl;
+        public String locationlabel;
+        //public String[] doccontriblist;
+        public String docdate;
+        public String bookname;
+        public String chapter;
+        public String sortpubdate;
+        public String sortfirstauthor;
+        public String vernaculartitle;
+
+        public static class Author {
+            public String name;
+            public String authtype;
+            public String clusterid;
+        }
+
+        public static class ArticleID {
+            public String idtype;
+            public Integer idtypen;
+            public String value;
+        }
+
+        public static class History {
+            public String pubstatus;
+            public String date;
         }
     }
 }

@@ -4,6 +4,8 @@ import java.util.Date;
 
 public class ResourceModel {
     public String DOI;
+    public String PubMedID;
+    public String PubMedCentralID;
     public String[] ISSN;
     public String URL;
 

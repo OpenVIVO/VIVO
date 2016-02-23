@@ -51,7 +51,7 @@ public class CrossrefCreateAndLinkResourceProvider implements CreateAndLinkResou
     }
 
     @Override
-    public ResourceModel makeResourceModel(String externalResource) {
+    public ResourceModel makeResourceModel(String externalId, String externalResource) {
         ResourceModel resourceModel = null;
 
         CrossrefResolverAPI resolverAPI = new CrossrefResolverAPI();
