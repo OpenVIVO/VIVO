@@ -26,7 +26,8 @@ public class CrossrefResolverAPI {
         // readUrl(CROSSREF_API + id);
 
         Gson gson = new Gson();
-        JSONModel jsonModel = gson.fromJson(json, JSONModel.class);
+        CrossrefCiteprocJSONModel jsonModel = gson.fromJson(json, CrossrefCiteprocJSONModel.class);
+//        JSONModel jsonModel = gson.fromJson(json, JSONModel.class);
         if (jsonModel == null) {
             return null;
         }
@@ -36,11 +37,12 @@ public class CrossrefResolverAPI {
         }
 
         citation.DOI = id;
+        citation.type = normalizeType(jsonModel.type);
         citation.title = jsonModel.title;
         citation.journal = jsonModel.containerTitle;
 
         List<Citation.Author> authors = new ArrayList<>();
-        for (JSONModel.Author author : jsonModel.author ) {
+        for (CrossrefCiteprocJSONModel.NameField author : jsonModel.author ) {
             splitAuthorLiteral(author);
             Citation.Author citationAuthor = new Citation.Author();
             citationAuthor.name = CreateAndLinkUtils.formatAuthorString(author.family, author.given);
@@ -60,13 +62,10 @@ public class CrossrefResolverAPI {
             citation.publicationYear = extractYearFromDateField(jsonModel.publishedOnline);
         }
 
-
-//        messageMap.get("type"); // String
-
         return json;
     }
 
-    private Integer extractYearFromDateField(JSONModel.DateField date) {
+    private Integer extractYearFromDateField(CrossrefCiteprocJSONModel.DateField date) {
         if (date == null) {
             return null;
         }
@@ -75,12 +74,12 @@ public class CrossrefResolverAPI {
             return null;
         }
 
-        return date.dateParts[0][0];
+        return Integer.parseInt(date.dateParts[0][0]);
     }
 
     public ResourceModel makeResourceModel(String externalResource) {
         Gson gson = new Gson();
-        JSONModel jsonModel = gson.fromJson(externalResource, JSONModel.class);
+        CrossrefCiteprocJSONModel jsonModel = gson.fromJson(externalResource, CrossrefCiteprocJSONModel.class);
         if (jsonModel == null) {
             return null;
         }
@@ -89,23 +88,34 @@ public class CrossrefResolverAPI {
 
         model.DOI = jsonModel.DOI;
         model.ISSN = jsonModel.ISSN;
+        model.ISBN = jsonModel.ISBN;
         model.URL = jsonModel.URL;
 
         if (jsonModel.author != null && jsonModel.author.length > 0) {
-            model.author = new ResourceModel.Author[jsonModel.author.length];
+            model.author = new ResourceModel.NameField[jsonModel.author.length];
             for (int authIdx = 0; authIdx < jsonModel.author.length; authIdx++) {
                 if (jsonModel.author[authIdx] != null) {
                     splitAuthorLiteral(jsonModel.author[authIdx]);
-                    model.author[authIdx] = new ResourceModel.Author();
+                    model.author[authIdx] = new ResourceModel.NameField();
                     model.author[authIdx].family = jsonModel.author[authIdx].family;
                     model.author[authIdx].given = jsonModel.author[authIdx].given;
                 }
             }
         }
 
-        model.containerTitle = jsonModel.containerTitle;
+        if (jsonModel.editor != null && jsonModel.editor.length > 0) {
+            model.editor = new ResourceModel.NameField[jsonModel.editor.length];
+            for (int editorIdx = 0; editorIdx < jsonModel.editor.length; editorIdx++) {
+                if (jsonModel.editor[editorIdx] != null) {
+                    splitAuthorLiteral(jsonModel.author[editorIdx]);
+                    model.editor[editorIdx] = new ResourceModel.NameField();
+                    model.editor[editorIdx].family = jsonModel.editor[editorIdx].family;
+                    model.editor[editorIdx].given = jsonModel.editor[editorIdx].given;
+                }
+            }
+        }
 
-        model.created = convertDateField(jsonModel.created);
+        model.containerTitle = jsonModel.containerTitle;
 
         model.issue = jsonModel.issue;
 
@@ -121,19 +131,42 @@ public class CrossrefResolverAPI {
             model.pageStart = jsonModel.articleNumber;
         }
 
-        model.publishedOnline = convertDateField(jsonModel.publishedOnline);
-        model.publishedPrint = convertDateField(jsonModel.publishedPrint);
+        model.publicationDate = convertDateField(jsonModel.publishedPrint);
+        if (model.publicationDate == null) {
+            model.publicationDate = convertDateField(jsonModel.publishedOnline);
+        }
 
         model.publisher = jsonModel.publisher;
         model.subject = jsonModel.subject;
         model.title = jsonModel.title;
-        model.type = jsonModel.type;
+        model.type = normalizeType(jsonModel.type);
         model.volume = jsonModel.volume;
+
+        model.status = jsonModel.status;
+        model.presentedAt = jsonModel.event;
+        model.abstractText = jsonModel.abstractText;
 
         return model;
     }
 
-    private void splitAuthorLiteral(JSONModel.Author author) {
+    private String normalizeType(String type) {
+        if (type != null) {
+            switch (type.toLowerCase()) {
+                case "journal-article":
+                    return "article-journal";
+
+                case "book-chapter":
+                    return "chapter";
+
+                case "proceedings-article":
+                    return "paper-conference";
+            }
+         }
+
+        return type;
+    }
+
+    private void splitAuthorLiteral(CrossrefCiteprocJSONModel.NameField author) {
         if (StringUtils.isEmpty(author.family) && StringUtils.isEmpty(author.given)) {
             if (!StringUtils.isEmpty(author.literal)) {
                 if (author.literal.contains(",")) {
@@ -147,19 +180,87 @@ public class CrossrefResolverAPI {
         }
     }
 
-    private ResourceModel.DateField convertDateField(JSONModel.DateField dateField) {
+    private ResourceModel.DateField convertDateField(CrossrefCiteprocJSONModel.DateField dateField) {
         if (dateField != null) {
             ResourceModel.DateField resourceDate = new ResourceModel.DateField();
             if (dateField.dateParts != null && dateField.dateParts.length > 0 && dateField.dateParts[0].length > 0) {
-                if (dateField.dateParts.length == 1) {
-                    resourceDate.year = dateField.dateParts[0][0];
-                } else if (dateField.dateParts.length == 2) {
-                    resourceDate.year = dateField.dateParts[0][0];
-                    resourceDate.month = dateField.dateParts[0][1];
-                } else {
-                    resourceDate.year = dateField.dateParts[0][0];
-                    resourceDate.month = dateField.dateParts[0][1];
-                    resourceDate.day = dateField.dateParts[0][2];
+                if (dateField.dateParts.length > 0) {
+                    try {
+                        resourceDate.year = Integer.parseInt(dateField.dateParts[0][0], 10);
+                    } catch (NumberFormatException nfe) {
+                    }
+                }
+                if (dateField.dateParts.length > 1) {
+                    try {
+                        resourceDate.month = Integer.parseInt(dateField.dateParts[0][1], 10);
+                    } catch (NumberFormatException nfe) {
+                        switch (dateField.dateParts[0][1].toLowerCase()) {
+                            case "jan":
+                            case "january":
+                                resourceDate.month = 1;
+                                break;
+
+                            case "feb":
+                            case "february":
+                                resourceDate.month = 2;
+                                break;
+
+                            case "mar":
+                            case "march":
+                                resourceDate.month = 3;
+                                break;
+
+                            case "apr":
+                            case "april":
+                                resourceDate.month = 4;
+                                break;
+
+                            case "may":
+                                resourceDate.month = 5;
+                                break;
+
+                            case "jun":
+                            case "june":
+                                resourceDate.month = 6;
+                                break;
+
+                            case "jul":
+                            case "july":
+                                resourceDate.month = 7;
+                                break;
+
+                            case "aug":
+                            case "august":
+                                resourceDate.month = 8;
+                                break;
+
+                            case "sep":
+                            case "september":
+                                resourceDate.month = 9;
+                                break;
+
+                            case "oct":
+                            case "october":
+                                resourceDate.month = 10;
+                                break;
+
+                            case "nov":
+                            case "november":
+                                resourceDate.month = 11;
+                                break;
+
+                            case "dec":
+                            case "december":
+                                resourceDate.month = 12;
+                                break;
+                        }
+                    }
+                }
+                if (dateField.dateParts.length > 2) {
+                    try {
+                        resourceDate.day = Integer.parseInt(dateField.dateParts[0][2], 10);
+                    } catch (NumberFormatException nfe) {
+                    }
                 }
             }
             return resourceDate;

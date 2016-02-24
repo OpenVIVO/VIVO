@@ -2,6 +2,7 @@ package org.vivoweb.webapp.createandlink;
 
 public class Citation {
     public String externalId;
+    public String type;
     public String title;
     public Author[] authors;
     public String journal;
@@ -14,6 +15,10 @@ public class Citation {
     public boolean alreadyClaimed = false;
 
     public String getExternalId() { return externalId; }
+
+    public String getType() {
+        return type;
+    }
 
     public String getTitle() {
         return title;

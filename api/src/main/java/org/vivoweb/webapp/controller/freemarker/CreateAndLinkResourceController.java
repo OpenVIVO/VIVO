@@ -89,11 +89,44 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
     public static final String VCARD_NAME = "http://www.w3.org/2006/vcard/ns#Name";
 
     static {
-        typeToClassMap.put("journal-article", "http://purl.org/ontology/bibo/AcademicArticle");
+        typeToClassMap.put("article", "http://purl.org/ontology/bibo/Article");
+        typeToClassMap.put("article-journal", "http://purl.org/ontology/bibo/AcademicArticle");
         typeToClassMap.put("book", "http://purl.org/ontology/bibo/Book");
-        typeToClassMap.put("book-chapter", "http://purl.org/ontology/bibo/BookSection");
-        typeToClassMap.put("proceedings-article", "http://vivoweb.org/ontology/core#ConferencePaper");
+        typeToClassMap.put("chapter", "http://purl.org/ontology/bibo/Chapter");
         typeToClassMap.put("dataset", "http://vivoweb.org/ontology/core#Dataset");
+        typeToClassMap.put("figure", "http://purl.org/ontology/bibo/Image");
+        typeToClassMap.put("graphic", "http://purl.org/ontology/bibo/Image");
+        typeToClassMap.put("legal_case", "http://purl.org/ontology/bibo/LegalCaseDocument");
+        typeToClassMap.put("legislation", "http://purl.org/ontology/bibo/Legislation");
+        typeToClassMap.put("manuscript", "http://purl.org/ontology/bibo/Manuscript");
+        typeToClassMap.put("map", "http://purl.org/ontology/bibo/Map");
+        typeToClassMap.put("musical_score", "http://vivoweb.org/ontology/core#Score");
+        typeToClassMap.put("paper-conference", "http://vivoweb.org/ontology/core#ConferencePaper");
+        typeToClassMap.put("patent", "http://purl.org/ontology/bibo/Patent");
+        typeToClassMap.put("personal_communication", "http://purl.org/ontology/bibo/PersonalCommunicationDocument");
+        typeToClassMap.put("post-weblog", "http://vivoweb.org/ontology/core#BlogPosting");
+        typeToClassMap.put("report", "http://purl.org/ontology/bibo/Report");
+        typeToClassMap.put("review", "http://vivoweb.org/ontology/core#Review");
+        typeToClassMap.put("speech", "http://vivoweb.org/ontology/core#Speech");
+        typeToClassMap.put("thesis", "http://purl.org/ontology/bibo/Thesis");
+        typeToClassMap.put("webpage", "http://purl.org/ontology/bibo/Webpage");
+
+        /*
+                    "article-magazine",
+                    "article-newspaper",
+                    "bill",
+                    "broadcast",
+                    "entry",
+                    "entry-dictionary",
+                    "entry-encyclopedia",
+                    "interview",
+                    "motion_picture",
+                    "pamphlet",
+                    "post",
+                    "review-book",
+                    "song",
+                    "treaty",
+         */
 
         providers.put("doi",  new CrossrefCreateAndLinkResourceProvider());
         providers.put("pmid", new PubMedCreateAndLinkResourceProvider());
@@ -506,12 +539,10 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
             work.addProperty(model.createProperty(BIBO_PAGE_END), resourceModel.pageEnd);
         }
 
-        if (!addDateToResource(vreq, work, resourceModel.publishedPrint)) {
-            addDateToResource(vreq, work, resourceModel.publishedOnline);
-        }
+        addDateToResource(vreq, work, resourceModel.publicationDate);
 
         int rank = 1;
-        for (ResourceModel.Author author : resourceModel.author) {
+        for (ResourceModel.NameField author : resourceModel.author) {
             Resource vcard = model.createResource(getVCardURI(vreq, author.family, author.given));
             vcard.addProperty(RDF.type, model.getResource(VCARD_INDIVIDUAL));
 

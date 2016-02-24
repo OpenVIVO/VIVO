@@ -78,6 +78,8 @@ public class PubMedCreateAndLinkResourceProvider implements CreateAndLinkResourc
                     citation.publicationYear = Integer.parseInt(response.pubdate.substring(0, 4), 10);
                 }
 
+                citation.type = getCiteprocTypeForPubType(response.pubtype);
+
                 return json;
             }
         }
@@ -100,9 +102,9 @@ public class PubMedCreateAndLinkResourceProvider implements CreateAndLinkResourc
                 ResourceModel resourceModel = new ResourceModel();
                 resourceModel.PubMedID = externalId;
                 resourceModel.title = response.title;
-                resourceModel.author = new ResourceModel.Author[response.authors.length];
+                resourceModel.author = new ResourceModel.NameField[response.authors.length];
                 for (int idx = 0; idx < response.authors.length; idx++) {
-                    resourceModel.author[idx] = new ResourceModel.Author();
+                    resourceModel.author[idx] = new ResourceModel.NameField();
                     if (response.authors[idx].name.lastIndexOf(' ') > 0) {
                         resourceModel.author[idx].family = response.authors[idx].name.substring(0, response.authors[idx].name.lastIndexOf(' '));
                         resourceModel.author[idx].given = response.authors[idx].name.substring(response.authors[idx].name.lastIndexOf(' ') + 1);
@@ -115,6 +117,9 @@ public class PubMedCreateAndLinkResourceProvider implements CreateAndLinkResourc
                 if (!StringUtils.isEmpty(response.issn)) {
                     resourceModel.ISSN = new String[1];
                     resourceModel.ISSN[0] = response.issn;
+                } else if (!StringUtils.isEmpty(response.eissn)) {
+                    resourceModel.ISSN = new String[1];
+                    resourceModel.ISSN[0] = response.eissn;
                 }
 
                 resourceModel.volume = response.volume;
@@ -128,8 +133,8 @@ public class PubMedCreateAndLinkResourceProvider implements CreateAndLinkResourc
                 }
 
                 if (!StringUtils.isEmpty(response.pubdate) && response.pubdate.length() >= 4) {
-                    resourceModel.publishedPrint = new ResourceModel.DateField();
-                    resourceModel.publishedPrint.year = Integer.parseInt(response.pubdate.substring(0, 4), 10);
+                    resourceModel.publicationDate = new ResourceModel.DateField();
+                    resourceModel.publicationDate.year = Integer.parseInt(response.pubdate.substring(0, 4), 10);
                 }
 
                 if (response.articleids != null) {
@@ -142,20 +147,73 @@ public class PubMedCreateAndLinkResourceProvider implements CreateAndLinkResourc
                     }
                 }
 
-                resourceModel.type = "journal-article";
+                resourceModel.type = getCiteprocTypeForPubType(response.pubtype);
+                resourceModel.publisher = response.publishername;
+                resourceModel.status = response.pubstatus;
 
 /*
-    public String DOI;
     public DateField created;
-    public String publisher;
     public String[] subject;
-    public String type;
+    public String presentedAt;
+    public String[] keyword;
+    public String abstractText;
  */
                 return resourceModel;
             }
         }
 
         return null;
+    }
+
+    private String getCiteprocTypeForPubType(String[] pubTypes) {
+        if (pubTypes != null && pubTypes.length > 0) {
+            for (String pubType : pubTypes) {
+                switch (pubType) {
+                    case "Journal Article":
+                        return "article-journal";
+
+                    case "Incunabula":
+                    case "Monograph":
+                    case "Textbooks":
+                        return "book";
+
+                    case "Dataset":
+                        return "dataset";
+
+                    case "Legal Cases":
+                        return "legal_case";
+
+                    case "Legislation":
+                        return "legislation";
+
+                    case "Manuscripts":
+                        return "manuscript";
+
+                    case "Maps":
+                        return "map";
+
+                    case "Meeting Abstracts":
+                        return "paper-conference";
+
+                    case "Patents":
+                        return "patent";
+
+                    case "Letter":
+                        return "personal_communication";
+
+                    case "Blogs":
+                        return "post-weblog";
+
+                    case "Review":
+                        return "review";
+
+                    case "Academic Dissertations":
+                        return "thesis";
+                }
+            }
+        }
+
+        return "article-journal";
     }
 
     private String readUrl(String url) {
@@ -196,7 +254,7 @@ public class PubMedCreateAndLinkResourceProvider implements CreateAndLinkResourc
         public String pubdate;
         public String epubdate;
         public String source;
-        public Author[] authors;
+        public NameField[] authors;
         public String lastauthor;
         public String title;
         public String sorttitle;
@@ -237,7 +295,7 @@ public class PubMedCreateAndLinkResourceProvider implements CreateAndLinkResourc
         public String sortfirstauthor;
         public String vernaculartitle;
 
-        public static class Author {
+        public static class NameField {
             public String name;
             public String authtype;
             public String clusterid;

@@ -37,6 +37,7 @@ public class CrossrefNativeAPI {
         }
 
         citation.DOI = id;
+        citation.type = normalizeType(response.message.type);
 
         if (!ArrayUtils.isEmpty(response.message.title)) {
             citation.title = response.message.title[0];
@@ -99,10 +100,10 @@ public class CrossrefNativeAPI {
         model.URL = response.message.URL;
 
         if (response.message.author != null && response.message.author.length > 0) {
-            model.author = new ResourceModel.Author[response.message.author.length];
+            model.author = new ResourceModel.NameField[response.message.author.length];
             for (int authIdx = 0; authIdx < response.message.author.length; authIdx++) {
                 if (response.message.author[authIdx] != null) {
-                    model.author[authIdx] = new ResourceModel.Author();
+                    model.author[authIdx] = new ResourceModel.NameField();
                     model.author[authIdx].family = response.message.author[authIdx].family;
                     model.author[authIdx].given = response.message.author[authIdx].given;
                 }
@@ -120,8 +121,6 @@ public class CrossrefNativeAPI {
             model.containerTitle = journalName;
         }
 
-        model.created = convertDateField(response.message.created);
-
         model.issue = response.message.issue;
 
         if (!StringUtils.isEmpty(response.message.page)) {
@@ -136,8 +135,10 @@ public class CrossrefNativeAPI {
             model.pageStart = response.message.articleNumber;
         }
 
-        model.publishedOnline = convertDateField(response.message.publishedOnline);
-        model.publishedPrint = convertDateField(response.message.publishedPrint);
+        model.publicationDate = convertDateField(response.message.publishedPrint);
+        if (model.publicationDate == null) {
+            model.publicationDate = convertDateField(response.message.publishedOnline);
+        }
 
         model.publisher = response.message.publisher;
         model.subject = response.message.subject;
@@ -145,10 +146,27 @@ public class CrossrefNativeAPI {
             model.title = response.message.title[0];
         }
 
-        model.type = response.message.type;
+        model.type = normalizeType(response.message.type);
         model.volume = response.message.volume;
 
         return model;
+    }
+
+    private String normalizeType(String type) {
+        if (type != null) {
+            switch (type.toLowerCase()) {
+                case "journal-article":
+                    return "article-journal";
+
+                case "book-chapter":
+                    return "chapter";
+
+                case "proceedings-article":
+                    return "paper-conference";
+            }
+        }
+
+        return type;
     }
 
     private ResourceModel.DateField convertDateField(CrossrefResponse.ResponseModel.DateField dateField) {

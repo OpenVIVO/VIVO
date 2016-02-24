@@ -1,6 +1,6 @@
 <style>
     .citation_claimed:before {
-        content: url('images/createAndLink/tick.png');
+        content: url('../images/createAndLink/tick.png');
 #        margin-left: 400px;
         zoom: 75%; margin-left: 535px;
         float: left;
@@ -14,6 +14,9 @@
     }
     .citation_claimed:hover .citation {
         opacity: 1.0;
+    }
+    .citation_type {
+        font-style: italic;
     }
     .citation_title {
         font-weight: bold;
@@ -46,6 +49,52 @@
         </#if>
         <div class="citation">
             <#assign proposedAuthor=false />
+            <#if citation.type?has_content>
+                <#switch citation.type>
+                    <#case "article">
+                        <span class="citation_type">Article</span><br/><#break>
+                    <#case "article-journal">
+                        <span class="citation_type">Journal Article</span><br/><#break>
+                    <#case "book">
+                        <span class="citation_type">Book</span><br/><#break>
+                    <#case "chapter">
+                        <span class="citation_type">Chapter</span><br/><#break>
+                    <#case "dataset">
+                        <span class="citation_type">Dataset</span><br/><#break>
+                    <#case "figure">
+                        <span class="citation_type">Image</span><br/><#break>
+                    <#case "graphic">
+                        <span class="citation_type">Image</span><br/><#break>
+                    <#case "legal_case">
+                        <span class="citation_type">Legal Case</span><br/><#break>
+                    <#case "legislation">
+                        <span class="citation_type">Legislation</span><br/><#break>
+                    <#case "manuscript">
+                        <span class="citation_type">Manuscript</span><br/><#break>
+                    <#case "map">
+                        <span class="citation_type">Map</span><br/><#break>
+                    <#case "musical_score">
+                        <span class="citation_type">Muscial Score</span><br/><#break>
+                    <#case "paper-conference">
+                        <span class="citation_type">Conference Paper</span><br/><#break>
+                    <#case "patent">
+                        <span class="citation_type">Patent</span><br/><#break>
+                    <#case "personal_communication">
+                        <span class="citation_type">Letter</span><br/><#break>
+                    <#case "post-weblog">
+                        <span class="citation_type">Blog</span><br/><#break>
+                    <#case "report">
+                        <span class="citation_type">Report</span><br/><#break>
+                    <#case "review">
+                        <span class="citation_type">Review</span><br/><#break>
+                    <#case "speech">
+                        <span class="citation_type">Speech</span><br/><#break>
+                    <#case "thesis">
+                        <span class="citation_type">Thesis</span><br/><#break>
+                    <#case "webpage">
+                        <span class="citation_type">Webpage</span><br/><#break>
+                </#switch>
+            </#if>
             <span class="citation_title">${citation.title!}</span><br />
             <#if citation.authors??>
                 <#list citation.authors as author>
