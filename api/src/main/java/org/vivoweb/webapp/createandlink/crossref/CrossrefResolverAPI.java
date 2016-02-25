@@ -41,14 +41,16 @@ public class CrossrefResolverAPI {
         citation.title = jsonModel.title;
         citation.journal = jsonModel.containerTitle;
 
-        List<Citation.Author> authors = new ArrayList<>();
-        for (CrossrefCiteprocJSONModel.NameField author : jsonModel.author ) {
-            splitAuthorLiteral(author);
-            Citation.Author citationAuthor = new Citation.Author();
-            citationAuthor.name = CreateAndLinkUtils.formatAuthorString(author.family, author.given);
-            authors.add(citationAuthor);
+        if (jsonModel.author != null) {
+            List<Citation.Author> authors = new ArrayList<>();
+            for (CrossrefCiteprocJSONModel.NameField author : jsonModel.author) {
+                splitNameLiteral(author);
+                Citation.Author citationAuthor = new Citation.Author();
+                citationAuthor.name = CreateAndLinkUtils.formatAuthorString(author.family, author.given);
+                authors.add(citationAuthor);
+            }
+            citation.authors = authors.toArray(new Citation.Author[authors.size()]);
         }
-        citation.authors = authors.toArray(new Citation.Author[authors.size()]);
 
         citation.volume = jsonModel.volume;
         citation.issue = jsonModel.issue;
@@ -91,29 +93,26 @@ public class CrossrefResolverAPI {
         model.ISBN = jsonModel.ISBN;
         model.URL = jsonModel.URL;
 
-        if (jsonModel.author != null && jsonModel.author.length > 0) {
-            model.author = new ResourceModel.NameField[jsonModel.author.length];
-            for (int authIdx = 0; authIdx < jsonModel.author.length; authIdx++) {
-                if (jsonModel.author[authIdx] != null) {
-                    splitAuthorLiteral(jsonModel.author[authIdx]);
-                    model.author[authIdx] = new ResourceModel.NameField();
-                    model.author[authIdx].family = jsonModel.author[authIdx].family;
-                    model.author[authIdx].given = jsonModel.author[authIdx].given;
+        if (jsonModel.ISBN != null) {
+            int isbnIdx = 0;
+            model.ISBN = new String[jsonModel.ISBN.length];
+            for (String isbn : jsonModel.ISBN) {
+                if (isbn.lastIndexOf('/') > -1) {
+                    isbn = isbn.substring(isbn.lastIndexOf('/') + 1);
                 }
+
+                if (isbn.indexOf('-') > -1) {
+                    isbn = isbn.replace("/", "");
+                }
+
+                model.ISBN[isbnIdx] = isbn;
+                isbnIdx++;
             }
         }
 
-        if (jsonModel.editor != null && jsonModel.editor.length > 0) {
-            model.editor = new ResourceModel.NameField[jsonModel.editor.length];
-            for (int editorIdx = 0; editorIdx < jsonModel.editor.length; editorIdx++) {
-                if (jsonModel.editor[editorIdx] != null) {
-                    splitAuthorLiteral(jsonModel.author[editorIdx]);
-                    model.editor[editorIdx] = new ResourceModel.NameField();
-                    model.editor[editorIdx].family = jsonModel.editor[editorIdx].family;
-                    model.editor[editorIdx].given = jsonModel.editor[editorIdx].given;
-                }
-            }
-        }
+        model.author = convertNameFields(jsonModel.author);
+        model.editor = convertNameFields(jsonModel.editor);
+        model.translator = convertNameFields(jsonModel.translator);
 
         model.containerTitle = jsonModel.containerTitle;
 
@@ -149,6 +148,25 @@ public class CrossrefResolverAPI {
         return model;
     }
 
+    private ResourceModel.NameField[] convertNameFields(CrossrefCiteprocJSONModel.NameField[] nameFields) {
+        if (nameFields == null) {
+            return null;
+        }
+
+        ResourceModel.NameField[] destNameFields = new ResourceModel.NameField[nameFields.length];
+
+        for (int nameIdx = 0; nameIdx < nameFields.length; nameIdx++) {
+            if (destNameFields[nameIdx] != null) {
+                splitNameLiteral(nameFields[nameIdx]);
+                destNameFields[nameIdx] = new ResourceModel.NameField();
+                destNameFields[nameIdx].family = nameFields[nameIdx].family;
+                destNameFields[nameIdx].given = nameFields[nameIdx].given;
+            }
+        }
+
+        return destNameFields;
+    }
+
     private String normalizeType(String type) {
         if (type != null) {
             switch (type.toLowerCase()) {
@@ -166,7 +184,7 @@ public class CrossrefResolverAPI {
         return type;
     }
 
-    private void splitAuthorLiteral(CrossrefCiteprocJSONModel.NameField author) {
+    private void splitNameLiteral(CrossrefCiteprocJSONModel.NameField author) {
         if (StringUtils.isEmpty(author.family) && StringUtils.isEmpty(author.given)) {
             if (!StringUtils.isEmpty(author.literal)) {
                 if (author.literal.contains(",")) {

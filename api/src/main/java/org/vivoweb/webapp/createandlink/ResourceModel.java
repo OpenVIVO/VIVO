@@ -10,6 +10,7 @@ public class ResourceModel {
 
     public NameField[] author;
     public NameField[] editor;
+    public NameField[] translator;
 
     public String containerTitle;
     public String issue;

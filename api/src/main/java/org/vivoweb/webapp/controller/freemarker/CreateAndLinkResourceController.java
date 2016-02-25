@@ -55,16 +55,19 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
 
     private static final Map<String, CreateAndLinkResourceProvider> providers = new HashMap<String, CreateAndLinkResourceProvider>();
 
+    public static final String BIBO_ABSTRACT = "http://purl.org/ontology/bibo/abstract";
     public static final String BIBO_ARTICLE = "http://purl.org/ontology/bibo/Article";
     public static final String BIBO_DOI = "http://purl.org/ontology/bibo/doi";
+    public static final String BIBO_ISBN10 = "http://purl.org/ontology/bibo/isbn10";
+    public static final String BIBO_ISBN13 = "http://purl.org/ontology/bibo/isbn13";
     public static final String BIBO_ISSN = "http://purl.org/ontology/bibo/issn";
     public static final String BIBO_ISSUE = "http://purl.org/ontology/bibo/issue";
     public static final String BIBO_JOURNAL = "http://purl.org/ontology/bibo/Journal";
-    public static final String BIBO_PAGE_START = "http://purl.org/ontology/bibo/pageStart";
+    public static final String BIBO_PAGE_COUNT = "http://purl.org/ontology/bibo/numPages";
     public static final String BIBO_PAGE_END = "http://purl.org/ontology/bibo/pageEnd";
+    public static final String BIBO_PAGE_START = "http://purl.org/ontology/bibo/pageStart";
     public static final String BIBO_PMID = "http://purl.org/ontology/bibo/pmid";
     public static final String BIBO_VOLUME = "http://purl.org/ontology/bibo/volume";
-
     public static final String FOAF_FIRSTNAME = "http://xmlns.com/foaf/0.1/firstName";
     public static final String FOAF_LASTNAME = "http://xmlns.com/foaf/0.1/lastName";
 
@@ -271,6 +274,10 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
     }
 
     protected void proposeAuthorToLink(VitroRequest vreq, final Citation citation, String profileUri) {
+        if (citation.authors == null) {
+            return;
+        }
+
         String query = "SELECT ?givenName ?familyName ?label\n" +
                 "WHERE\n" +
                 "{\n" +
@@ -524,6 +531,17 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
 
         }
 
+        if (resourceModel.ISBN != null && resourceModel.ISBN.length > 0) {
+            for (String isbn : resourceModel.ISBN) {
+                int length = getDigitCount(isbn);
+                if (length == 10) {
+                    work.addProperty(model.getProperty(BIBO_ISBN10), isbn);
+                } else {
+                    work.addProperty(model.getProperty(BIBO_ISBN13), isbn);
+                }
+            }
+        }
+
         if (!StringUtils.isEmpty(resourceModel.volume)) {
             work.addProperty(model.createProperty(BIBO_VOLUME), resourceModel.volume);
         }
@@ -539,43 +557,80 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
             work.addProperty(model.createProperty(BIBO_PAGE_END), resourceModel.pageEnd);
         }
 
-        addDateToResource(vreq, work, resourceModel.publicationDate);
+        if (!StringUtils.isEmpty(resourceModel.pageStart) && !StringUtils.isEmpty(resourceModel.pageEnd)) {
+            try {
+                int pageStart = Integer.parseInt(resourceModel.pageStart, 10);
+                int pageEnd   = Integer.parseInt(resourceModel.pageEnd, 10);
 
-        int rank = 1;
-        for (ResourceModel.NameField author : resourceModel.author) {
-            Resource vcard = model.createResource(getVCardURI(vreq, author.family, author.given));
-            vcard.addProperty(RDF.type, model.getResource(VCARD_INDIVIDUAL));
-
-            Resource name = model.createResource(getUnusedUri(vreq));
-            vcard.addProperty(model.createProperty(VCARD_HASNAME), name);
-            name.addProperty(RDF.type, model.getResource(VCARD_NAME));
-            if (!StringUtils.isEmpty(author.given)) {
-                name.addProperty(model.createProperty(VCARD_GIVENNAME), author.given);
+                if (pageStart > 0) {
+                    if (pageEnd > pageStart) {
+                        work.addLiteral(model.createProperty(BIBO_PAGE_COUNT), pageEnd - pageStart);
+                    } else if (pageEnd == pageStart) {
+                        work.addLiteral(model.createProperty(BIBO_PAGE_COUNT), 1);
+                    }
+                }
+            } catch (NumberFormatException nfe) {
             }
-            if (!StringUtils.isEmpty(author.family)) {
-                name.addProperty(model.createProperty(VCARD_FAMILYNAME), author.family);
-            }
-
-            Resource authorship = model.createResource(getUnusedUri(vreq));
-            authorship.addProperty(RDF.type, model.getResource(VIVO_AUTHORSHIP));
-
-            authorship.addProperty(model.createProperty(VIVO_RELATES), model.getResource(vivoUri));
-            authorship.addProperty(model.createProperty(VIVO_RELATES), model.getResource(vcard.getURI()));
-
-            model.getResource(vivoUri).addProperty(model.createProperty(VIVO_RELATEDBY), authorship);
-            vcard.addProperty(model.createProperty(VIVO_RELATEDBY), authorship);
-            authorship.addLiteral(model.createProperty(VIVO_RANK), rank);
-            rank++;
         }
 
+        addDateToResource(vreq, work, resourceModel.publicationDate);
+
+        if (!StringUtils.isEmpty(resourceModel.abstractText)) {
+            work.addProperty(model.createProperty(BIBO_ABSTRACT), resourceModel.abstractText);
+        }
+
+        if (resourceModel.author != null) {
+            int rank = 1;
+            for (ResourceModel.NameField author : resourceModel.author) {
+                Resource vcard = model.createResource(getVCardURI(vreq, author.family, author.given));
+                vcard.addProperty(RDF.type, model.getResource(VCARD_INDIVIDUAL));
+
+                Resource name = model.createResource(getUnusedUri(vreq));
+                vcard.addProperty(model.createProperty(VCARD_HASNAME), name);
+                name.addProperty(RDF.type, model.getResource(VCARD_NAME));
+                if (!StringUtils.isEmpty(author.given)) {
+                    name.addProperty(model.createProperty(VCARD_GIVENNAME), author.given);
+                }
+                if (!StringUtils.isEmpty(author.family)) {
+                    name.addProperty(model.createProperty(VCARD_FAMILYNAME), author.family);
+                }
+
+                Resource authorship = model.createResource(getUnusedUri(vreq));
+                authorship.addProperty(RDF.type, model.getResource(VIVO_AUTHORSHIP));
+
+                authorship.addProperty(model.createProperty(VIVO_RELATES), model.getResource(vivoUri));
+                authorship.addProperty(model.createProperty(VIVO_RELATES), model.getResource(vcard.getURI()));
+
+                model.getResource(vivoUri).addProperty(model.createProperty(VIVO_RELATEDBY), authorship);
+                vcard.addProperty(model.createProperty(VIVO_RELATEDBY), authorship);
+                authorship.addLiteral(model.createProperty(VIVO_RANK), rank);
+                rank++;
+            }
+        }
+
+        // URL
+        // editor
+        // translator
+        // publisher
+        // subject
+        // status
+        // presented at
+        // keyword
+
+        // http://purl.obolibrary.org/obo/ARG_2000028 (webpage)
+        // http://purl.org/ontology/bibo/translator
+        // http://purl.org/ontology/bibo/status
+        // http://vivoweb.org/ontology/core#hasSubjectArea
+        // http://purl.org/ontology/bibo/presentedAt
+        // http://vivoweb.org/ontology/core#freetextKeyword
+        // http://purl.org/ontology/bibo/translator (Direct to user)
+
+        // Journal level
+        // http://vivoweb.org/ontology/core#publisher
+
+        // http://vivoweb.org/ontology/core#Editorship
+
         return vivoUri;
-/*
-    -- Unmapped
-    public String URL;
-    @SerializedName("reference-count")
-    public Integer referenceCount;
-    public String[] subject;
- */
     }
 
     protected String getVCardURI(VitroRequest vreq, String familyName, String givenName) {
@@ -681,6 +736,20 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
         }
 
         return null;
+    }
+
+    private int getDigitCount(String id) {
+        int digits = 0;
+
+        if (id != null) {
+            for (char ch : id.toCharArray()) {
+                if (Character.isDigit(ch)) {
+                    digits++;
+                }
+            }
+        }
+
+        return digits;
     }
 
     private String getVIVOUriForPubMedID(RDFService rdfService, String pmid) {

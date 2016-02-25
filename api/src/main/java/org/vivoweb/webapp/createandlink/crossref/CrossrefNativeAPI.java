@@ -51,13 +51,15 @@ public class CrossrefNativeAPI {
             }
         }
 
-        List<Citation.Author> authors = new ArrayList<>();
-        for (CrossrefResponse.ResponseModel.Author author : response.message.author) {
-            Citation.Author citationAuthor = new Citation.Author();
-            citationAuthor.name = CreateAndLinkUtils.formatAuthorString(author.family, author.given);
-            authors.add(citationAuthor);
+        if (response.message.author != null) {
+            List<Citation.Author> authors = new ArrayList<>();
+            for (CrossrefResponse.ResponseModel.Author author : response.message.author) {
+                Citation.Author citationAuthor = new Citation.Author();
+                citationAuthor.name = CreateAndLinkUtils.formatAuthorString(author.family, author.given);
+                authors.add(citationAuthor);
+            }
+            citation.authors = authors.toArray(new Citation.Author[authors.size()]);
         }
-        citation.authors = authors.toArray(new Citation.Author[authors.size()]);
 
         citation.volume = response.message.volume;
         citation.issue = response.message.issue;

@@ -9,24 +9,24 @@ public class CiteprocJSONModel {
     public String language;
     public String journalAbbreviation;
     public String shortTitle;
-    public Name[] author;
+    public NameField[] author;
     @SerializedName("collection-editor")
-    public Name[] collectionEditor;
-    public Name[] composer;
+    public NameField[] collectionEditor;
+    public NameField[] composer;
     @SerializedName("container-author")
-    public Name[] containerAuthor;
-    public Name[] director;
-    public Name[] editor;
+    public NameField[] containerAuthor;
+    public NameField[] director;
+    public NameField[] editor;
     @SerializedName("editorial-director")
-    public Name[] editorialDirector;
-    public Name[] interviewer;
-    public Name[] illustrator;
+    public NameField[] editorialDirector;
+    public NameField[] interviewer;
+    public NameField[] illustrator;
     @SerializedName("original-author")
-    public Name[] originalAuthor;
-    public Name[] recipient;
+    public NameField[] originalAuthor;
+    public NameField[] recipient;
     @SerializedName("reviewed-author")
-    public Name[] reviewedAuthor;
-    public Name[] translator;
+    public NameField[] reviewedAuthor;
+    public NameField[] translator;
     public DateField accessed;
     public DateField container;
     @SerializedName("event-date")
@@ -107,7 +107,7 @@ public class CiteprocJSONModel {
     @SerializedName("year-suffix")
     public String yearSuffix;
 
-    public static class Name {
+    public static class NameField {
         public String family;
         public String given;
         @SerializedName("dropping-particle")
