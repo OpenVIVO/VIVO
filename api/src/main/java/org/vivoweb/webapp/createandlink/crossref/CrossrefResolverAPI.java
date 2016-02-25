@@ -101,10 +101,6 @@ public class CrossrefResolverAPI {
                     isbn = isbn.substring(isbn.lastIndexOf('/') + 1);
                 }
 
-                if (isbn.indexOf('-') > -1) {
-                    isbn = isbn.replace("/", "");
-                }
-
                 model.ISBN[isbnIdx] = isbn;
                 isbnIdx++;
             }
@@ -156,7 +152,7 @@ public class CrossrefResolverAPI {
         ResourceModel.NameField[] destNameFields = new ResourceModel.NameField[nameFields.length];
 
         for (int nameIdx = 0; nameIdx < nameFields.length; nameIdx++) {
-            if (destNameFields[nameIdx] != null) {
+            if (nameFields[nameIdx] != null) {
                 splitNameLiteral(nameFields[nameIdx]);
                 destNameFields[nameIdx] = new ResourceModel.NameField();
                 destNameFields[nameIdx].family = nameFields[nameIdx].family;

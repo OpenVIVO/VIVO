@@ -43,6 +43,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -68,8 +70,12 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
     public static final String BIBO_PAGE_START = "http://purl.org/ontology/bibo/pageStart";
     public static final String BIBO_PMID = "http://purl.org/ontology/bibo/pmid";
     public static final String BIBO_VOLUME = "http://purl.org/ontology/bibo/volume";
+
     public static final String FOAF_FIRSTNAME = "http://xmlns.com/foaf/0.1/firstName";
     public static final String FOAF_LASTNAME = "http://xmlns.com/foaf/0.1/lastName";
+
+    public static final String OBO_HAS_CONTACT_INFO = "http://purl.obolibrary.org/obo/ARG_2000028";
+    public static final String OBO_CONTACT_INFO_FOR = "http://purl.obolibrary.org/obo/ARG_2000029";
 
     public static final String RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
 
@@ -81,15 +87,22 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
     public static final String VIVO_HASPUBLICATIONVENUE = "http://vivoweb.org/ontology/core#hasPublicationVenue";
     public static final String VIVO_PMCID = "http://vivoweb.org/ontology/core#pmcid";
     public static final String VIVO_PUBLICATIONVENUEFOR = "http://vivoweb.org/ontology/core#publicationVenueFor";
+    public static final String VIVO_PUBLISHER = "http://vivoweb.org/ontology/core#publisher";
+    public static final String VIVO_PUBLISHER_CLASS = "http://vivoweb.org/ontology/core#Publisher";
+    public static final String VIVO_PUBLISHER_OF = "http://vivoweb.org/ontology/core#publisherOf";
     public static final String VIVO_RANK = "http://vivoweb.org/ontology/core#rank";
     public static final String VIVO_RELATEDBY = "http://vivoweb.org/ontology/core#relatedBy";
     public static final String VIVO_RELATES = "http://vivoweb.org/ontology/core#relates";
 
     public static final String VCARD_FAMILYNAME = "http://www.w3.org/2006/vcard/ns#familyName";
     public static final String VCARD_GIVENNAME = "http://www.w3.org/2006/vcard/ns#givenName";
-    public static final String VCARD_HASNAME = "http://www.w3.org/2006/vcard/ns#hasName";
+    public static final String VCARD_HAS_NAME = "http://www.w3.org/2006/vcard/ns#hasName";
+    public static final String VCARD_HAS_URL = "http://www.w3.org/2006/vcard/ns#hasURL";
     public static final String VCARD_INDIVIDUAL = "http://www.w3.org/2006/vcard/ns#Individual";
+    public static final String VCARD_KIND = "http://www.w3.org/2006/vcard/ns#Kind";
     public static final String VCARD_NAME = "http://www.w3.org/2006/vcard/ns#Name";
+    public static final String VCARD_URL_CLASS = "http://www.w3.org/2006/vcard/ns#URL";
+    public static final String VCARD_URL_PROPERTY = "http://www.w3.org/2006/vcard/ns#url";
 
     static {
         typeToClassMap.put("article", "http://purl.org/ontology/bibo/Article");
@@ -526,9 +539,17 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
             for (String issn : resourceModel.ISSN) {
                 journal.addProperty(model.getProperty(BIBO_ISSN), issn);
             }
+
+            if (!StringUtils.isEmpty(resourceModel.publisher)) {
+                Resource publisher = model.createResource(getPublisherURI(vreq, resourceModel.publisher));
+                publisher.addProperty(RDFS.label, resourceModel.publisher);
+                publisher.addProperty(RDF.type, model.getResource(VIVO_PUBLISHER_CLASS));
+                publisher.addProperty(model.createProperty(VIVO_PUBLISHER_OF), journal);
+                journal.addProperty(model.createProperty(VIVO_PUBLISHER), publisher);
+            }
+
             journal.addProperty(model.getProperty(VIVO_PUBLICATIONVENUEFOR), work);
             work.addProperty(model.getProperty(VIVO_HASPUBLICATIONVENUE), journal);
-
         }
 
         if (resourceModel.ISBN != null && resourceModel.ISBN.length > 0) {
@@ -582,42 +603,58 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
         if (resourceModel.author != null) {
             int rank = 1;
             for (ResourceModel.NameField author : resourceModel.author) {
-                Resource vcard = model.createResource(getVCardURI(vreq, author.family, author.given));
-                vcard.addProperty(RDF.type, model.getResource(VCARD_INDIVIDUAL));
+                if (author != null) {
+                    Resource vcard = model.createResource(getVCardURI(vreq, author.family, author.given));
+                    vcard.addProperty(RDF.type, model.getResource(VCARD_INDIVIDUAL));
 
-                Resource name = model.createResource(getUnusedUri(vreq));
-                vcard.addProperty(model.createProperty(VCARD_HASNAME), name);
-                name.addProperty(RDF.type, model.getResource(VCARD_NAME));
-                if (!StringUtils.isEmpty(author.given)) {
-                    name.addProperty(model.createProperty(VCARD_GIVENNAME), author.given);
+                    Resource name = model.createResource(getUnusedUri(vreq));
+                    vcard.addProperty(model.createProperty(VCARD_HAS_NAME), name);
+                    name.addProperty(RDF.type, model.getResource(VCARD_NAME));
+                    if (!StringUtils.isEmpty(author.given)) {
+                        name.addProperty(model.createProperty(VCARD_GIVENNAME), author.given);
+                    }
+                    if (!StringUtils.isEmpty(author.family)) {
+                        name.addProperty(model.createProperty(VCARD_FAMILYNAME), author.family);
+                    }
+
+                    Resource authorship = model.createResource(getUnusedUri(vreq));
+                    authorship.addProperty(RDF.type, model.getResource(VIVO_AUTHORSHIP));
+
+                    authorship.addProperty(model.createProperty(VIVO_RELATES), model.getResource(vivoUri));
+                    authorship.addProperty(model.createProperty(VIVO_RELATES), model.getResource(vcard.getURI()));
+
+                    model.getResource(vivoUri).addProperty(model.createProperty(VIVO_RELATEDBY), authorship);
+                    vcard.addProperty(model.createProperty(VIVO_RELATEDBY), authorship);
+                    authorship.addLiteral(model.createProperty(VIVO_RANK), rank);
                 }
-                if (!StringUtils.isEmpty(author.family)) {
-                    name.addProperty(model.createProperty(VCARD_FAMILYNAME), author.family);
-                }
-
-                Resource authorship = model.createResource(getUnusedUri(vreq));
-                authorship.addProperty(RDF.type, model.getResource(VIVO_AUTHORSHIP));
-
-                authorship.addProperty(model.createProperty(VIVO_RELATES), model.getResource(vivoUri));
-                authorship.addProperty(model.createProperty(VIVO_RELATES), model.getResource(vcard.getURI()));
-
-                model.getResource(vivoUri).addProperty(model.createProperty(VIVO_RELATEDBY), authorship);
-                vcard.addProperty(model.createProperty(VIVO_RELATEDBY), authorship);
-                authorship.addLiteral(model.createProperty(VIVO_RANK), rank);
                 rank++;
             }
         }
 
-        // URL
+        if (!StringUtils.isEmpty(resourceModel.URL)) {
+            try {
+                URL url = new URL(resourceModel.URL);
+                Resource urlModel = model.createResource(getUnusedUri(vreq));
+                urlModel.addProperty(RDF.type, model.getResource(VCARD_URL_CLASS));
+                urlModel.addLiteral(model.createProperty(VCARD_URL_PROPERTY), url);
+
+                Resource kindModel = model.createResource(getUnusedUri(vreq));
+                kindModel.addProperty(RDF.type, model.getResource(VCARD_KIND));
+                kindModel.addProperty(model.createProperty(VCARD_HAS_URL), urlModel);
+                kindModel.addProperty(model.createProperty(OBO_CONTACT_INFO_FOR), work);
+
+                work.addProperty(model.createProperty(OBO_HAS_CONTACT_INFO), kindModel);
+            } catch (MalformedURLException e) {
+            }
+        }
+
         // editor
         // translator
-        // publisher
         // subject
         // status
         // presented at
         // keyword
 
-        // http://purl.obolibrary.org/obo/ARG_2000028 (webpage)
         // http://purl.org/ontology/bibo/translator
         // http://purl.org/ontology/bibo/status
         // http://vivoweb.org/ontology/core#hasSubjectArea
@@ -625,12 +662,25 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
         // http://vivoweb.org/ontology/core#freetextKeyword
         // http://purl.org/ontology/bibo/translator (Direct to user)
 
-        // Journal level
-        // http://vivoweb.org/ontology/core#publisher
 
         // http://vivoweb.org/ontology/core#Editorship
 
         return vivoUri;
+    }
+
+    protected String getPublisherURI(VitroRequest vreq, String publisher) {
+        if (!StringUtils.isEmpty(publisher)) {
+            String publisherUri = vreq.getUnfilteredWebappDaoFactory().getDefaultNamespace();
+            if (!publisherUri.endsWith("/")) {
+                publisherUri += "/";
+            }
+
+            publisherUri += "publisher/" + publisher.trim().replaceAll("[^a-zA-Z0-9/]" , "-");
+
+            return publisherUri;
+        }
+
+        return getUnusedUri(vreq);
     }
 
     protected String getVCardURI(VitroRequest vreq, String familyName, String givenName) {
@@ -884,7 +934,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                                 Statement familyName = null;
                                 Statement givenName = null;
                                 if (isResourceOfType(authorResource, VCARD_INDIVIDUAL)) {
-                                    Statement vcardName = authorResource.getProperty(model.getProperty(VCARD_HASNAME));
+                                    Statement vcardName = authorResource.getProperty(model.getProperty(VCARD_HAS_NAME));
                                     if (vcardName != null) {
                                         givenName = vcardName.getProperty(model.getProperty(VCARD_GIVENNAME));
                                         familyName = vcardName.getProperty(model.getProperty(VCARD_FAMILYNAME));
