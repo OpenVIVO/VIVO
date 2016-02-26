@@ -30,6 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.vivoweb.webapp.createandlink.Citation;
 import org.vivoweb.webapp.createandlink.CreateAndLinkResourceProvider;
@@ -194,91 +195,114 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
             return null;
         }
 
-        switch (action) {
-            case "confirmID": {
-                String externalId = provider.normalize(vreq.getParameter("externalId"));
+        String externalIdsToFind = null;
 
-                Model existingModel = getExistingResource(vreq, vreq.getParameter("vivoUri" + externalId));
-
+        if ("confirmID".equals(action)) {
+            String[] externalIds = vreq.getParameterValues("externalId");
+            if (!ArrayUtils.isEmpty(externalIds)) {
+                Model existingModel = ModelFactory.createDefaultModel();
                 Model updatedModel = ModelFactory.createDefaultModel();
-                updatedModel.add(existingModel);
+                for (String externalId : externalIds) {
+                    externalId = provider.normalize(externalId);
+                    if (!StringUtils.isEmpty(externalId)) {
+                        Model existingResourceModel = getExistingResource(vreq, vreq.getParameter("vivoUri" + externalId));
+                        existingModel.add(existingModel);
+                        updatedModel.add(existingModel);
 
-                String vivoUri = vreq.getParameter("vivoUri" + externalId);
-                if (!"notmine".equalsIgnoreCase(vreq.getParameter("contributor" + externalId))) {
-                    if (StringUtils.isEmpty(vivoUri)) {
-                        ResourceModel resourceModel = null;
-                        String resourceProvider = vreq.getParameter("externalProvider" + externalId);
-                        if (providers.containsKey(resourceProvider)) {
-                            resourceModel = providers.get(resourceProvider).makeResourceModel(externalId, vreq.getParameter("externalResource" + externalId));
-                        } else {
-                            resourceModel = provider.makeResourceModel(externalId, vreq.getParameter("externalResource" + externalId));
-                        }
-                        if (resourceModel != null) {
-                            vivoUri = createVIVOObject(vreq, updatedModel, resourceModel);
+                        String vivoUri = vreq.getParameter("vivoUri" + externalId);
+                        if (!"notmine".equalsIgnoreCase(vreq.getParameter("contributor" + externalId))) {
+                            if (StringUtils.isEmpty(vivoUri)) {
+                                ResourceModel resourceModel = null;
+                                String resourceProvider = vreq.getParameter("externalProvider" + externalId);
+                                if (providers.containsKey(resourceProvider)) {
+                                    resourceModel = providers.get(resourceProvider).makeResourceModel(externalId, vreq.getParameter("externalResource" + externalId));
+                                } else {
+                                    resourceModel = provider.makeResourceModel(externalId, vreq.getParameter("externalResource" + externalId));
+                                }
+                                if (resourceModel != null) {
+                                    vivoUri = createVIVOObject(vreq, updatedModel, resourceModel);
+                                }
+                            }
+
+                            // link person to vivoUri
+                            processRelationships(vreq, updatedModel, vivoUri, profileUri, vreq.getParameter("contributor" + externalId));
                         }
                     }
-
-                    // link person to vivoUri
-                    processRelationships(vreq, updatedModel, vivoUri, profileUri, vreq.getParameter("contributor" + externalId));
                 }
-
                 writeChanges(vreq.getRDFService(), existingModel, updatedModel);
+            }
 
+            externalIdsToFind = vreq.getParameter("remainderIds");
+
+            if (StringUtils.isEmpty(externalIdsToFind)) {
                 Map<String, Object> templateValues = new HashMap<>();
                 templateValues.put("link", profileUri);
                 templateValues.put("label", provider.getLabel());
                 return new TemplateResponseValues("createAndLinkResourceEnterID.ftl", templateValues);
             }
+        } else if ("findID".equals(action)) {
+            externalIdsToFind = vreq.getParameter("externalIds");
+        }
 
-            case "findID": {
-                String externalId = provider.normalize(vreq.getParameter("externalId"));
+        if (!StringUtils.isEmpty(externalIdsToFind)) {
+            List<Citation> citations = new ArrayList<Citation>();
+            String[] externalIdArr = externalIdsToFind.split("[\\s,;]+");
 
-                Citation citation = new Citation();
-                citation.externalId = externalId;
+            int idCount = 0;
+            StringBuilder remainderIds = new StringBuilder();
+            for (String externalId : externalIdArr) {
+                externalId = provider.normalize(externalId);
+                if (!StringUtils.isEmpty(externalId)) {
+                    if (idCount > 4) {
+                        remainderIds.append(externalId).append("\n");
+                    } else {
+                        Citation citation = new Citation();
+                        citation.externalId = externalId;
 
-                String vivoUri = null;
-                String externalResource = null;
+                        String externalResource = null;
 
-                ExternalIdentifiers allExternalIds = provider.allExternalIDsForFind(externalId);
-                vivoUri = findInVIVO(vreq, allExternalIds, profileUri, citation);
-                if (StringUtils.isEmpty(vivoUri)) {
-                    if (!StringUtils.isEmpty(allExternalIds.DOI)) {
-                        CreateAndLinkResourceProvider doiProvider = providers.get("doi");
-                        if (doiProvider != null) {
-                            externalResource = doiProvider.findInExternal(allExternalIds.DOI, citation);
-                            if (!StringUtils.isEmpty(externalResource)) {
-                                externalProvider = "doi";
+                        ExternalIdentifiers allExternalIds = provider.allExternalIDsForFind(externalId);
+                        citation.vivoUri = findInVIVO(vreq, allExternalIds, profileUri, citation);
+                        if (StringUtils.isEmpty(citation.vivoUri)) {
+                            if (!StringUtils.isEmpty(allExternalIds.DOI)) {
+                                CreateAndLinkResourceProvider doiProvider = providers.get("doi");
+                                if (doiProvider != null) {
+                                    citation.externalResource = doiProvider.findInExternal(allExternalIds.DOI, citation);
+                                    if (!StringUtils.isEmpty(citation.externalResource)) {
+                                        citation.externalProvider = "doi";
+                                    }
+                                }
+                            }
+
+                            if (StringUtils.isEmpty(citation.externalResource)) {
+                                citation.externalResource = provider.findInExternal(externalId, citation);
+                                citation.externalProvider = externalProvider;
                             }
                         }
-                    }
 
-                    if (StringUtils.isEmpty(externalResource)) {
-                        externalResource = provider.findInExternal(externalId, citation);
+                        proposeAuthorToLink(vreq, citation, profileUri);
+
+                        if (citation.vivoUri != null || citation.externalResource != null) {
+                            citations.add(citation);
+                        }
+
+                        idCount++;
                     }
                 }
+            }
 
-                proposeAuthorToLink(vreq, citation, profileUri);
-
-                Map<String, Object> templateValues = new HashMap<>();
-
-                if (vivoUri != null) {
-                    templateValues.put("citation", citation);
-                    templateValues.put("vivoUri", vivoUri);
-                    return new TemplateResponseValues("createAndLinkResourceConfirm.ftl", templateValues);
-                } else if (externalResource != null) {
-                    templateValues.put("citation", citation);
-                    templateValues.put("externalResource", externalResource);
-                    templateValues.put("externalProvider", externalProvider);
-                    return new TemplateResponseValues("createAndLinkResourceConfirm.ftl", templateValues);
+            Map<String, Object> templateValues = new HashMap<>();
+            if (citations.size() > 0) {
+                templateValues.put("citations", citations);
+                if (remainderIds.length() > 0) {
+                    templateValues.put("remainderIds", remainderIds.toString());
                 }
-
+                return new TemplateResponseValues("createAndLinkResourceConfirm.ftl", templateValues);
+            } else {
                 templateValues.put("notfound", true);
                 templateValues.put("label", provider.getLabel());
                 return new TemplateResponseValues("createAndLinkResourceEnterID.ftl", templateValues);
             }
-
-            default:
-                break;
         }
 
         Map<String, Object> templateValues = new HashMap<>();
@@ -339,7 +363,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                     if (authorStr != null) {
                         String authorStrLwr = authorStr.toLowerCase();
                         String authorStrUpr = authorStr.toUpperCase();
-                        for (Citation.Author author : citation.authors) {
+                        for (Citation.Name author : citation.authors) {
                             if (author.name != null) {
                                 if (author.name.startsWith(authorStr) || authorStr.startsWith(author.name)) {
                                     author.proposed = true;
@@ -655,13 +679,11 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
         // presented at
         // keyword
 
-        // http://purl.org/ontology/bibo/translator
         // http://purl.org/ontology/bibo/status
         // http://vivoweb.org/ontology/core#hasSubjectArea
         // http://purl.org/ontology/bibo/presentedAt
         // http://vivoweb.org/ontology/core#freetextKeyword
         // http://purl.org/ontology/bibo/translator (Direct to user)
-
 
         // http://vivoweb.org/ontology/core#Editorship
 
@@ -849,8 +871,8 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
             StmtIterator stmtIterator = work.listProperties();
             String pageStart = null;
             String pageEnd = null;
-            Citation.Author[] rankedAuthors = null;
-            ArrayList<Citation.Author> unrankedAuthors = new ArrayList<Citation.Author>();
+            Citation.Name[] rankedAuthors = null;
+            ArrayList<Citation.Name> unrankedAuthors = new ArrayList<Citation.Name>();
 
             while (stmtIterator.hasNext()) {
                 Statement stmt = stmtIterator.next();
@@ -907,7 +929,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                                 break;
                             }
 
-                            Citation.Author newAuthor = null;
+                            Citation.Name newAuthor = null;
                             Resource authorResource = null;
                             StmtIterator relationshipIter = relationship.listProperties();
                             while (relationshipIter.hasNext()) {
@@ -946,7 +968,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                                 }
 
                                 if (familyName != null) {
-                                    newAuthor = new Citation.Author();
+                                    newAuthor = new Citation.Name();
                                     if (givenName != null) {
                                         newAuthor.name = CreateAndLinkUtils.formatAuthorString(familyName.getString(), givenName.getString());
                                     } else {
@@ -959,9 +981,9 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                             if (newAuthor != null) {
                                 if (rank != null) {
                                     if (rankedAuthors == null) {
-                                        rankedAuthors = new Citation.Author[rank];
+                                        rankedAuthors = new Citation.Name[rank];
                                     } else if (rankedAuthors.length < rank) {
-                                        Citation.Author[] newAuthors = new Citation.Author[rank];
+                                        Citation.Name[] newAuthors = new Citation.Name[rank];
                                         for (int i = 0; i < rankedAuthors.length; i++) {
                                             newAuthors[i] = rankedAuthors[i];
                                         }
@@ -986,7 +1008,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
             }
 
             if (unrankedAuthors.size() > 0) {
-                Citation.Author[] newAuthors = new Citation.Author[rankedAuthors.length + unrankedAuthors.size()];
+                Citation.Name[] newAuthors = new Citation.Name[rankedAuthors.length + unrankedAuthors.size()];
                 int i = 0;
                 while (i < rankedAuthors.length) {
                     newAuthors[i] = rankedAuthors[i];

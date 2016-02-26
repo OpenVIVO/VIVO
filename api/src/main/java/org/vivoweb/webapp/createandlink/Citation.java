@@ -2,9 +2,14 @@ package org.vivoweb.webapp.createandlink;
 
 public class Citation {
     public String externalId;
+    public String externalProvider;
+    public String externalResource;
+
+    public String vivoUri;
+
     public String type;
     public String title;
-    public Author[] authors;
+    public Name[] authors;
     public String journal;
     public String volume;
     public String issue;
@@ -15,35 +20,28 @@ public class Citation {
     public boolean alreadyClaimed = false;
 
     public String getExternalId() { return externalId; }
+    public String getExternalProvider() { return externalProvider; }
+    public String getExternalResource() { return externalResource; }
 
-    public String getType() {
-        return type;
-    }
+    public String getVivoUri() { return vivoUri; }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public Author[] getAuthors() {
+    public String getType() { return type; }
+    public String getTitle() { return title; }
+    public Name[] getAuthors() {
         return authors;
     }
-
     public String getJournal() {
         return journal;
     }
-
     public String getVolume() {
         return volume;
     }
-
     public String getIssue() {
         return issue;
     }
-
     public String getPagination() {
         return pagination;
     }
-
     public Integer getPublicationYear() {
         return publicationYear;
     }
@@ -54,8 +52,9 @@ public class Citation {
 
     public boolean getAlreadyClaimed() { return alreadyClaimed; }
 
-    public static class Author {
+    public static class Name {
         public String name;
+
         public boolean linked = false;
         public boolean proposed = false;
 
@@ -66,7 +65,6 @@ public class Citation {
         public boolean getLinked() {
             return linked;
         }
-
         public boolean getProposed() {
             return proposed;
         }

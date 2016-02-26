@@ -65,9 +65,9 @@ public class PubMedCreateAndLinkResourceProvider implements CreateAndLinkResourc
             PubMedSummaryResponse response = gson.fromJson(data, PubMedSummaryResponse.class);
             if (response != null) {
                 citation.title = response.title;
-                citation.authors = new Citation.Author[response.authors.length];
+                citation.authors = new Citation.Name[response.authors.length];
                 for (int idx = 0; idx < response.authors.length; idx++) {
-                    citation.authors[idx] = new Citation.Author();
+                    citation.authors[idx] = new Citation.Name();
                     citation.authors[idx].name = response.authors[idx].name;
                 }
                 citation.journal = response.fulljournalname;

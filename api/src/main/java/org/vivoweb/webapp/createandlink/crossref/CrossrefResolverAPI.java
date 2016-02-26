@@ -42,14 +42,14 @@ public class CrossrefResolverAPI {
         citation.journal = jsonModel.containerTitle;
 
         if (jsonModel.author != null) {
-            List<Citation.Author> authors = new ArrayList<>();
+            List<Citation.Name> authors = new ArrayList<>();
             for (CrossrefCiteprocJSONModel.NameField author : jsonModel.author) {
                 splitNameLiteral(author);
-                Citation.Author citationAuthor = new Citation.Author();
+                Citation.Name citationAuthor = new Citation.Name();
                 citationAuthor.name = CreateAndLinkUtils.formatAuthorString(author.family, author.given);
                 authors.add(citationAuthor);
             }
-            citation.authors = authors.toArray(new Citation.Author[authors.size()]);
+            citation.authors = authors.toArray(new Citation.Name[authors.size()]);
         }
 
         citation.volume = jsonModel.volume;
