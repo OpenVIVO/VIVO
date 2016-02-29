@@ -48,8 +48,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
     public static final AuthorizationRequest REQUIRED_ACTIONS = SimplePermission.EDIT_OWN_ACCOUNT.ACTION;
@@ -195,6 +197,11 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
             return null;
         }
 
+        Map<String, Object> templateValues = new HashMap<>();
+        templateValues.put("link", profileUri);
+        templateValues.put("label", provider.getLabel());
+        templateValues.put("provider", externalProvider);
+
         String externalIdsToFind = null;
 
         if ("confirmID".equals(action)) {
@@ -235,9 +242,6 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
             externalIdsToFind = vreq.getParameter("remainderIds");
 
             if (StringUtils.isEmpty(externalIdsToFind)) {
-                Map<String, Object> templateValues = new HashMap<>();
-                templateValues.put("link", profileUri);
-                templateValues.put("label", provider.getLabel());
                 return new TemplateResponseValues("createAndLinkResourceEnterID.ftl", templateValues);
             }
         } else if ("findID".equals(action)) {
@@ -245,21 +249,27 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
         }
 
         if (!StringUtils.isEmpty(externalIdsToFind)) {
+            List<String> uniqueIds = new ArrayList<>();
+            Set<String> remainderIds = new HashSet<>();
+
             List<Citation> citations = new ArrayList<Citation>();
             String[] externalIdArr = externalIdsToFind.split("[\\s,;]+");
 
-            int idCount = 0;
-            StringBuilder remainderIds = new StringBuilder();
             for (String externalId : externalIdArr) {
                 externalId = provider.normalize(externalId);
+                if (!uniqueIds.contains(externalId)) {
+                    uniqueIds.add(externalId);
+                }
+            }
+
+            int idCount = 0;
+            for (String externalId : uniqueIds) {
                 if (!StringUtils.isEmpty(externalId)) {
                     if (idCount > 4) {
-                        remainderIds.append(externalId).append("\n");
+                        remainderIds.add(externalId);
                     } else {
                         Citation citation = new Citation();
                         citation.externalId = externalId;
-
-                        String externalResource = null;
 
                         ExternalIdentifiers allExternalIds = provider.allExternalIDsForFind(externalId);
                         citation.vivoUri = findInVIVO(vreq, allExternalIds, profileUri, citation);
@@ -291,22 +301,19 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                 }
             }
 
-            Map<String, Object> templateValues = new HashMap<>();
             if (citations.size() > 0) {
                 templateValues.put("citations", citations);
-                if (remainderIds.length() > 0) {
-                    templateValues.put("remainderIds", remainderIds.toString());
+                if (remainderIds.size() > 0) {
+                    templateValues.put("remainderIds", String.join("\n", remainderIds));
+                    templateValues.put("remainderCount", remainderIds.size());
                 }
                 return new TemplateResponseValues("createAndLinkResourceConfirm.ftl", templateValues);
             } else {
                 templateValues.put("notfound", true);
-                templateValues.put("label", provider.getLabel());
                 return new TemplateResponseValues("createAndLinkResourceEnterID.ftl", templateValues);
             }
         }
 
-        Map<String, Object> templateValues = new HashMap<>();
-        templateValues.put("label", provider.getLabel());
         return new TemplateResponseValues("createAndLinkResourceEnterID.ftl", templateValues);
     }
 

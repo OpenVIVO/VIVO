@@ -221,10 +221,13 @@ public class PubMedCreateAndLinkResourceProvider implements CreateAndLinkResourc
             HttpClient client = HttpClientFactory.getHttpClient();
             HttpGet request = new HttpGet(url);
             HttpResponse response = client.execute(request);
-            try (InputStream in = response.getEntity().getContent()) {
-                StringWriter writer = new StringWriter();
-                IOUtils.copy(in, writer, "UTF-8");
-                return writer.toString();
+            switch (response.getStatusLine().getStatusCode()) {
+                case 200:
+                    try (InputStream in = response.getEntity().getContent()) {
+                        StringWriter writer = new StringWriter();
+                        IOUtils.copy(in, writer, "UTF-8");
+                        return writer.toString();
+                    }
             }
         } catch (IOException e) {
         }

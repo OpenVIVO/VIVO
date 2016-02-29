@@ -1,2 +1,2 @@
-<h1>Unknown Resource Type</h1>
+<h2>Unknown Resource Type</h2>
 
