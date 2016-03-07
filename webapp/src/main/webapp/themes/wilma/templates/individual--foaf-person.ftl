@@ -60,9 +60,19 @@
     </section>
 
     <section id="individual-info" ${infoClass!} role="region"> 
-    <section id="right-hand-column" role="region">
-        <#include "individual-visualizationFoafPerson.ftl">    
+        <section id="right-hand-column" role="region">
+            <#include "individual-visualizationFoafPerson.ftl">
+            <br />
+            Claim publications by
+            <br />
+            <form action="${urls.base}/createAndLink/doi" method="get" style="float: left;">
+                <input type="submit" class="submit" value="DOI" />
+            </form>
+            <form action="${urls.base}/createAndLink/pmid" method="get" style="float: right;">
+                <input type="submit" class="submit" value="PubMed ID" />
+            </form>
         </section>
+
         <#include "individual-adminPanel.ftl">
         
         <header>
