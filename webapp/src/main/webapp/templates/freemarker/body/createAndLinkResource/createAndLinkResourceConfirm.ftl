@@ -32,13 +32,14 @@
         font-style: italic;
     }
     .entryId {
-        background-color: #E0E0E0;
+        background-color: #3e8baa; /* #E0E0E0; */
+        color: #ffffff;
         padding: 5px;
         font-weight: bold;
         display: inline-block;
     }
     .entry {
-        border: 2px solid #E0E0E0;
+        border: 2px solid #3e8baa; /* #E0E0E0; */
         padding: 5px;
     }
     label {
@@ -53,10 +54,26 @@
     .remainder {
         font-style: italic;
     }
+    .claim-for {
+        float: right;
+        border: 2px solid #3e8baa; /* #E0E0E0; */
+        padding: 5px;
+    }
+    .claim-for h3 {
+        text-align: center;
+    }
 </style>
 <#setting number_format="computer">
 <#escape var as var?html>
 <form method="post">
+    <#if personLabel??>
+        <div class="claim-for">
+            <h3>Claiming works for<br />${personLabel}</h3>
+            <#if personThumbUrl??>
+                <img src="${urls.base}${personThumbUrl}" />
+            </#if>
+        </div>
+    </#if>
     <h2>Confirm your work(s)</h2>
     Please check that these are the work(s) that you wish to claim, and indicate your relationship with them.<br /><br />
     <h4>Authors</h4>
@@ -168,6 +185,7 @@
             <input type="hidden" name="externalResource${citation.externalId}" value="${citation.externalResource!}" />
             <input type="hidden" name="externalProvider${citation.externalId}" value="${citation.externalProvider!}" />
             <input type="hidden" name="vivoUri${citation.externalId}" value="${citation.vivoUri!}" />
+            <input type="hidden" name="profileUri" value="${profileUri!}" />
             <#if citation.alreadyClaimed>
             </div>
             </#if>

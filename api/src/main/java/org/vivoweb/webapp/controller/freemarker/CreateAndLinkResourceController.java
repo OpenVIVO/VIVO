@@ -23,6 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.NewURIMakerVitro;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
@@ -186,21 +187,40 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
             action = "";
         }
 
-        UserAccount loggedInAccount = LoginStatusBean.getCurrentUser(vreq);
-        String profileUri = null;
+        IndividualDao individualDao = vreq.getWebappDaoFactory().getIndividualDao();
+        Individual person = null;
 
-        SelfEditingConfiguration sec = SelfEditingConfiguration.getBean(vreq);
-        List<Individual> assocInds = sec.getAssociatedIndividuals(vreq.getWebappDaoFactory().getIndividualDao(), loggedInAccount.getExternalAuthId());
-        if (!assocInds.isEmpty()) {
-            profileUri = assocInds.get(0).getURI();
-        } else {
-            return null;
+        UserAccount loggedInAccount = LoginStatusBean.getCurrentUser(vreq);
+        String profileUri = vreq.getParameter("profileUri");
+
+        if (!StringUtils.isEmpty(profileUri)) {
+            person = individualDao.getIndividualByURI(profileUri);
+        }
+
+        if (person == null) {
+            SelfEditingConfiguration sec = SelfEditingConfiguration.getBean(vreq);
+            List<Individual> assocInds = sec.getAssociatedIndividuals(vreq.getWebappDaoFactory().getIndividualDao(), loggedInAccount.getExternalAuthId());
+            if (!assocInds.isEmpty()) {
+                profileUri = assocInds.get(0).getURI();
+                if (!StringUtils.isEmpty(profileUri)) {
+                    person = individualDao.getIndividualByURI(profileUri);
+                }
+            }
+        }
+
+        if (person == null) {
+            return new TemplateResponseValues("unknownProfile.ftl");
         }
 
         Map<String, Object> templateValues = new HashMap<>();
         templateValues.put("link", profileUri);
         templateValues.put("label", provider.getLabel());
         templateValues.put("provider", externalProvider);
+        templateValues.put("profileUri", profileUri);
+        if (person != null) {
+            templateValues.put("personLabel",    person.getRdfsLabel());
+            templateValues.put("personThumbUrl", person.getThumbUrl());
+        }
 
         String externalIdsToFind = null;
 
