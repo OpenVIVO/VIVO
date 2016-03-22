@@ -584,23 +584,32 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
         }
 
         if (resourceModel.ISSN != null && resourceModel.ISSN.length > 0) {
-            Resource journal = model.createResource(defaultNamespace + "issn/" + resourceModel.ISSN[0]);
-            journal.addProperty(RDFS.label, resourceModel.containerTitle);
-            journal.addProperty(RDF.type, model.getResource(BIBO_JOURNAL));
-            for (String issn : resourceModel.ISSN) {
-                journal.addProperty(model.getProperty(BIBO_ISSN), issn);
+            Resource journal = null;
+            String journalUri = getVIVOUriForISSNs(vreq.getRDFService(), resourceModel.ISSN);
+
+            if (journalUri != null) {
+                journal = model.getResource(journalUri);
+            } else {
+                journal = model.createResource(defaultNamespace + "issn/" + resourceModel.ISSN[0]);
+                journal.addProperty(RDFS.label, resourceModel.containerTitle);
+                journal.addProperty(RDF.type, model.getResource(BIBO_JOURNAL));
+                for (String issn : resourceModel.ISSN) {
+                    journal.addProperty(model.getProperty(BIBO_ISSN), issn);
+                }
+
+                if (!StringUtils.isEmpty(resourceModel.publisher)) {
+                    Resource publisher = model.createResource(getPublisherURI(vreq, resourceModel.publisher));
+                    publisher.addProperty(RDFS.label, resourceModel.publisher);
+                    publisher.addProperty(RDF.type, model.getResource(VIVO_PUBLISHER_CLASS));
+                    publisher.addProperty(model.createProperty(VIVO_PUBLISHER_OF), journal);
+                    journal.addProperty(model.createProperty(VIVO_PUBLISHER), publisher);
+                }
             }
 
-            if (!StringUtils.isEmpty(resourceModel.publisher)) {
-                Resource publisher = model.createResource(getPublisherURI(vreq, resourceModel.publisher));
-                publisher.addProperty(RDFS.label, resourceModel.publisher);
-                publisher.addProperty(RDF.type, model.getResource(VIVO_PUBLISHER_CLASS));
-                publisher.addProperty(model.createProperty(VIVO_PUBLISHER_OF), journal);
-                journal.addProperty(model.createProperty(VIVO_PUBLISHER), publisher);
+            if (journal != null) {
+                journal.addProperty(model.getProperty(VIVO_PUBLICATIONVENUEFOR), work);
+                work.addProperty(model.getProperty(VIVO_HASPUBLICATIONVENUE), journal);
             }
-
-            journal.addProperty(model.getProperty(VIVO_PUBLICATIONVENUEFOR), work);
-            work.addProperty(model.getProperty(VIVO_HASPUBLICATIONVENUE), journal);
         }
 
         if (resourceModel.ISBN != null && resourceModel.ISBN.length > 0) {
@@ -800,6 +809,40 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
         try {
             return uriMaker.getUnusedNewURI(null);
         } catch (InsertException e) {
+        }
+
+        return null;
+    }
+
+    private String getVIVOUriForISSNs(RDFService rdfService, String[] issns) {
+        if (issns != null && issns.length > 0) {
+            for (String issn : issns) {
+                final List<String> journals = new ArrayList<String>();
+                String query = "SELECT ?journal\n" +
+                        "WHERE\n" +
+                        "{\n" +
+                        "  {\n" +
+                        "  \t?journal <http://purl.org/ontology/bibo/issn> \"" + issn + "\" .\n" +
+                        "  }\n" +
+                        "}\n";
+
+                try {
+                    rdfService.sparqlSelectQuery(query, new ResultSetConsumer() {
+                        @Override
+                        protected void processQuerySolution(QuerySolution qs) {
+                            Resource journal = qs.getResource("journal");
+                            if (journal != null) {
+                                journals.add(journal.getURI());
+                            }
+                        }
+                    });
+                } catch (RDFServiceException e) {
+                }
+
+                if (journals.size() == 1) {
+                    return journals.get(0);
+                }
+            }
         }
 
         return null;
