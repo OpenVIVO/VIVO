@@ -18,23 +18,41 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Interface to the CrossRef resolver
+ */
 public class CrossrefResolverAPI {
+    // Base URL for the resolver
     private static final String CROSSREF_RESOLVER = "http://dx.doi.org/";
 
+    /**
+     * Find the DOI in CrossRef, filling the citation object
+     *
+     * @param id
+     * @param citation
+     * @return
+     */
     public String findInExternal(String id, Citation citation) {
+        // Read JSON from the resolver
         String json = readJSON(CROSSREF_RESOLVER + id);
-        // readUrl(CROSSREF_API + id);
 
+        if (StringUtils.isEmpty(json)) {
+             return null;
+        }
+
+        // Use GSON to parse the JSON into a Java object
         Gson gson = new Gson();
         CrossrefCiteprocJSONModel jsonModel = gson.fromJson(json, CrossrefCiteprocJSONModel.class);
-//        JSONModel jsonModel = gson.fromJson(json, JSONModel.class);
         if (jsonModel == null) {
             return null;
         }
 
+        // Ensure that we have the correct resource
         if (!id.equalsIgnoreCase(jsonModel.DOI)) {
             return null;
         }
+
+        // Map the fields of the resolver response to the citation object
 
         citation.DOI = id;
         citation.type = normalizeType(jsonModel.type);
@@ -67,6 +85,12 @@ public class CrossrefResolverAPI {
         return json;
     }
 
+    /**
+     * Extract the year from the crossref JSON model
+     *
+     * @param date
+     * @return
+     */
     private Integer extractYearFromDateField(CrossrefCiteprocJSONModel.DateField date) {
         if (date == null) {
             return null;
@@ -79,12 +103,24 @@ public class CrossrefResolverAPI {
         return Integer.parseInt(date.dateParts[0][0]);
     }
 
+    /**
+     *
+     * @param externalResource
+     * @return
+     */
     public ResourceModel makeResourceModel(String externalResource) {
+        if (StringUtils.isEmpty(externalResource)) {
+            return null;
+        }
+
+        // Use GSON to parse JSON into a Java Object
         Gson gson = new Gson();
         CrossrefCiteprocJSONModel jsonModel = gson.fromJson(externalResource, CrossrefCiteprocJSONModel.class);
         if (jsonModel == null) {
             return null;
         }
+
+        // Map the fields of the Java object to the resource model
 
         ResourceModel model = new ResourceModel();
 
@@ -144,6 +180,12 @@ public class CrossrefResolverAPI {
         return model;
     }
 
+    /**
+     * Convert CiteProc name fields into resource model name fields
+     *
+     * @param nameFields
+     * @return
+     */
     private ResourceModel.NameField[] convertNameFields(CrossrefCiteprocJSONModel.NameField[] nameFields) {
         if (nameFields == null) {
             return null;
@@ -163,6 +205,12 @@ public class CrossrefResolverAPI {
         return destNameFields;
     }
 
+    /**
+     * Map non-standard publication types into the CiteProc types
+     *
+     * @param type
+     * @return
+     */
     private String normalizeType(String type) {
         if (type != null) {
             switch (type.toLowerCase()) {
@@ -180,6 +228,11 @@ public class CrossrefResolverAPI {
         return type;
     }
 
+    /**
+     * Split a name literal into first and last names
+     *
+     * @param author
+     */
     private void splitNameLiteral(CrossrefCiteprocJSONModel.NameField author) {
         if (StringUtils.isEmpty(author.family) && StringUtils.isEmpty(author.given)) {
             if (!StringUtils.isEmpty(author.literal)) {
@@ -194,6 +247,12 @@ public class CrossrefResolverAPI {
         }
     }
 
+    /**
+     * Convert a CiteProc date field to resource model date field
+     *
+     * @param dateField
+     * @return
+     */
     private ResourceModel.DateField convertDateField(CrossrefCiteprocJSONModel.DateField dateField) {
         if (dateField != null) {
             ResourceModel.DateField resourceDate = new ResourceModel.DateField();
@@ -283,11 +342,19 @@ public class CrossrefResolverAPI {
         return null;
     }
 
+    /**
+     * Read JSON from the URL
+     * @param url
+     * @return
+     */
     private String readJSON(String url) {
         try {
             HttpClient client = HttpClientFactory.getHttpClient();
             HttpGet request = new HttpGet(url);
+
+            // Content negotiate for csl / citeproc JSON
             request.setHeader("Accept", "application/vnd.citationstyles.csl+json;q=1.0");
+
             HttpResponse response = client.execute(request);
             switch (response.getStatusLine().getStatusCode()) {
                 case 200:

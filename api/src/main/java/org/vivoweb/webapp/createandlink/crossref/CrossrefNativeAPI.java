@@ -20,21 +20,42 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Interface to CrossRef's native API
+ */
 public class CrossrefNativeAPI {
+    // API endpoint address
     private static final String CROSSREF_API      = "http://api.crossref.org/works/";
 
+    /**
+     * Find the DOI in CrossRef, filling the citation object
+     *
+     * @param id
+     * @param citation
+     * @return
+     */
     public String findInExternal(String id, Citation citation) {
+        // Get JSON from the CrossRef API
         String json = readUrl(CROSSREF_API + id);
 
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
+
+        // Use GSON to parse the JSON into a Java object
         Gson gson = new Gson();
         CrossrefResponse response = gson.fromJson(json, CrossrefResponse.class);
         if (response == null || response.message == null) {
             return null;
         }
 
+        // The CrossRef API sometimes gives a false record when the DOI deosn't exist
+        // So ensure that the response we got contains the DOI we asked for
         if (!id.equalsIgnoreCase(response.message.DOI)) {
             return null;
         }
+
+        // Map the fields from the CrossRef response to the Citation object
 
         citation.DOI = id;
         citation.type = normalizeType(response.message.type);
@@ -76,6 +97,12 @@ public class CrossrefNativeAPI {
         return json;
     }
 
+    /**
+     * Retrieve the year from a compound date field
+     *
+     * @param date
+     * @return
+     */
     private Integer extractYearFromDateField(CrossrefResponse.ResponseModel.DateField date) {
         if (date == null) {
             return null;
@@ -88,12 +115,24 @@ public class CrossrefNativeAPI {
         return date.dateParts[0][0];
     }
 
+    /**
+     * Create a full resource model from the external resource (JSON)
+     * @param externalResource
+     * @return
+     */
     public ResourceModel makeResourceModel(String externalResource) {
+        if (StringUtils.isEmpty(externalResource)) {
+            return null;
+        }
+
+        // Use GSON to parse the JSON into a Java object
         Gson gson = new Gson();
         CrossrefResponse response = gson.fromJson(externalResource, CrossrefResponse.class);
         if (response == null || response.message == null) {
             return null;
         }
+
+        // Map the fields from the CrossRef response to the resource model
 
         ResourceModel model = new ResourceModel();
 
@@ -154,6 +193,12 @@ public class CrossrefNativeAPI {
         return model;
     }
 
+    /**
+     * Map non-standard publication types into the CiteProc types
+     *
+     * @param type
+     * @return
+     */
     private String normalizeType(String type) {
         if (type != null) {
             switch (type.toLowerCase()) {
@@ -171,6 +216,12 @@ public class CrossrefNativeAPI {
         return type;
     }
 
+    /**
+     * Convert a date field from the CrossRef response to the internal resource model format
+     *
+     * @param dateField
+     * @return
+     */
     private ResourceModel.DateField convertDateField(CrossrefResponse.ResponseModel.DateField dateField) {
         if (dateField != null) {
             ResourceModel.DateField resourceDate = new ResourceModel.DateField();
@@ -192,6 +243,12 @@ public class CrossrefNativeAPI {
         return null;
     }
 
+    /**
+     * Read JSON from the given URL
+     *
+     * @param url
+     * @return
+     */
     private String readUrl(String url) {
         try {
             HttpClient client = HttpClientFactory.getHttpClient();
@@ -211,6 +268,9 @@ public class CrossrefNativeAPI {
         return null;
     }
 
+    /**
+     * Java object representation of the JSON returned by CrossRef
+     */
     private static class CrossrefResponse {
         public ResponseModel message;
 
