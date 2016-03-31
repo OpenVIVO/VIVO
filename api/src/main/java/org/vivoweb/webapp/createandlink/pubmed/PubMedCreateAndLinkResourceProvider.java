@@ -126,7 +126,7 @@ public class PubMedCreateAndLinkResourceProvider implements CreateAndLinkResourc
                 resourceModel.issue = response.issue;
                 if (response.pages.contains("-")) {
                     int hyphen = response.pages.indexOf('-');
-                    resourceModel.pageStart = response.pages.substring(0, hyphen - 1);
+                    resourceModel.pageStart = response.pages.substring(0, hyphen);
                     resourceModel.pageEnd = response.pages.substring(hyphen + 1);
                 } else {
                     resourceModel.pageStart = response.pages;

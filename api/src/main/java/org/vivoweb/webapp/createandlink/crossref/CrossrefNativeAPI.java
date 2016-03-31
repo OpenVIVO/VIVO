@@ -167,7 +167,7 @@ public class CrossrefNativeAPI {
         if (!StringUtils.isEmpty(response.message.page)) {
             if (response.message.page.contains("-")) {
                 int hyphen = response.message.page.indexOf('-');
-                model.pageStart = response.message.page.substring(0, hyphen - 1);
+                model.pageStart = response.message.page.substring(0, hyphen);
                 model.pageEnd = response.message.page.substring(hyphen + 1);
             } else {
                 model.pageStart = response.message.page;

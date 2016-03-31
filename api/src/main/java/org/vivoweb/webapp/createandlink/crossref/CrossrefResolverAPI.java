@@ -153,7 +153,7 @@ public class CrossrefResolverAPI {
         if (!StringUtils.isEmpty(jsonModel.page)) {
             if (jsonModel.page.contains("-")) {
                 int hyphen = jsonModel.page.indexOf('-');
-                model.pageStart = jsonModel.page.substring(0, hyphen - 1);
+                model.pageStart = jsonModel.page.substring(0, hyphen);
                 model.pageEnd = jsonModel.page.substring(hyphen + 1);
             } else {
                 model.pageStart = jsonModel.page;
