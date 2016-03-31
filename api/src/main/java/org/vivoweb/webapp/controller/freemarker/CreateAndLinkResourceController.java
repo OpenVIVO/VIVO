@@ -751,7 +751,9 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
 
         // Generate a URI for the reource (DOI based if we have one, otherwise a standard URI)
         if (!StringUtils.isEmpty(resourceModel.DOI)) {
-            vivoUri = defaultNamespace + "doi/" + resourceModel.DOI.toLowerCase();
+            vivoUri = defaultNamespace + "doi" + resourceModel.DOI.toLowerCase();
+        } else if (!StringUtils.isEmpty(resourceModel.PubMedID)) {
+            vivoUri = defaultNamespace + "pmid" + resourceModel.PubMedID;
         } else {
             vivoUri = getUnusedUri(vreq);
         }
@@ -798,7 +800,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                 journal = model.getResource(journalUri);
             } else {
                 // Create a new journal, using the ISSN for a Uri
-                journal = model.createResource(defaultNamespace + "issn/" + resourceModel.ISSN[0]);
+                journal = model.createResource(defaultNamespace + "issn" + resourceModel.ISSN[0]);
                 journal.addProperty(RDFS.label, resourceModel.containerTitle);
                 journal.addProperty(RDF.type, model.getResource(BIBO_JOURNAL));
                 for (String issn : resourceModel.ISSN) {
@@ -961,7 +963,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                 publisherUri += "/";
             }
 
-            publisherUri += "publisher/" + publisher.trim().replaceAll("[^a-zA-Z0-9/]" , "-");
+            publisherUri += "publisher" + publisher.trim().replaceAll("[^a-zA-Z0-9/]" , "-");
 
             return publisherUri;
         }
@@ -984,10 +986,10 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                 vcardUri += "/";
             }
 
-            vcardUri += "vcard/" + familyName.replaceAll("[^a-zA-Z0-9/]" , "-");
+            vcardUri += "vcard" + familyName.replaceAll("[^a-zA-Z0-9/]" , "-");
 
             if (!StringUtils.isEmpty(givenName)) {
-                vcardUri += "/" + givenName.replaceAll("[^a-zA-Z0-9/]" , "-");
+                vcardUri += "--" + givenName.replaceAll("[^a-zA-Z0-9/]" , "-");
             }
 
             return vcardUri;
@@ -1029,9 +1031,9 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
 
         String dateUri = vreq.getUnfilteredWebappDaoFactory().getDefaultNamespace();
         if (dateUri.endsWith("/")) {
-            dateUri += "date/" + formattedDate;
+            dateUri += "date" + formattedDate;
         } else {
-            dateUri += "/date/" + formattedDate;
+            dateUri += "/date" + formattedDate;
         }
 
         Resource dateResource = model.createResource(dateUri).addProperty(RDF.type, model.getResource("http://vivoweb.org/ontology/core#DateTimeValue"));
