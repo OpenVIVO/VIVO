@@ -1332,6 +1332,19 @@
     <servlet-name>createAndLinkResource</servlet-name>
     <url-pattern>/createAndLink/*</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description>Orcid Authentication</description>
+    <servlet-name>orcidAuth</servlet-name>
+    <servlet-class>org.vivoweb.webapp.controller.freemarker.OrcidAuthController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>orcidAuth</servlet-name>
+    <url-pattern>/orcidAuth</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>orcidAuth</servlet-name>
+    <url-pattern>/orcidAuth/*</url-pattern>
+  </servlet-mapping>
 
   <!-- ============================== servlet-mappings ======================== -->
    <servlet-mapping>
