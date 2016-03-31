@@ -733,9 +733,6 @@ public class OrcidAuthController extends FreemarkerHttpServlet {
                 @SerializedName("contact-details")
                 ContactDetails contactDetails;
 
-                @SerializedName("external-identifiers")
-                ExternalIdentifiers externalIdentifiers;
-
                 Keywords keywords;
 
                 @SerializedName("personal-details")
@@ -757,12 +754,6 @@ public class OrcidAuthController extends FreemarkerHttpServlet {
                         String value;
                         String visibility;
                     }
-                }
-
-                private class ExternalIdentifiers {
-                    @SerializedName("external-identifier")
-                    String[] externalIdentifier;
-                    String visibility;
                 }
 
                 private class Keywords {
