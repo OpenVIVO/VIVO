@@ -73,6 +73,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
      */
     public static final String BIBO_ABSTRACT = "http://purl.org/ontology/bibo/abstract";
     public static final String BIBO_ARTICLE = "http://purl.org/ontology/bibo/Article";
+    public static final String BIBO_BOOK = "http://purl.org/ontology/bibo/Book";
     public static final String BIBO_DOI = "http://purl.org/ontology/bibo/doi";
     public static final String BIBO_ISBN10 = "http://purl.org/ontology/bibo/isbn10";
     public static final String BIBO_ISBN13 = "http://purl.org/ontology/bibo/isbn13";
@@ -789,37 +790,39 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
         }
 
         // Add the journal
-        if (resourceModel.ISSN != null && resourceModel.ISSN.length > 0) {
-            Resource journal = null;
+        if (!"book".equals(resourceModel.type) && !"chapter".equals(resourceModel.type)) {
+            if (resourceModel.ISSN != null && resourceModel.ISSN.length > 0) {
+                Resource journal = null;
 
-            // Try to find the ISSN in VIVO
-            String journalUri = findVIVOUriForISSNs(vreq.getRDFService(), resourceModel.ISSN);
+                // Try to find the ISSN in VIVO
+                String journalUri = findVIVOUriForISSNs(vreq.getRDFService(), resourceModel.ISSN);
 
-            if (journalUri != null) {
-                // If we jave a Journal URI, get the resource from the model
-                journal = model.getResource(journalUri);
-            } else {
-                // Create a new journal, using the ISSN for a Uri
-                journal = model.createResource(defaultNamespace + "issn" + resourceModel.ISSN[0]);
-                journal.addProperty(RDFS.label, resourceModel.containerTitle);
-                journal.addProperty(RDF.type, model.getResource(BIBO_JOURNAL));
-                for (String issn : resourceModel.ISSN) {
-                    journal.addProperty(model.getProperty(BIBO_ISSN), issn);
+                if (journalUri != null) {
+                    // If we jave a Journal URI, get the resource from the model
+                    journal = model.getResource(journalUri);
+                } else {
+                    // Create a new journal, using the ISSN for a Uri
+                    journal = model.createResource(defaultNamespace + "issn" + resourceModel.ISSN[0]);
+                    journal.addProperty(RDFS.label, resourceModel.containerTitle);
+                    journal.addProperty(RDF.type, model.getResource(BIBO_JOURNAL));
+                    for (String issn : resourceModel.ISSN) {
+                        journal.addProperty(model.getProperty(BIBO_ISSN), issn);
+                    }
+
+                    if (!StringUtils.isEmpty(resourceModel.publisher)) {
+                        Resource publisher = model.createResource(getPublisherURI(vreq, resourceModel.publisher));
+                        publisher.addProperty(RDFS.label, resourceModel.publisher);
+                        publisher.addProperty(RDF.type, model.getResource(VIVO_PUBLISHER_CLASS));
+                        publisher.addProperty(model.createProperty(VIVO_PUBLISHER_OF), journal);
+                        journal.addProperty(model.createProperty(VIVO_PUBLISHER), publisher);
+                    }
                 }
 
-                if (!StringUtils.isEmpty(resourceModel.publisher)) {
-                    Resource publisher = model.createResource(getPublisherURI(vreq, resourceModel.publisher));
-                    publisher.addProperty(RDFS.label, resourceModel.publisher);
-                    publisher.addProperty(RDF.type, model.getResource(VIVO_PUBLISHER_CLASS));
-                    publisher.addProperty(model.createProperty(VIVO_PUBLISHER_OF), journal);
-                    journal.addProperty(model.createProperty(VIVO_PUBLISHER), publisher);
+                // Add relationships between our resource and the journal
+                if (journal != null) {
+                    journal.addProperty(model.getProperty(VIVO_PUBLICATIONVENUEFOR), work);
+                    work.addProperty(model.getProperty(VIVO_HASPUBLICATIONVENUE), journal);
                 }
-            }
-
-            // Add relationships between our resource and the journal
-            if (journal != null) {
-                journal.addProperty(model.getProperty(VIVO_PUBLICATIONVENUEFOR), work);
-                work.addProperty(model.getProperty(VIVO_HASPUBLICATIONVENUE), journal);
             }
         }
 
@@ -831,6 +834,40 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                     work.addProperty(model.getProperty(BIBO_ISBN10), isbn);
                 } else {
                     work.addProperty(model.getProperty(BIBO_ISBN13), isbn);
+                }
+            }
+
+            if ("chapter".equals(resourceModel.type)) {
+                Resource book = null;
+
+                String bookUri = findVIVOUriForISBNs(vreq.getRDFService(), resourceModel.ISBN);
+                if (StringUtils.isEmpty(bookUri)) {
+                    book = model.createResource(defaultNamespace + "isbn" + resourceModel.ISBN[0]);
+
+                    book.addProperty(RDFS.label, resourceModel.containerTitle);
+                    book.addProperty(RDF.type, model.getResource(BIBO_BOOK));
+                    for (String isbn : resourceModel.ISBN) {
+                        if (getDigitCount(isbn) == 10) {
+                            book.addProperty(model.getProperty(BIBO_ISBN10), isbn);
+                        } else {
+                            book.addProperty(model.getProperty(BIBO_ISBN13), isbn);
+                        }
+                    }
+
+                    if (!StringUtils.isEmpty(resourceModel.publisher)) {
+                        Resource publisher = model.createResource(getPublisherURI(vreq, resourceModel.publisher));
+                        publisher.addProperty(RDFS.label, resourceModel.publisher);
+                        publisher.addProperty(RDF.type, model.getResource(VIVO_PUBLISHER_CLASS));
+                        publisher.addProperty(model.createProperty(VIVO_PUBLISHER_OF), book);
+                        book.addProperty(model.createProperty(VIVO_PUBLISHER), publisher);
+                    }
+                } else {
+                    book = model.getResource(bookUri);
+                }
+
+                if (book != null) {
+                    book.addProperty(model.getProperty(VIVO_PUBLICATIONVENUEFOR), work);
+                    work.addProperty(model.getProperty(VIVO_HASPUBLICATIONVENUE), book);
                 }
             }
         }
@@ -1101,6 +1138,59 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
         }
 
         // No journal found, so return null
+        return null;
+    }
+
+    /**
+     * Find a Uri for an ISBN
+     *
+     * @param rdfService
+     * @param isbns
+     * @return
+     */
+    private String findVIVOUriForISBNs(RDFService rdfService, String[] isbns) {
+        // First look to see if any journals already define the ISSN
+        if (isbns != null && isbns.length > 0) {
+            for (String isbn : isbns) {
+                final List<String> books = new ArrayList<String>();
+                String query = "SELECT ?book\n" +
+                        "WHERE\n" +
+                        "{\n" +
+                        "  {\n" +
+                        (getDigitCount(isbn) == 10 ?
+                        "  \t?book <http://purl.org/ontology/bibo/isbn10> \"" + isbn + "\" .\n" :
+                        "  \t?book <http://purl.org/ontology/bibo/isbn13> \"" + isbn + "\" .\n" ) +
+                        "  \t?book a <http://purl.org/ontology/bibo/Book> .\n" +
+                        "  }\n" +
+                        "}\n";
+
+                try {
+                    rdfService.sparqlSelectQuery(query, new ResultSetConsumer() {
+                        @Override
+                        protected void processQuerySolution(QuerySolution qs) {
+                            Resource book = qs.getResource("book");
+                            if (book != null) {
+                                books.add(book.getURI());
+                            }
+                        }
+                    });
+                } catch (RDFServiceException e) {
+                }
+
+                // We've found a book that matches, so use that
+                if (books.size() > 0) {
+                    for (String url : books) {
+                        if (url.contains("doi")) {
+                            return url;
+                        }
+                    }
+
+                    return books.get(0);
+                }
+            }
+        }
+
+        // No books found, so return null
         return null;
     }
 
