@@ -70,9 +70,9 @@ public class OrcidAuthController extends FreemarkerHttpServlet {
         super.init();
 
         ConfigurationProperties configProperties = ConfigurationProperties.getBean(getServletContext());
-        clientId     = configProperties.getProperty("orcid.clientId");
-        clientSecret = configProperties.getProperty("orcid.clientPassword");
-        callbackUrl  = configProperties.getProperty("orcid.callbackUrl");
+        clientId     = configProperties.getProperty("auth.orcid.clientId");
+        clientSecret = configProperties.getProperty("auth.orcid.clientPassword");
+        callbackUrl  = configProperties.getProperty("auth.orcid.callbackUrl");
     }
 
     /**
