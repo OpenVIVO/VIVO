@@ -1090,7 +1090,12 @@
     <servlet-name>ontology</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.OntologyController</servlet-class>
   </servlet>
-  
+
+  <servlet>
+    <servlet-name>openvivoindividual</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.individual.OpenVIVOIndividualController</servlet-class>
+  </servlet>
+
   <servlet>
     <servlet-name>individual</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.individual.IndividualController</servlet-class>
@@ -1356,29 +1361,33 @@
     <servlet-name>ontology</servlet-name>
     <url-pattern>/ontology/*</url-pattern>
   </servlet-mapping>
-    
+
   <servlet-mapping>
-    <servlet-name>individual</servlet-name>
+    <servlet-name>openvivoindividual</servlet-name>
+    <url-pattern>/a/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>openvivoindividual</servlet-name>
     <url-pattern>/entity</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>individual</servlet-name>
+    <servlet-name>openvivoindividual</servlet-name>
     <url-pattern>/entity/*</url-pattern>
   </servlet-mapping>
     <servlet-mapping>
-    <servlet-name>individual</servlet-name>
+      <servlet-name>openvivoindividual</servlet-name>
     <url-pattern>/individual</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>individual</servlet-name>
+    <servlet-name>openvivoindividual</servlet-name>
     <url-pattern>/individual/*</url-pattern>
   </servlet-mapping>
     <servlet-mapping>
-    <servlet-name>individual</servlet-name>
+      <servlet-name>openvivoindividual</servlet-name>
     <url-pattern>/display</url-pattern>
   </servlet-mapping> 
   <servlet-mapping>
-    <servlet-name>individual</servlet-name>
+    <servlet-name>openvivoindividual</servlet-name>
     <url-pattern>/display/*</url-pattern>
   </servlet-mapping>
 
