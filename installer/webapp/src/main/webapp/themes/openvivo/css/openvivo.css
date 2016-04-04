@@ -1155,6 +1155,89 @@ ul#individual-tools-people li a {
     display: none;
 }
 
+#login-orcid {
+    float: right;
+    width: 314px;
+    border: 1px solid #e8ece9;
+    margin-right: 25px;
+    padding-bottom: 30px;
+    margin-bottom: 30px;
+    overflow: hidden;
+    margin-top: 20px;
+}
+body.login #login-orcid {
+    float: none;
+}
+#login-orcid h2 {
+    font-size: 22px;
+    color: #2485ae;
+    padding-left: 15px;
+    padding-top: 18px;
+    border-bottom: none;
+}
+#login-orcid-form p {
+    display: block;
+    color: #5e6363;
+    padding-top: 0;
+    padding-left: 38px;
+    font-size: 14px;
+}
+#login-orcid-form input.text-field {
+    border: 0;
+    font-size: 14px;
+    padding: 5px;
+    width: 219px;
+    height: 24px;
+    margin-left: 38px;
+    background: #fff;
+    border: 1px solid #e0dfdf;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
+#login-orcid-form input.text-field:focus {
+    border: 1px solid rgba(57, 138, 172, .5);
+    background-color: rgba(57, 138, 172, .1);
+}
+#login-orcid-form p.submit {
+    width: 100px;
+    height: 40px;
+    margin-top: 20px;
+    margin-left: 38px;
+}
+#login-orcid-form p.submit-password {
+    height: 40px;
+    margin-top: 20px;
+    margin-left: 38px;
+}
+#login-orcid-form input.checkbox-remember-me {
+    float: left;
+    height: 14px;
+    width: 14px;
+    color: #5e6363;
+    padding: 0;
+    margin-top: 33px;
+    margin-left: 20px;
+}
+#login-orcid-form label.label-remember-me {
+    display: block;
+    float: right;
+    color: #5e6363;
+    font-size: 12px;
+    width: 100px;
+    margin: 0;
+    padding: 0;
+    margin-top: 29px;
+    margin-right: 32px;
+}
+#login-orcid-form .button {
+    background-color: #3E8BAA;
+}
+
+#login-orcid-form .button:hover {
+    background-color: #3446A0;
+}
+
 /* ------------------------------------------------->  */
 /* INDIVIDUAL LIST --------------------------------->  */
 /* ------------------------------------------------->  */
