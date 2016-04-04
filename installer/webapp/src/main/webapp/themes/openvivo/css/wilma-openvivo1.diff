@@ -1,0 +1,842 @@
+$ diff webapp/src/main/webapp/themes/openvivo/css/openvivo.css ../VIVO/webapp/src/main/webapp/themes/wilma/css/wilma.css 
+6,8d5
+< /* orcid.org green - a6ce39 */
+< 
+< 
+26c23
+<     font-family: Calibri,"Helvetica Neue",Helvetica,Arial,sans-serif; 
+---
+>     font-family: "Lucida Sans Unicode","Lucida Grande", Geneva, helvetica, sans-serif; 
+33c30
+<    background: #d4d5d6; 
+---
+>    background: #f3f3f0 url(../images/header-background.png) center 0 no-repeat; 
+36c33
+<     color: #0082bf;
+---
+>     color: #2485AE;
+46,57d42
+< 
+< #wrapper-content a { 
+<     font-weight: 700;
+<     text-decoration: none;
+< }
+< 
+<     #wrapper-content a:hover { 
+<         text-decoration: underline;
+<     }
+< 
+< li { line-height: 1.15em; }
+< 
+462,466d446
+< header {
+<     z-index: 0;
+<     background-color: #FFF;
+< }
+< 
+468,469d447
+<   background-image: linear-gradient(#fff 50px, #b1a3c7 15%, #61468B 100%);
+<     padding-bottom: 1em;
+471a450
+>     height: 114px;
+474,563c453,454
+< /* Northwestern Medicine */
+<     #NM-hdr {
+<         height: 25px;
+<         padding: 15px;
+<     }
+<     #NMLogo {
+<         background: url("http://deptcommon.fsm.northwestern.edu/images/nm/NM-FSM-sprite.png") no-repeat scroll 0 0 rgba(0, 0, 0, 0);
+<         display: block;
+<         float: left;
+<         height: 40px;
+<         position: relative;
+<         width: 200px;
+<     }
+<     #NMLogo a {
+<         display: block;
+<         float: left;
+<         height: 40px;
+<         width: 140px;
+<     }
+< 
+<     #NMLogo  a .alt {
+<        display: none;
+<     }
+<     
+<     #NMLogo:hover {
+<         background-position: 0 -50px;
+<     }
+<     
+<     #NMLogo:hover .arrow {
+<         display: inline-block;
+<         opacity: 0.5;
+<     }
+< 
+<     #NMLogo .arrow {
+<         background: url("http://deptcommon.fsm.northwestern.edu/images/nm/NM-FSM-sprite.png") no-repeat scroll -150px -100px rgba(0, 0, 0, 0);
+<         display: none;
+<         float: left;
+<         height: 15px;
+<         margin-left: 20px;
+<         margin-top: 5px;
+<         width: 15px;
+<     }
+< 
+< #FeinbergHomeText {
+<   font: 16px "Helvetica Neue",Helvetica,Arial;
+< }
+< 
+< #FeinbergHomeText h4 {
+<     margin-top: 5px;
+<     padding: 0;
+< }
+< 
+<   #FeinbergHomeText a {
+<       color: #ffffff;
+<       text-decoration: none;
+<   }
+< 
+<     #FeinbergHomeText a:hover {
+<       opacity: 0.7;
+<     }
+< 
+<         #FeinbergHomeText h4 a:hover .arrow {
+<             background: url("http://deptcommon.fsm.northwestern.edu/images/nm/NM-FSM-sprite.png") no-repeat scroll -100px -98px rgba(0, 0, 0, 0);
+<             display: inline-block;
+<             height: 16px;
+<             margin-left: 12px;
+<             opacity: 0.5;
+<             width: 15px;
+<         }
+< 
+<   #FeinbergHomeText h1 {
+<       font-size: 40px;
+<       margin: 0;
+<   }
+< 
+< #branding #search {
+<     width: 260px !important;
+< }
+< #branding #search #search-form {
+<     width: 260px !important;
+< }
+< #branding #search .search-vivo {
+<     clear: none;
+<     color: #6C7272 !important;
+<     float: left !important;
+<     font-style: italic;
+<     width: 200px !important;
+< }
+< #branding #search .search {
+<     float: right;
+---
+> /* BRANDING ------>  */
+> h1.vivo-logo {
+565c456,465
+<     left: 215px;
+---
+>     width: 442px;
+>     height: 59px;
+>     top: 28px;
+>     left: 0;
+>     background: url(../images/VIVO-logo.png) 0 0 no-repeat;
+> }
+> h1.vivo-logo a {
+>     display: block;
+>     width: 386px;
+>     height: 59px;
+567,569d466
+< 
+< 
+< 
+571d467
+< header#branding nav { position:absolute; top: 0; right: 0; }
+573d468
+<     color: #7f8283;
+579d473
+<     z-index: 1000 !important;
+587a482
+>     color: #fff;
+594c489,490
+< ul#header-nav a {
+---
+> ul#header-nav a:hover,
+> ul#header-nav a:active {
+596,599c492
+<     color: #7f8283 !important;
+< }
+< ul#header-nav a:hover {
+<     opactiy: 0.7 !important;
+---
+>     color: #999;
+609c502
+<     top: 88px;
+---
+>     top: 40px;
+616c509,519
+<     /*background: url(../images/search-interior-pages.png) 0 0 no-repeat; */
+---
+>     background: url(../images/search-interior-pages.png) 0 0 no-repeat;
+> }
+> #search-field input.search {
+>     text-decoration: none;
+>     background-color: transparent;
+>     color: #fff;
+>     font-size: 14px;
+>     border: none;
+>     padding-left: 25px;
+>     padding-top: 8px;
+>     cursor: pointer;
+618d520
+< 
+620,623d521
+<     /*background-color: #FFF;
+<     border: 0 none;
+<     border-radius: 0;
+<     color: #6d6e71;
+625,645c523,530
+<     font: italic 17px Calibri,Helvetica,Arial;
+<     margin-left: 5px;
+<     outline: medium none;
+<     padding: 0;*/
+<     background-color: #FFF !important;
+<     float: right;
+<     opacity: 1 !important;
+<     position: absolute;
+<     width: 225px !important;
+<     /*
+<     background-color: #FFF;
+<     border-color: #ccc;
+<     border-radius: 0;
+<     border-style: solid;
+<     border-width: 1px 0 1px 1px;
+<     height: 23px;
+<     margin-left: 0;
+<     margin-top: 0;
+<     text-align: right;
+<     width: 274px;
+<     */
+---
+>     width: 290px;
+>     height: 25px;
+>     border: 0;
+>     font-size: 16px;
+>     color: #5e6363;
+>     margin-left: 10px;
+>     margin-top: 5px;
+>     padding: 0;
+650,654d534
+< 
+< .home #browse { padding-top: 7px; float: right; font-size: .85em; }
+< 
+< .home #browse:before { content:"or ";}
+< 
+659,661c539,541
+<     height: 42px;
+<     border: none;
+<     background-color: #e6e6e6;
+---
+>     height: 46px;
+>     border: 1px solid #dce4e3;
+>     background-color: #f7f9f9;
+669c549,550
+<     line-height: 42px;
+---
+>     line-height: 46px;
+>     background: url(../images/separator-main-nav.jpg) right -2px no-repeat;
+671,674d551
+< 
+<     #main-nav li:first-of-type { padding-left: 15px; }
+<       #main-nav li:first-of-type a { border-left: 2px solid #FFF; }
+< 
+676,678c553,554
+<     border-right: 2px solid #FFF;
+<     font-size: 18px;
+<     padding: 0px 10px;
+---
+>     padding-left: 16px;
+>     padding-right: 16px;
+680c556
+<     color: #54585a;
+---
+>     color: #706a66;
+684,685c560
+<     background-color: #d4d5d6;
+<     color: #0082bf;
+---
+>     color: #002b44;
+688,692c563,565
+<     background-color: #FFF;
+<     border-right: medium none;
+<     margin-top: -4px;
+<     padding-top: 4px;
+<     position: relative;
+---
+>     color: #002b44;
+>     background: url(../images/selected-main-nav.jpg) left -1px no-repeat;
+>     margin-left: 18px;
+694,698d566
+< 
+<   #main-nav li > a.selected {
+<       margin-left: -2px;
+<   }
+< 
+706d573
+<     overflow: auto;
+714a582,584
+> body.loggedIn #intro {
+>     width: 98%;
+> }
+716c586
+<     padding: 15px 0 12px 24px;
+---
+>     padding: 35px 0 12px 24px;
+738,746d607
+< 
+< .home #home-image {
+<     border: 8px solid #fff;
+<     border-radius: 5px;
+<     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.38);
+<     float: right;
+<     height: 300px;
+< }
+< 
+911c772
+<   padding-left: 24px;
+---
+>     padding-left: 24px;
+913,925c774,777
+< 
+< input.search {
+<     background:  url(../images/search-icon_FSM.png) center center no-repeat #D4D5D6;
+<     border-color: #CCC !important;
+<     border-style: solid !important;
+<     border-width: 1px 1px 1px 0px !important;
+<     color: #fff;
+<     font-size: 0px !important;
+<     height: 39px;
+<     padding: 9px;
+<     position: absolute;
+<     text-decoration: none;
+<     width: 39px;
+---
+> #search-home-field {
+>     width: 483px;
+>     height: 44px;
+>     background: url(../images/search-field-and-button.gif) 0 0 no-repeat;
+928c780,787
+<     position: relative !important;
+---
+>     text-decoration: none;
+>     background-color: transparent;
+>     color: #fff;
+>     font-size: 18px;
+>     border: none;
+>     padding-left: 23px;
+>     padding-top: 8px;
+>     cursor: pointer;
+930,934d788
+<   input.search:hover,
+<     #search-home-field input.search:hover {
+<         background-color: #a9abac;
+<     }
+< 
+939c793
+<     height: 26px;
+---
+>     height: 20px;
+942c796
+<     color: #5E6363;
+---
+>     color: #5e6363;
+947a802
+> 
+949,951c804,805
+<     background-color: #F9FAFA;
+<         height: auto !important;
+<         width: 418px;
+---
+>     background: url(../images/search-field-and-button.gif) 0 0 no-repeat;
+>     width: 520px;
+954,956c808,813
+< /*    background-color: url(../images/search-field-and-button.gif) center center no-repeat; */
+<         color: #fff;
+<     border: none;
+---
+>     background-color: transparent;
+>     color: #fff;
+>     border: none;
+> }
+> a.filter-search {
+>   right: 109px;
+958,959d814
+< 
+< input.search-vivo,
+961,972c816,820
+<         border-color: #CCC;
+<         border-style: solid;
+<     border-width: 1px 0px 1px 1px;
+<     background-color: #f9fafa;
+<     background-position: right;
+<         border-radius: 0;
+<         height: 23px;
+<         margin-left: 0;
+<         margin-top: 0;
+<     opacity: .5;
+<     text-align:right;
+<         width: 324px; 
+---
+>     border: 0;
+>     background-color: #f9fafa;
+>     background-position: right;
+>     opacity: .5;
+>     text-align:right; 
+975,986c823,828
+< #search-homepage a.filter-search {
+<     background-image: url("../images/filteredSearch_new.gif");
+<     height: 39px;
+<     right: 130px;
+<     width: 39px
+< }
+<     .filter-default {
+<         background-position: 0 0;
+<     }
+<     .filter-active {
+<         background-position: 0px 38px;
+<     }
+---
+> .filter-default {
+>     background: url(../images/filteredSearch.gif) 0 0 no-repeat;
+> }
+> .filter-active {
+>     background: url(../images/filteredSearchActive.gif) 0 0 no-repeat;
+> }
+988,990c830,834
+<     background-color: #6C7474;
+<     color: #fff;
+<     right: 109px;
+---
+>     background-color: #2d3535;
+>     color: #fff;
+>     background-color: #2d3535;
+>     color: #fff;
+>     right: 109px;
+993,995c837,839
+<     background-image: none;
+<     padding-left: 0;
+<     margin-left: 0;
+---
+>     background-image: none;
+>     padding-left: 0;
+>     margin-left: 0;
+1004,1005c848,849
+<     border-bottom: 1px dotted #cfcfcf;
+<     color: #ccc;
+---
+>     border-bottom: 1px dotted #4f5656;
+>     color: #1483A4;
+1008,1018d851
+< /* HOME IMAGE------>  */ 
+< 
+< #image-home {
+<     float: right;
+<     padding: 20px;
+<     width: 300px;
+< }
+<     #image-home img { 
+<         border-radius: 10px;
+<     }
+< 
+1049c882,884
+<   background-color: #fff; /* layer fill content */
+---
+>     border-top: 1px dotted #dbe3e3; /* stroke */
+>     border-bottom: 1px dotted #dbe3e3; /* stroke */
+>     background-color: #fff; /* layer fill content */
+1052c887,891
+<     color: #61468b;
+---
+>     border-top: 1px solid rgba(220,228,227,.42); /* stroke */
+>     border-bottom: 1px solid rgba(220,228,227,.42); /* stroke */
+>     background-color: #395d7f; /* layer fill content */
+>     border-bottom: 2px solid #62b6d7;
+>     color: #fff;
+1054,1055d892
+< 
+< 
+1057c894
+<     margin-top: 30px;
+---
+>     margin-top: 30px;
+1060,1062c897,904
+<   border: 1px solid #ccc;
+<     border-radius: 10px;
+<     box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.38);
+---
+>     -moz-border-radius: 6px;
+>     -webkit-border-radius: 6px;
+>     border-radius: 6px; /* border radius */
+>     -moz-background-clip: padding;
+>     -webkit-background-clip: padding-box;
+>     background-clip: padding-box; /* prevents bg color from leaking outside the border */
+>     background: #5e6363 url(../images/stats-bg.png) repeat-x 0 0;
+>     color: #fff;
+1065c907
+<     opacity: .8;
+---
+>     opacity: .5;
+1067,1068c909,911
+< #stats .stats-count { 
+<     color: #61468b;
+---
+> #stats .stats-count span {
+>     color: #fff;
+>     opacity: .5;
+1070,1080d912
+<     #stats .stats-count span {
+<         display: inline-block !important;
+<         opacity: .5;
+<     }
+<     
+< #stats a:hover { text-decoration: none !important;}
+< #stats .stats-type {
+<     border-top: 1px solid #CCC;
+<     color: #595b5b;
+< }
+< 
+1082,1084c914,916
+<   width: 297px; 
+<   float: left;
+<   clear: both;
+---
+>   width: 297px; 
+>   float: left;
+>   clear: both;
+1087,1090c919
+<     list-style: none;
+<     margin-top: .25em;
+<     /* list-style: outside url('http://deptcommon.fsm.northwestern.edu/images/sidebar-arrow-gray.gif') disc !important; */
+<     padding: 0.4em 0 0.6em 0.5em;
+---
+>   padding: 0.7em 0 0.6em 0.75em; 
+1093,1096c922,924
+<     clear: both;
+<   line-height: 1.25em;
+<   margin-top: 0.7em; 
+<   font-size: 0.9em;
+---
+>   line-height: 1.25em;
+>   margin-top: 0.7em; 
+>   font-size: 0.9em;
+1099,1100c927,928
+<   text-align:right;
+<   padding: 4px 16px 0 0;
+---
+>   text-align:right;
+>   padding: 4px 16px 0 0;
+1102,1115c930,938
+< #home-research li a .number {
+<     background: url("../images/li-background_FSM-angle.png") no-repeat scroll 0 0 #775E9E;
+<     float: left;
+<     height: 28px;
+<     margin-bottom: 1em;
+<     margin-right: .5em;
+<     padding-left: 10px;
+<     padding-top: 0.2em;
+<     position: relative;
+<     text-align: center;
+<     text-decoration: none;
+<     top: -5px;
+<     vertical-align: middle;
+<     width: 47px;
+---
+> #home-research li span {
+>   color: #fff;
+>   background: url(../../../images/count-background.png) no-repeat;
+>   width: 65px;
+>   height: 27px;
+>   display: inline-block;
+>   padding: 6px 8px 0 0;
+>   margin-left: 4px;
+>   text-align: center;
+1117,1124d939
+<     
+<     #home-research li a .number span {
+<         color: #FFF;
+<         display: block;
+<         font-size: 1em;
+<         margin-top:3px; 
+<     }
+< 
+1126,1128c941,943
+<   width: 297px; 
+<   margin-left: 15px;
+<   float: left;
+---
+>   width: 297px; 
+>   margin-left: 15px;
+>   float: left;
+1138,1139c953,954
+<     list-style: outside url("http://deptcommon.fsm.northwestern.edu/images/sidebar-arrow-gray.gif") disc; 
+<   padding: 0.4em 0 0.6em 1.65em;
+---
+>     list-style: disc outside url(../../../images/arrowIcon.gif); 
+>   padding: 0.4em 0 0.6em 1.8em; 
+1142,1145c957,960
+<   line-height: 1.25em;
+<   padding-top: 1.0em;
+<   padding-right: 4px;
+<   font-size: 0.9em;
+---
+>   line-height: 1.25em;
+>   padding-top: 1.0em;
+>   padding-right: 4px;
+>   font-size: 0.9em;
+1148,1150c963,965
+<   width: 297px; 
+<   margin: 0 0 20px 15px;
+<   float: left;
+---
+>   width: 297px; 
+>   margin: 0 0 20px 15px;
+>   float: left;
+1157,1161d971
+< 
+< #home-faculty-mbrs ul#facultyThumbs {
+<     margin-left: .7em;
+< }
+< 
+1165d974
+<     margin-top: -0.35em;
+1179a989
+>     padding: 0px 8px 10px 10px; 
+1195d1004
+< div.adjImgHeight,
+1197,1202c1006,1009
+<     border-radius: 5px;
+<     float: left;
+<     height: 75px;
+<     margin: 0 10px 10px 0;
+<     overflow: hidden;
+<     width: 60px;
+---
+>     height:65px;
+>     overflow:hidden;
+>     float:left;
+>     margin-bottom:10px;
+1204,1209d1010
+<     /* Fix for short images */
+<     #home-faculty-mbrs #research-faculty-mbrs ul#facultyThumbs li.individual > img {
+<         border-radius: 5px;
+<         margin: 0 10px 10px 0;
+<     }
+< 
+1211,1212c1012,1013
+<   clear: both;
+<   display: inline-block; 
+---
+>   clear: both;
+>   display: inline-block; 
+1227c1028
+<     font-size: .85em;
+---
+>     font-size: .7em;
+1229c1030
+<     background-color: #61468b;
+---
+>     background-color: #fff;
+1271a1073,1077
+> a.terms:hover,
+> a.powered-by-vivo:hover {
+>     color: #4e5051;
+>     text-decoration: none;
+> }
+1276,1313d1081
+< /* NU/NUCATS FOOTER */
+<   footer {
+<       margin-bottom: 1em;
+<       margin-left: auto;
+<       margin-right: auto;
+<       min-height: 165px;
+<       max-width: 930px;
+<       padding: 20px;
+<   }
+< 
+<     footer p { line-height: 130%;}
+< 
+<     footer p,
+<     footer a { color: #FFF; text-decoration: none; }
+<         footer a:hover { opacity: .7; text-decoration: underline; }
+< 
+<     footer .vivo { color: #FFF; float: right; list-style-type: none; }
+<         footer .vivo a { color: #FFF; }
+< 
+<   /* NU Logo */
+<     footer #NU-logo {
+<       float: left;
+<       height: 133px;
+<       margin-right: 25px;
+<       margin-top: 25px;
+<       padding-right: 4px;
+<       position: relative;
+<       top: -20px;
+<       width: 221px;
+<     }
+< 
+< .multiSiteFooter ul { list-style-type: none; }
+<     .multiSiteFooter li { float: left; margin-left: 3px; } 
+<         .multiSiteFooter li:first-child { margin-left: 0px; }
+<         .multiSiteFooter li:after { content: " | "; color: #FFF; }
+<         .multiSiteFooter li:last-child:after { content: ""; }
+< 
+< 
+1370a1139,1141
+> .rdfLink a {
+>     color: #84a655;
+> }
+1395d1165
+<     margin: 0.5em auto !important;
+1401d1170
+<     padding-bottom: 0px !important;
+1484,1485d1252
+<     list-style: outside url('http://deptcommon.fsm.northwestern.edu/images/sidebar-arrow-gray.gif') disc !important; */
+<     background-color: #fff;
+1487d1253
+<     border-radius: 5px 0px 0px 5px;
+1489,1490c1255
+<     position: relative;
+<     right: -2px;
+---
+>     background-color: #f1f2ee;
+1497,1498d1261
+< ul#browse-classes a { font-weight: normal !important; }
+< 
+1501c1264,1265
+<     /*color: #2ea0cf; */
+---
+>     background: url(../images/arrow.gif) 4px 5px no-repeat;
+>     color: #2ea0cf;
+1511a1276
+>     background: url(../images/arrowSmall.gif) -3px 7px no-repeat;
+1526,1527d1290
+<     border-bottom: 0px;
+<     border-radius: 5px 5px 0px 0px;
+1528a1292,1293
+>     border-left: 1px solid #dde4e3;
+>     border-bottom: none;
+1534d1298
+<     border-radius: 0px 0px 5px 5px;
+1541c1305
+<     border-radius: 5px;
+---
+>     border: 2px solid #dde4e3;
+1601d1364
+< 
+1606,1612c1369,1372
+< 
+<     #individual-intro h1 .fn {
+<         color: #61468b;
+<         font-size: 1.875em;
+<     }
+< 
+< 
+---
+> #individual-intro h1 {
+>     font-size: 1.375em; 
+>     color: #2485ae; 
+> }
+1614,1619c1374,1377
+< h1.fn span.display-title {
+<     display: block;
+<     margin-top: .5em;
+<     line-height: .65em !important;
+<     margin-left: 0 !important;
+<     padding-left: 0 !important;
+---
+> h1.fn .display-title {
+>     font-size: .825em;
+>     color: #5e6363;
+>     border-left: 1px solid #a6b1b0;
+1621,1625d1378
+< 
+<   h1.fn span.display-title {
+<     font-size: .65em !important;
+<   }
+< 
+1632d1384
+< 
+1635c1387
+<     border-radius: 10px;
+---
+>     border: 7px solid #ebebeb;
+1672,1674c1424,1426
+<     font-size: 1.75em;
+<     color: #61468b !important;
+<     line-height: 1em;
+---
+>     font-size: 1.375em;
+>     color: #595B5B;
+>     line-height: 1.3em;
+1687c1439
+<     list-style: url("http://deptcommon.fsm.northwestern.edu/images/sidebar-arrow-gray.gif"); 
+---
+>     list-style: url("../../../images/individual/arrow-green.gif");
+1690,1691c1442
+<     line-height: 1.15em;
+<     margin-bottom: 0.5em;
+---
+>     line-height: 1.8em;
+1746,1764d1496
+< div#wrapper-content section.property-group div article.property:first-of-type { 
+<     margin-top: -15px !important; 
+< }
+< 
+< section.property-group h2:first-of-type {
+<     border-top: 0px !important;
+<     margin-top: 0 !important;
+< }
+< section.property-group h2 {
+<     background-color: #efefef !important;
+<     margin-bottom: -1em !important;
+< }
+< 
+< section.property-group div article.property { margin-top: -15px !important; }
+< 
+< section.property-group { border-top: 1px solid #DFE6E5; }
+< 
+< section.property-group h2 { margin-top: -1em !important; }
+< 
+1772c1504
+<     width: 100%;
+---
+>     width: 852px;
+1775,1777c1507
+<     background: #efefef;
+<     background-color: #fafaf9;
+<     color: #61468b;
+---
+>     background: #fafaf9;
+1779,1781c1509
+< }
+< .property-group div article.property:first-child {
+<     border-width: 0px 0px 1px 0px;
+---
+>     color: #8aa149;
+1849a1578,1580
+> 
+> 
+> 
+1896d1626
+<     text-transform: uppercase;
+1995,2004d1724
+< 
+< /* CUSTOM */
+< ul.no-bullet { list-style: none !important; margin: 0 !important; padding: 0; }
+< ul.no-bullet li { margin-left: 0 !important; }
+< .siteMap h2 { text-transform: capitalize !important; }
+< 
+< span#sparklineHeading, div#vis_container_coauthor { display: none; }
+< #individual-info ul { font-size: 0.9em; }
+< ul.propertyTabsList { margin-top: 0; }
+< 
