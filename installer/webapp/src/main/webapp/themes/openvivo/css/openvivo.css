@@ -134,7 +134,7 @@ input.form-button:visited {
     border: 0;
     margin: 0;
     /* background-color: #749a02; */
-    background-color: #59971f;
+    background-color: #3446A0;
     color: #fff;
     font-size: 14px;
     font-weight: normal;
@@ -183,7 +183,7 @@ input.submit:hover,
 input#submit:hover,
 input.form-button:hover {
     color: #fff;
-    background-color: #b2d15a;
+    background-color: #3E8BAA;
 }
 input.delete:hover,
 input#delete:hover {
@@ -1144,11 +1144,11 @@ ul#individual-tools-people li a {
 }
 
 #login-form .button {
-    background-color: #a6ce39;
+    background-color: #3E8BAA;
 }
 
 #login-form .button:hover {
-    background-color: #749a02;
+    background-color: #3446A0;
 }
 
 .home h3.internal-auth {
