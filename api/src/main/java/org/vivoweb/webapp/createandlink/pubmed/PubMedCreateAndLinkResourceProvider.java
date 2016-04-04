@@ -255,58 +255,58 @@ public class PubMedCreateAndLinkResourceProvider implements CreateAndLinkResourc
     private static class PubMedSummaryResponse {
         public String uid;
         public String pubdate;
-        public String epubdate;
+        //public String epubdate;
         public String source;
         public NameField[] authors;
-        public String lastauthor;
+        //public String lastauthor;
         public String title;
-        public String sorttitle;
+        //public String sorttitle;
         public String volume;
         public String issue;
         public String pages;
         public String[] lang;
-        public String nlmuniqueid;
+        //public String nlmuniqueid;
         public String issn;
         public String eissn;
         public String[] pubtype;
-        public String recordstatus;
+        //public String recordstatus;
         public String pubstatus;
         public ArticleID[] articleids;
         public History[] history;
         //public String[] references;
         public String[] attributes;
-        public Integer pmcrefcount;
+        //public Integer pmcrefcount;
         public String fulljournalname;
-        public String elocationid;
-        public Integer viewcount;
-        public String doctype;
+        //public String elocationid;
+        //public Integer viewcount;
+        //public String doctype;
         //public String[] srccontriblist;
-        public String booktitle;
-        public String medium;
-        public String edition;
-        public String publisherlocation;
+        //public String booktitle;
+        //public String medium;
+        //public String edition;
+        //public String publisherlocation;
         public String publishername;
-        public String srcdate;
-        public String reportnumber;
-        public String availablefromurl;
-        public String locationlabel;
+        //public String srcdate;
+        //public String reportnumber;
+        //public String availablefromurl;
+        //public String locationlabel;
         //public String[] doccontriblist;
-        public String docdate;
-        public String bookname;
+        //public String docdate;
+        //public String bookname;
         public String chapter;
-        public String sortpubdate;
-        public String sortfirstauthor;
-        public String vernaculartitle;
+        //public String sortpubdate;
+        //public String sortfirstauthor;
+        //public String vernaculartitle;
 
         public static class NameField {
             public String name;
-            public String authtype;
-            public String clusterid;
+            //public String authtype;
+            //public String clusterid;
         }
 
         public static class ArticleID {
             public String idtype;
-            public Integer idtypen;
+            //public Integer idtypen;
             public String value;
         }
 
