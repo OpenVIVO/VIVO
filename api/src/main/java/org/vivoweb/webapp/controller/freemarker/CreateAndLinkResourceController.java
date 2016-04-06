@@ -35,6 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.vivoweb.webapp.createandlink.Citation;
+import org.vivoweb.webapp.createandlink.ContributorRole;
 import org.vivoweb.webapp.createandlink.CreateAndLinkResourceProvider;
 import org.vivoweb.webapp.createandlink.CreateAndLinkUtils;
 import org.vivoweb.webapp.createandlink.ExternalIdentifiers;
@@ -65,6 +66,9 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
     // Mappings for publication type to ontology types / classes
     private static final Map<String, String> typeToClassMap = new HashMap<String, String>();
 
+    // Mappings for contributor roles
+    private static final Map<String, ContributorRole> contributorRoleMap = new HashMap<String, ContributorRole>();
+
     // Providers for resolving ids in different resource providers (e.g. CrossRef, PubMed)
     private static final Map<String, CreateAndLinkResourceProvider> providers = new HashMap<String, CreateAndLinkResourceProvider>();
 
@@ -89,8 +93,11 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
     public static final String FOAF_FIRSTNAME = "http://xmlns.com/foaf/0.1/firstName";
     public static final String FOAF_LASTNAME = "http://xmlns.com/foaf/0.1/lastName";
 
-    public static final String OBO_HAS_CONTACT_INFO = "http://purl.obolibrary.org/obo/ARG_2000028";
     public static final String OBO_CONTACT_INFO_FOR = "http://purl.obolibrary.org/obo/ARG_2000029";
+    public static final String OBO_HAS_CONTACT_INFO = "http://purl.obolibrary.org/obo/ARG_2000028";
+
+    public static final String OBO_INHERES_IN = "http://purl.obolibrary.org/obo/RO_0000052";
+    public static final String OBO_BEARER_OF  = "http://purl.obolibrary.org/obo/RO_0000053";
 
     public static final String RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
 
@@ -145,6 +152,13 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
         typeToClassMap.put("thesis", "http://purl.org/ontology/bibo/Thesis");
         typeToClassMap.put("webpage", "http://purl.org/ontology/bibo/Webpage");
 
+/*
+        contributorRoleMap.put("softeng", new ContributorRole("softeng", "Software Engineering", "http://purl.obolibrary.org/obo/CRO_0000026"));
+        contributorRoleMap.put("softtest", new ContributorRole("softtest", "Software Testing", "http://purl.obolibrary.org/obo/CRO_0000027"));
+        contributorRoleMap.put("qa", new ContributorRole("qa", "Quality Assurance", "http://purl.obolibrary.org/obo/CRO_0000028"));
+        contributorRoleMap.put("techwrite", new ContributorRole("techwrite", "Technical Writing", "http://purl.obolibrary.org/obo/CRO_0000029"));
+*/
+        
         /*
             Additional CSL-defined publication types that we might see, but not sure what to map them to
 
@@ -323,6 +337,8 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
 
                             // Process the user's chosen relationship with the resource, updating the updated model
                             processRelationships(vreq, updatedModel, vivoUri, profileUri, vreq.getParameter("contributor" + externalId));
+
+                            processRoles(vreq, updatedModel, vivoUri, profileUri, vreq.getParameterValues("role" + externalId));
                         }
                     }
                 }
@@ -430,6 +446,10 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                 if (remainderIds.size() > 0) {
                     templateValues.put("remainderIds", StringUtils.join(remainderIds, "\n"));
                     templateValues.put("remainderCount", remainderIds.size());
+                }
+
+                if (contributorRoleMap != null && contributorRoleMap.size() > 0) {
+                    templateValues.put("contributorRoles", contributorRoleMap.values());
                 }
 
                 // Show the confirmation page for the processed identifiers
@@ -659,6 +679,32 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
             // Add related by predicates to the user and resource, linking to the context
             model.getResource(vivoUri).addProperty(model.createProperty(VIVO_RELATEDBY), editorship);
             model.getResource(userUri).addProperty(model.createProperty(VIVO_RELATEDBY), editorship);
+        }
+    }
+
+    /**
+     *
+     * @param vreq
+     * @param model
+     * @param vivoUri
+     * @param userUri
+     * @param roles
+     */
+    protected void processRoles(VitroRequest vreq, Model model, String vivoUri, String userUri, String[] roles) {
+        if (roles != null && roles.length > 0) {
+            for (String role : roles) {
+                ContributorRole contributorRole = contributorRoleMap.get(role);
+                if (contributorRole != null) {
+                    Resource contributorship = model.createResource(getUnusedUri(vreq));
+                    contributorship.addProperty(RDF.type, model.getResource(contributorRole.getUri()));
+
+                    contributorship.addProperty(model.createProperty(VIVO_RELATEDBY), model.getResource(vivoUri));
+                    model.getResource(vivoUri).addProperty(model.createProperty(VIVO_RELATES), contributorship);
+
+                    contributorship.addProperty(model.createProperty(OBO_INHERES_IN), model.getResource(userUri));
+                    model.getResource(userUri).addProperty(model.createProperty(OBO_BEARER_OF), contributorship);
+                }
+            }
         }
     }
 

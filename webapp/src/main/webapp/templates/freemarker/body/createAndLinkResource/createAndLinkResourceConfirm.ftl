@@ -180,6 +180,15 @@
             <#else>
                 <input type="radio" id="author${citation.externalId}" name="contributor${citation.externalId}" value="author" <#if !proposedAuthor>checked</#if> class="radioWithLabel" /><label for="author${citation.externalId}" class="labelForRadio"> Unlisted Author</label><br />
                 <input type="radio" id="editor${citation.externalId}" name="contributor${citation.externalId}" value="editor" class="radioWithLabel" /><label for="editor${citation.externalId}" class="labelForRadio"> Editor</label><br />
+                <#if contributorRoles??>
+                    <input type="radio" id="other${citation.externalId}" name="contributor${citation.externalId}" value="other" class="radioWithLabel" /><label for="other${citation.externalId}" class="labelForRadio"> Other Contribution</label><br />
+                    <span>Please indicate the contribution that you made to this work</span><br />
+                    <#list contributorRoles as contributorRole>
+                        <input type="checkbox" id="${contributorRole.key}${citation.externalId}" name="role${citation.externalId}" value="${contributorRole.key}" /><label for="${contributorRole.key}${citation.externalId}"> ${contributorRole.label}</label>
+                       <#sep>; </#sep>
+                    </#list>
+                    <br /><br />
+                </#if>
                 <input type="radio" id="notmine${citation.externalId}" name="contributor${citation.externalId}" value="notmine" class="radioWithLabel" /><label for="notmine${citation.externalId}" class="labelForRadio"> This is not my work</label><br />
             </#if>
             <input type="hidden" name="externalResource${citation.externalId}" value="${citation.externalResource!}" />
@@ -187,7 +196,7 @@
             <input type="hidden" name="vivoUri${citation.externalId}" value="${citation.vivoUri!}" />
             <input type="hidden" name="profileUri" value="${profileUri!}" />
             <#if citation.alreadyClaimed>
-            </div>
+                </div>
             </#if>
             <div style="clear: both;"></div>
         </div>
