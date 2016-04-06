@@ -17,6 +17,14 @@
             </#if>
         </div>
     </#if>
+    <#if showConfirmation??>
+        <h2>Thank you</h2>
+        There are no more works left to claim.<br />
+        You may enter more IDs below, or view your profile.<br /><br />
+        <#if profileUri??>
+            <a href="${profileUri}">Go to profile</a><br /><br />
+        </#if>
+    </#if>
     <#switch provider>
         <#case "doi">
             <h2>${i18n().create_and_link_enter(label)}</h2>
@@ -31,6 +39,7 @@
         <#case "pmid">
             <h2>${i18n().create_and_link_enter(label)}</h2>
             You may enter one or more PubMed IDs to match. Each ID should be separated by a comma, semi colon or new line.<br /><br />
+            Note that metadata will be retrieved from Crossref, if the PubMed ID can be resolved to a DOI.<br /><br />
             <#break>
     </#switch>
     <textarea name="externalIds" rows="15" cols="50"></textarea><br />

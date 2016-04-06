@@ -335,8 +335,8 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
             externalIdsToFind = vreq.getParameter("remainderIds");
 
             // If There are no IDs left to process, go back to the entry screen
-            // TODO make this a final confirmation page?
             if (StringUtils.isEmpty(externalIdsToFind)) {
+                templateValues.put("showConfirmation", true);
                 return new TemplateResponseValues("createAndLinkResourceEnterID.ftl", templateValues);
             }
         } else if ("findID".equals(action)) {
