@@ -24,6 +24,7 @@ public class ConceptSearchServiceUtils {
     private static final String AgrovocVocabSource = "http://aims.fao.org/aos/agrovoc/agrovocScheme";
     private static final String GemetVocabSource = "http://www.eionet.europa.eu/gemet/gemetThesaurus";
     private static final String LCSHVocabSource = "http://id.loc.gov/authorities/subjects";
+	private static final String FASTVocabSource = "http://id.worldcat.org/fast/";
 
     //Get the class that corresponds to the appropriate search
 	public static String getConceptSearchServiceClassName(String searchServiceName) {
@@ -39,10 +40,11 @@ public class ConceptSearchServiceUtils {
 	public static HashMap<String, VocabSourceDescription> getVocabSources() {
 		HashMap<String, VocabSourceDescription> map = new HashMap<String, VocabSourceDescription>();
     	map.put(UMLSVocabSource, new VocabSourceDescription("UMLS", UMLSVocabSource, "http://www.nlm.nih.gov/research/umls/", "Unified Medical Language System"));
+		map.put(FASTVocabSource, new VocabSourceDescription("FAST", FASTVocabSource, "http://www.nlm.nih.gov/research/umls/", "OCLC FAST"));
     	//Commenting out agrovoc for now until implementation is updated
-    	map.put(AgrovocVocabSource, new VocabSourceDescription("AGROVOC", AgrovocVocabSource, "http://www.fao.org/agrovoc/", "Agricultural Vocabulary"));
-    	map.put(GemetVocabSource, new VocabSourceDescription("GEMET", GemetVocabSource, "http://www.eionet.europa.eu/gemet", "GEneral Multilingual Environmental Thesaurus"));
-    	map.put(LCSHVocabSource, new VocabSourceDescription("LCSH", LCSHVocabSource, "http://id.loc.gov/authorities/subjects/", "Library of Congress Subject Headings"));
+//    	map.put(AgrovocVocabSource, new VocabSourceDescription("AGROVOC", AgrovocVocabSource, "http://www.fao.org/agrovoc/", "Agricultural Vocabulary"));
+//    	map.put(GemetVocabSource, new VocabSourceDescription("GEMET", GemetVocabSource, "http://www.eionet.europa.eu/gemet", "GEneral Multilingual Environmental Thesaurus"));
+//    	map.put(LCSHVocabSource, new VocabSourceDescription("LCSH", LCSHVocabSource, "http://id.loc.gov/authorities/subjects/", "Library of Congress Subject Headings"));
 
     	return map;
 	}
@@ -57,6 +59,7 @@ public class ConceptSearchServiceUtils {
     	map.put(AgrovocVocabSource, "edu.cornell.mannlib.semservices.service.impl.AgrovocService");
     	map.put(GemetVocabSource, "edu.cornell.mannlib.semservices.service.impl.GemetService");
     	map.put(LCSHVocabSource, "edu.cornell.mannlib.semservices.service.impl.LCSHService");
+		map.put(FASTVocabSource, "edu.cornell.mannlib.semservices.service.impl.FASTService");
 
     	return map;
     }
