@@ -640,45 +640,47 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
      * @param relationship
      */
     protected void processRelationships(VitroRequest vreq, Model model, String vivoUri, String userUri, String relationship) {
-        // If authorship is being claimed
-        if (relationship.startsWith("author")) {
-            // Create an authorship context object
-            Resource authorship = model.createResource(getUnusedUri(vreq));
-            authorship.addProperty(RDF.type, model.getResource(VIVO_AUTHORSHIP));
+        if (relationship != null) {
+            // If authorship is being claimed
+            if (relationship.startsWith("author")) {
+                // Create an authorship context object
+                Resource authorship = model.createResource(getUnusedUri(vreq));
+                authorship.addProperty(RDF.type, model.getResource(VIVO_AUTHORSHIP));
 
-            // Add the resource and the user as relates predicates of the context
-            authorship.addProperty(model.createProperty(VIVO_RELATES), model.getResource(vivoUri));
-            authorship.addProperty(model.createProperty(VIVO_RELATES), model.getResource(userUri));
+                // Add the resource and the user as relates predicates of the context
+                authorship.addProperty(model.createProperty(VIVO_RELATES), model.getResource(vivoUri));
+                authorship.addProperty(model.createProperty(VIVO_RELATES), model.getResource(userUri));
 
-            // Add related by predicates to the user and resource, linking to the context
-            model.getResource(vivoUri).addProperty(model.createProperty(VIVO_RELATEDBY), authorship);
-            model.getResource(userUri).addProperty(model.createProperty(VIVO_RELATEDBY), authorship);
+                // Add related by predicates to the user and resource, linking to the context
+                model.getResource(vivoUri).addProperty(model.createProperty(VIVO_RELATEDBY), authorship);
+                model.getResource(userUri).addProperty(model.createProperty(VIVO_RELATEDBY), authorship);
 
-            // If the relationship contains an author position
-            if (relationship.length() > 6) {
-                // Parse out the author position to a numeric rank
-                String posStr = relationship.substring(6);
-                int rank = Integer.parseInt(posStr, 10);
-                // Remove an existing authorship at that rank
-                removeAuthorship(model, vivoUri, rank);
-                try {
-                    // Add the chosen rank to the authorship context created
-                    authorship.addLiteral(model.createProperty(VIVO_RANK), rank);
-                } catch (NumberFormatException nfe) {
+                // If the relationship contains an author position
+                if (relationship.length() > 6) {
+                    // Parse out the author position to a numeric rank
+                    String posStr = relationship.substring(6);
+                    int rank = Integer.parseInt(posStr, 10);
+                    // Remove an existing authorship at that rank
+                    removeAuthorship(model, vivoUri, rank);
+                    try {
+                        // Add the chosen rank to the authorship context created
+                        authorship.addLiteral(model.createProperty(VIVO_RANK), rank);
+                    } catch (NumberFormatException nfe) {
+                    }
                 }
+            } else if (relationship.startsWith("editor")) {
+                // User is claiming editorship
+                Resource editorship = model.createResource(getUnusedUri(vreq));
+                editorship.addProperty(RDF.type, model.getResource(VIVO_EDITORSHIP));
+
+                // Add the resource and the user as relates predicates of the context
+                editorship.addProperty(model.createProperty(VIVO_RELATES), model.getResource(vivoUri));
+                editorship.addProperty(model.createProperty(VIVO_RELATES), model.getResource(userUri));
+
+                // Add related by predicates to the user and resource, linking to the context
+                model.getResource(vivoUri).addProperty(model.createProperty(VIVO_RELATEDBY), editorship);
+                model.getResource(userUri).addProperty(model.createProperty(VIVO_RELATEDBY), editorship);
             }
-        } else if (relationship.startsWith("editor")) {
-            // User is claiming editorship
-            Resource editorship = model.createResource(getUnusedUri(vreq));
-            editorship.addProperty(RDF.type, model.getResource(VIVO_EDITORSHIP));
-
-            // Add the resource and the user as relates predicates of the context
-            editorship.addProperty(model.createProperty(VIVO_RELATES), model.getResource(vivoUri));
-            editorship.addProperty(model.createProperty(VIVO_RELATES), model.getResource(userUri));
-
-            // Add related by predicates to the user and resource, linking to the context
-            model.getResource(vivoUri).addProperty(model.createProperty(VIVO_RELATEDBY), editorship);
-            model.getResource(userUri).addProperty(model.createProperty(VIVO_RELATEDBY), editorship);
         }
     }
 
