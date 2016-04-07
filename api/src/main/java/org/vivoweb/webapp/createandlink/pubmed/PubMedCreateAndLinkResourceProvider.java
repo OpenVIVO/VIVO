@@ -68,7 +68,7 @@ public class PubMedCreateAndLinkResourceProvider implements CreateAndLinkResourc
                 citation.authors = new Citation.Name[response.authors.length];
                 for (int idx = 0; idx < response.authors.length; idx++) {
                     citation.authors[idx] = new Citation.Name();
-                    citation.authors[idx].name = response.authors[idx].name;
+                    citation.authors[idx].name = normalizeAuthorName(response.authors[idx].name);
                 }
                 citation.journal = response.fulljournalname;
                 citation.volume = response.volume;
@@ -163,6 +163,23 @@ public class PubMedCreateAndLinkResourceProvider implements CreateAndLinkResourc
         }
 
         return null;
+    }
+
+    private String normalizeAuthorName(String name) {
+        if (name.indexOf(',') < 0 && name.indexOf(' ') > -1) {
+            int lastSpace = name.lastIndexOf(' ');
+            int insertPoint = lastSpace;
+            while (insertPoint > 0) {
+                if (name.charAt(insertPoint - 1) == ' ') {
+                    insertPoint--;
+                } else {
+                    break;
+                }
+            }
+
+            return name.substring(0, insertPoint) + "," + name.substring(lastSpace);
+        }
+        return name;
     }
 
     private String getCiteprocTypeForPubType(String[] pubTypes) {
