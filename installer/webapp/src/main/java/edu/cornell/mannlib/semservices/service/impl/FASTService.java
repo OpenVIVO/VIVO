@@ -10,12 +10,14 @@ import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.Sort;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -40,17 +42,31 @@ public class FASTService implements ExternalConceptService {
 
         if (FASTSearch.searcher != null) {
             QueryParser parser = new QueryParser("label", new StandardAnalyzer());
+            parser.setDefaultOperator(QueryParser.Operator.AND);
             Query query = null;
             try {
+                boolean bestMatch = true;
+                int scoreInt = 0;
+
                 query = parser.parse(term);
-                ScoreDoc[] hits = FASTSearch.searcher.search(query, null, 1000).scoreDocs;
+                ScoreDoc[] hits = FASTSearch.searcher.search(query, 1000).scoreDocs;
                 if (hits.length > 0) {
                     for (ScoreDoc hit : hits) {
                         Document hitDoc = FASTSearch.searcher.doc(hit.doc);
 
+                        if (scoreInt == 0) {
+                            if (hit.score < 6.0) {
+                                bestMatch = false;
+                            } else {
+                                scoreInt = (int)hit.score;
+                            }
+                        } else if (scoreInt > (int)hit.score) {
+                            bestMatch = false;
+                        }
+
                         Concept concept = new Concept();
                         concept.setDefinedBy(schemeURI);
-                        concept.setBestMatch("true");
+                        concept.setBestMatch(bestMatch ? "true" : "false");
                         concept.setLabel(hitDoc.getField("label").stringValue());
                         concept.setUri(hitDoc.getField("uri").stringValue());
                         concept.setConceptId(stripConceptId(hitDoc.getField("uri").stringValue()));
