@@ -31,6 +31,9 @@
     .linked {
         font-style: italic;
     }
+    .role_group {
+        font-style: italic;
+    }
     .entryId {
         background-color: #3e8baa; /* #E0E0E0; */
         color: #ffffff;
@@ -46,6 +49,9 @@
         display: inline;
     }
     .radioWithLabel:checked + .labelForRadio {
+        font-weight: bold;
+    }
+    .checkboxWithLabel:checked + .labelForCheckbox {
         font-weight: bold;
     }
     .description {
@@ -184,8 +190,11 @@
                     <input type="radio" id="other${citation.externalId}" name="contributor${citation.externalId}" value="other" class="radioWithLabel" /><label for="other${citation.externalId}" class="labelForRadio"> Other Contribution</label><br />
                     <span>Please indicate the contribution that you made to this work</span><br />
                     <#list contributorRoles as contributorRole>
-                        <input type="checkbox" id="${contributorRole.key}${citation.externalId}" name="role${citation.externalId}" value="${contributorRole.key}" /><label for="${contributorRole.key}${citation.externalId}"> ${contributorRole.label}</label>
-                       <#sep>; </#sep>
+                        <#if contributorRole.key??>
+                            <input type="checkbox" id="${contributorRole.key}${citation.externalId}" name="role${citation.externalId}" value="${contributorRole.key}" class="checkboxWithLabel" /><label for="${contributorRole.key}${citation.externalId}" class="labelForCheckbox"> ${contributorRole.label}</label>
+                        <#else>
+                            <br /><span class="role_group">${contributorRole.label}</span><br />
+                        </#if>
                     </#list>
                     <br /><br />
                 </#if>
