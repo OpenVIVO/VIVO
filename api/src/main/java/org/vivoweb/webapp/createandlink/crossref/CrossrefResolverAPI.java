@@ -125,6 +125,8 @@ public class CrossrefResolverAPI {
         ResourceModel model = new ResourceModel();
 
         model.DOI = jsonModel.DOI;
+        model.PubMedID = jsonModel.PMID;
+        model.PubMedCentralID = jsonModel.PMCID;
         model.ISSN = jsonModel.ISSN;
         model.ISBN = jsonModel.ISBN;
         model.URL = jsonModel.URL;
