@@ -36,17 +36,21 @@
 <script type="text/javascript">
     $(document).ready(function() {
         $('#rolesSelectionsGroup').hide();
+        $('#rolesSelectionsGroupShowButton').show();
 
         $('#rolesSelectionsGroupToggle').click(function() {
             $('#rolesSelectionsGroup').toggle();
         });
-        $('#rolesSelectionsGroupShow').click(function() {
+        $('#rolesSelectionsGroupShowButton').click(function() {
             $('#rolesSelectionsGroupShow').hide();
+            $('#rolesSelectionsGroupHideButton').show();
             $('#rolesSelectionsGroup').show();
+            return false;
         });
-        $('#rolesSelectionsGroupHide').click(function() {
+        $('#rolesSelectionsGroupHideButton').click(function() {
             $('#rolesSelectionsGroup').hide();
             $('#rolesSelectionsGroupShow').show();
+            return false;
         });
     });
 </script>
@@ -59,9 +63,11 @@
 
 <input type="radio" id="other${citation.externalId}" name="contributor${citation.externalId}" value="other" class="radioWithLabel" /><label for="other${citation.externalId}" class="labelForRadio"> Other Contribution</label><br />
 <div class="contribution_title">Please indicate the contribution that you made to this work</div>
-<div id="rolesSelectionsGroupShow">[click here to show roles]</div>
+<div id="rolesSelectionsGroupShow">
+    <input id="rolesSelectionsGroupShowButton" type="submit" class="submit" value="Show roles" style="display: none;" />
+</div>
 <div id="rolesSelectionsGroup">
-    <div id="rolesSelectionsGroupHide">[hide roles]</div>
+    <input id="rolesSelectionsGroupHideButton" type="submit" class="submit" value="Hide roles" style="display: none;" />
     <div id="rolesAuthorGroupToggle" class="role_group_title"">Author</div><!-- CRO_0000001 -->
     <div id="rolesAuthorGroup" class="role_group"><ul class="roles">
         <@contributorRole citationId="${citation.externalId}" roleId="CRO_0000019" roleLabel="Writing Original Draft" />
