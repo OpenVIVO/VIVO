@@ -1707,9 +1707,9 @@ obo:ARG_0000197
       vitro:displayLimitAnnot
               "2"^^xsd:int ;
       vitro:hiddenFromDisplayBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:hiddenFromPublishBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
               <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:inPropertyGroupAnnot
@@ -1971,13 +1971,13 @@ vivo:outreachOverview
       vitro:displayRankAnnot
               "10"^^xsd:int ;
       vitro:hiddenFromDisplayBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:hiddenFromPublishBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:inPropertyGroupAnnot
               <http://vivoweb.org/ontology#vitroPropertyGroupoutreach> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:publicDescriptionAnnot
               "Please enter a single summary narrative of your outreach goals and/or contributions"^^xsd:string .
 
@@ -2463,13 +2463,13 @@ vivo:teachingOverview
       vitro:displayRankAnnot
               "10"^^xsd:int ;
       vitro:hiddenFromDisplayBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:hiddenFromPublishBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:inPropertyGroupAnnot
               <http://vivoweb.org/ontology#vitroPropertyGroupteaching> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:publicDescriptionAnnot
               "Please enter a single narrative summary description of your teaching activities, goals, and/or experience"^^xsd:string .
 
@@ -5050,7 +5050,7 @@ vivo:geographicFocus
       vitro:offerCreateNewOptionAnnot
               "true"^^xsd:boolean ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:selectFromExistingAnnot
               "true"^^xsd:boolean .
 
@@ -5131,13 +5131,13 @@ vivo:researcherId
       vitro:displayRankAnnot
               "20"^^xsd:int ;
       vitro:hiddenFromDisplayBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:hiddenFromPublishBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:inPropertyGroupAnnot
               <http://vivoweb.org/ontology#vitroPropertyGroupidentifiers> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:publicDescriptionAnnot
               "The identification number given to the profile created by a researcher in ResearcherID (http://isiwebofknowledge.com/researcherid/)."^^xsd:string .
 
@@ -6348,13 +6348,13 @@ vivo:researchOverview
       vitro:displayRankAnnot
               "10"^^xsd:int ;
       vitro:hiddenFromDisplayBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:hiddenFromPublishBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:inPropertyGroupAnnot
               <http://vivoweb.org/ontology#vitroPropertyGroupresearch> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> .
 
 obo:ERO_0000390
       rdfs:label "service provided by"@en-US ;
@@ -7021,13 +7021,13 @@ vivo:eRACommonsId
       vitro:displayRankAnnot
               "15"^^xsd:int ;
       vitro:hiddenFromDisplayBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:hiddenFromPublishBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:inPropertyGroupAnnot
               <http://vivoweb.org/ontology#vitroPropertyGroupidentifiers> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> .
 
 vcard:Muse
       rdfs:label "Muse"@en-US .
@@ -7273,9 +7273,11 @@ obo:ERO_0000033
               "true"^^xsd:boolean ;
       vitro:offerCreateNewOptionAnnot
               "true"^^xsd:boolean ;
+      vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:inPropertyGroupAnnot
               <http://vivoweb.org/ontology#vitroPropertyGroupoutreach> .
-              
+
 obo:ERO_0000397
       rdfs:label "performs technique"@en-US ;
       vitro:displayLimitAnnot
@@ -8329,13 +8331,13 @@ vivo:scopusId
       vitro:displayRankAnnot
               "30"^^xsd:int ;
       vitro:hiddenFromDisplayBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:hiddenFromPublishBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:inPropertyGroupAnnot
               <http://vivoweb.org/ontology#vitroPropertyGroupidentifiers> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:publicDescriptionAnnot
               "The numeric digit assigned to an author in Scopus.  In Scopus it's call the \"Author Identifier\"."^^xsd:string .
 

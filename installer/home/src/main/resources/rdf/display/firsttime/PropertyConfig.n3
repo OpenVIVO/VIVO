@@ -65,7 +65,7 @@ local:authorInAuthorshipConfig a :ObjectPropertyDisplayConfig ;
               "true"^^xsd:boolean;
     vitro:displayRankAnnot 1;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddPublicationToPersonGenerator"^^xsd:string ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupbibliographic> . 
 
@@ -101,7 +101,7 @@ local:hasServiceProviderRoleConfig a :ObjectPropertyDisplayConfig ;
     :displayName "professional service activities" ;
    vitro:displayRankAnnot 32;
    vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-   vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+   vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
    vitro:stubObjectPropertyAnnot "true"^^xsd:boolean ;
    vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddServiceProviderRoleToPersonGenerator"^^<http://www.w3.org/2001/XMLSchema#string> ;
    :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupoutreach> .
@@ -118,7 +118,7 @@ local:hasClinicalRoleConfig a :ObjectPropertyDisplayConfig ;
     :displayName "clinical activities" ;
     vitro:displayRankAnnot 70;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:stubObjectPropertyAnnot "true"^^xsd:boolean ;
     vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddClinicalRoleToPersonGenerator"^^<http://www.w3.org/2001/XMLSchema#string> ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupaffiliation> .
@@ -152,7 +152,7 @@ local:hasLeaderRoleConfig a :ObjectPropertyDisplayConfig ;
     :displayName "head of" ;
     vitro:displayRankAnnot 30;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:stubObjectPropertyAnnot "true"^^xsd:boolean ;
     vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddHeadOfRoleToPersonGenerator"^^<http://www.w3.org/2001/XMLSchema#string> ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupaffiliation> .
@@ -186,7 +186,7 @@ local:hasMemberRoleConfig a :ObjectPropertyDisplayConfig ;
     :displayName "member of" ;
     vitro:displayRankAnnot 50;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:stubObjectPropertyAnnot "true"^^xsd:boolean ;
     vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddMemberRoleToPersonGenerator"^^<http://www.w3.org/2001/XMLSchema#string> ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupaffiliation> .
@@ -220,7 +220,7 @@ local:hasTeacherRoleConfig a :ObjectPropertyDisplayConfig ;
     :displayName "teaching activities" ;
     vitro:displayRankAnnot 20;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:stubObjectPropertyAnnot "true"^^xsd:boolean ;
     vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddTeacherRoleToPersonGenerator"^^<http://www.w3.org/2001/XMLSchema#string> ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupteaching> .
@@ -237,7 +237,7 @@ local:hasEditorRoleConfig a :ObjectPropertyDisplayConfig ;
     :displayName "collection or series editor for" ;
     vitro:displayRankAnnot 15;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:stubObjectPropertyAnnot "true"^^xsd:boolean ;
     vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddEditorRoleToPersonGenerator"^^<http://www.w3.org/2001/XMLSchema#string> ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupbibliographic> .
@@ -271,7 +271,7 @@ local:hasReviewerRoleConfig a :ObjectPropertyDisplayConfig ;
     :displayName "reviewer of" ;
     vitro:displayRankAnnot 18;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:stubObjectPropertyAnnot "true"^^xsd:boolean ;
     vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddReviewerRoleToPersonGenerator"^^<http://www.w3.org/2001/XMLSchema#string> ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupoutreach> .
@@ -288,7 +288,7 @@ local:hasOrganizerRoleConfig a :ObjectPropertyDisplayConfig ;
     :displayName "organizer of event" ;
     vitro:displayRankAnnot 27;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:stubObjectPropertyAnnot "true"^^xsd:boolean ;
     vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddOrganizerRoleToPersonGenerator"^^<http://www.w3.org/2001/XMLSchema#string> ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupoutreach> .
@@ -322,7 +322,7 @@ local:hasOutreachProviderRoleConfig a :ObjectPropertyDisplayConfig ;
     :displayName "outreach and community service activities" ;
     vitro:displayRankAnnot 50;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:stubObjectPropertyAnnot "true"^^xsd:boolean ;
     vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddOutreachProviderRoleToPersonGenerator"^^<http://www.w3.org/2001/XMLSchema#string> ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupoutreach> .
@@ -356,7 +356,7 @@ local:hasAttendeeRoleConfig a :ObjectPropertyDisplayConfig ;
     :displayName "attended event" ;
     vitro:displayRankAnnot 85;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:stubObjectPropertyAnnot "true"^^xsd:boolean ;
     vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddAttendeeRoleToPersonGenerator"^^<http://www.w3.org/2001/XMLSchema#string> ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupaffiliation> .
@@ -390,7 +390,7 @@ local:hasResearcherRoleConfig a :ObjectPropertyDisplayConfig ;
     :displayName "other research activities" ;
     vitro:displayRankAnnot 35;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:stubObjectPropertyAnnot "true"^^xsd:boolean ;
     vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddResearcherRoleToPersonGenerator"^^<http://www.w3.org/2001/XMLSchema#string> ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupresearch> .
@@ -407,7 +407,7 @@ local:hasInvestigatorRoleConfig a :ObjectPropertyDisplayConfig ;
     :displayName "investigator on" ;
     vitro:displayRankAnnot 30;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddGrantRoleToPersonGenerator"^^<http://www.w3.org/2001/XMLSchema#string> ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupresearch> .
 
@@ -423,7 +423,7 @@ local:hasPrincipalInvestigatorRoleConfig a :ObjectPropertyDisplayConfig ;
     :displayName "principal investigator on" ;
     vitro:displayRankAnnot 20;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddGrantRoleToPersonGenerator"^^<http://www.w3.org/2001/XMLSchema#string> ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupresearch> .
 
@@ -439,7 +439,7 @@ local:hasCo-PrincipalInvestigatorRoleConfig a :ObjectPropertyDisplayConfig ;
     :displayName "co-principal investigator on" ;
     vitro:displayRankAnnot 25;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddGrantRoleToPersonGenerator"^^<http://www.w3.org/2001/XMLSchema#string> ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupresearch> .
 
@@ -457,7 +457,7 @@ local:hasPresenterRoleConfig a :ObjectPropertyDisplayConfig ;
               "true"^^xsd:boolean;
     vitro:displayRankAnnot 30;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddPresenterRoleToPersonGenerator"^^<http://www.w3.org/2001/XMLSchema#string> ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupbibliographic> .
 
@@ -493,7 +493,7 @@ local:awardOrHonorConfig a :ObjectPropertyDisplayConfig ;
     :displayName "awards and honors" ;
     vitro:displayRankAnnot 20;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.PersonHasAwardOrHonorGenerator"^^<http://www.w3.org/2001/XMLSchema#string> ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupbiography> .
 
@@ -525,7 +525,7 @@ local:educationalTrainingConfig a :ObjectPropertyDisplayConfig ;
     :displayName "education and training" ;
     vitro:displayRankAnnot 10;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:stubObjectPropertyAnnot "true"^^xsd:boolean ;
     vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.PersonHasEducationalTraining"^^<http://www.w3.org/2001/XMLSchema#string> ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupbiography> .
@@ -608,7 +608,7 @@ local:adviseeRoleConfig a :ObjectPropertyDisplayConfig ;
               "true"^^xsd:boolean;
     vitro:displayRankAnnot 30;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.PersonHasAdviseeRelationshipGenerator"^^<http://www.w3.org/2001/XMLSchema#string> ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupbiography> .
 
@@ -626,7 +626,7 @@ local:advisorRoleConfig a :ObjectPropertyDisplayConfig ;
               "true"^^xsd:boolean;
     vitro:displayRankAnnot 40;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.PersonHasAdvisorRelationshipGenerator"^^<http://www.w3.org/2001/XMLSchema#string> ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupteaching> .
 
@@ -676,7 +676,7 @@ local:editorOfConfig a :ObjectPropertyDisplayConfig ;
     vitro:collateBySubclassAnnot
               "true"^^xsd:boolean;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddEditorshipToPersonGenerator"^^<http://www.w3.org/2001/XMLSchema#string> ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupbibliographic> .
 
@@ -692,7 +692,7 @@ local:issuedCredentialConfig a :ObjectPropertyDisplayConfig ;
     :displayName "credentials" ;
     vitro:displayRankAnnot 12;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.PersonHasIssuedCredentialGenerator"^^<http://www.w3.org/2001/XMLSchema#string> ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupbiography> .
 
@@ -769,7 +769,7 @@ local:hasCollaboratorConfig a :ObjectPropertyDisplayConfig ;
           "true"^^xsd:boolean ;
     vitro:offerCreateNewOptionAnnot "true"^^xsd:boolean ;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
 #    vitro:stubObjectPropertyAnnot "true"^^xsd:boolean ;
 #    vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddOrganizerRoleToPersonGenerator"^^<http://www.w3.org/2001/XMLSchema#string> ;
      vitro:publicDescriptionAnnot
@@ -819,7 +819,7 @@ local:mailingAddressConfig a :ObjectPropertyDisplayConfig ;
     :displayName "mailing address" ;
     vitro:displayRankAnnot 29;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.SubjectHasMailingAddressGenerator"^^<http://www.w3.org/2001/XMLSchema#string> ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupaddress> .
 
@@ -887,7 +887,7 @@ local:personFaxConfig a :ObjectPropertyDisplayConfig ;
     :displayName "fax" ;
     vitro:displayRankAnnot 60;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.SubjectHasPhoneFaxNumberGenerator"^^<http://www.w3.org/2001/XMLSchema#string> ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupaddress> .
 
@@ -1393,7 +1393,7 @@ local:agentInGeoLocationConfig a :ObjectPropertyDisplayConfig ;
     :displayName "geographic location" ;
     vitro:displayRankAnnot 30;
     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:offerCreateNewOptionAnnot "true"^^xsd:boolean ;
     vitro:selectFromExistingAnnot   "true"^^xsd:boolean ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupaddress> .
@@ -1409,8 +1409,8 @@ local:agentInFacilityConfig a :ObjectPropertyDisplayConfig ;
     rdfs:label "agentInFacility"@en-US;
     :displayName "located in facility" ;
     vitro:displayRankAnnot 32;
-    vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public ;
+    vitro:hiddenFromDisplayBelowRoleLevelAnnot role:dbAdmin ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     vitro:offerCreateNewOptionAnnot "true"^^xsd:boolean ;
     vitro:selectFromExistingAnnot   "true"^^xsd:boolean ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupaddress> .
