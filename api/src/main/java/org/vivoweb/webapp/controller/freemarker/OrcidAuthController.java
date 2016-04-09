@@ -21,6 +21,8 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.DirectRedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
@@ -98,7 +100,7 @@ public class OrcidAuthController extends FreemarkerHttpServlet {
 
             // We have a user with a profile, so redirect
             if (profileUri != null) {
-                return new RedirectResponseValues(profileUri);
+                return new DirectRedirectResponseValues(UrlBuilder.getIndividualProfileUrl(profileUri, vreq));
             }
 /*
             if (StringUtils.isEmpty(loggedInAccount.getEmailAddress())) {
@@ -327,7 +329,7 @@ public class OrcidAuthController extends FreemarkerHttpServlet {
                 return new TemplateResponseValues("claimDOIs.ftl", templateValues);
             }
 
-            return new RedirectResponseValues(profileUri);
+            return new DirectRedirectResponseValues(UrlBuilder.getIndividualProfileUrl(profileUri, vreq));
         } else {
             String location = "https://orcid.org/oauth/authorize"
                     + "?client_id=" + clientId

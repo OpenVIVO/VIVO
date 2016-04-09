@@ -22,8 +22,8 @@
         <input type="hidden" name="externalIds" value="${externalIds}" />
         <input type="hidden" name="action" value="findID" />
         <input type="hidden" name="profileUri" value="${profileUri!}" />
-        <input type="submit" class="submit" value="Claim these works" /> <a href="${profileUri}">Cancel</a>
+        <input type="submit" class="submit" value="Claim these works" /> <a href="${profileUrl(profileUri)}">Cancel</a>
     </form>
 <#else>
-    <a href="${profileUri}">Go To My Profile</a>
+    <a href="${profileUrl(profileUri)}">Go To My Profile</a>
 </#if>

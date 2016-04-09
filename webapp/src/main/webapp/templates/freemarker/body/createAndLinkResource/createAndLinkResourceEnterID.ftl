@@ -22,7 +22,7 @@
         There are no more works left to claim.<br />
         You may enter more IDs below, or view your profile.<br /><br />
         <#if profileUri??>
-            <a href="${profileUri}">Go to profile</a><br /><br />
+            <a href="${profileUrl(profileUri)}">Go to profile</a><br /><br />
         </#if>
     </#if>
     <#switch provider>
