@@ -11,7 +11,6 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import edu.cornell.mannlib.orcidclient.context.OrcidClientContext;
-import edu.cornell.mannlib.orcidclient.orcidmessage.Keyword;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSets;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -23,7 +22,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.DirectRedirectResponseValues;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
@@ -339,7 +337,7 @@ public class OrcidAuthController extends FreemarkerHttpServlet {
                     + "&show_login=true"
                     + "&redirect_uri=" + callbackUrl;
 
-            return new RedirectResponseValues(location);
+            return new DirectRedirectResponseValues(location);
         }
     }
 
