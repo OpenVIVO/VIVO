@@ -65,6 +65,7 @@
 </style>
 <#setting number_format="computer">
 <#escape var as var?html>
+<#include "createAndLinkResourceContributorRoles.ftl" />
 <form method="post">
     <#if personLabel??>
         <div class="claim-for">
@@ -180,7 +181,7 @@
             <#else>
                 <input type="radio" id="author${citation.externalId}" name="contributor${citation.externalId}" value="author" <#if !proposedAuthor>checked</#if> class="radioWithLabel" /><label for="author${citation.externalId}" class="labelForRadio"> Unlisted Author</label><br />
                 <input type="radio" id="editor${citation.externalId}" name="contributor${citation.externalId}" value="editor" class="radioWithLabel" /><label for="editor${citation.externalId}" class="labelForRadio"> Editor</label><br />
-                <#include "createAndLinkResourceContributorRoles.ftl" />
+                <@showContributorRoles citation=citation position=citation?counter />
                 <input type="radio" id="notmine${citation.externalId}" name="contributor${citation.externalId}" value="notmine" class="radioWithLabel" /><label for="notmine${citation.externalId}" class="labelForRadio"> This is not my work</label><br />
             </#if>
             <input type="hidden" name="externalResource${citation.externalId}" value="${citation.externalResource!}" />
