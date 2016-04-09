@@ -193,15 +193,7 @@ public class OrcidAuthController extends FreemarkerHttpServlet {
                                         if (!StringUtils.isEmpty(keyword.value)) {
                                             String[] splitKeywords = keyword.value.split("\\s*,\\s*");
                                             for (String splitKeyword : splitKeywords) {
-                                                String conceptUri = defaultNamespace + "orcidKeyword" + splitKeyword.toLowerCase().replaceAll("[^a-z0-9]", "");
-                                                Resource concept = model.createResource(conceptUri);
-                                                if (!vreq.getWebappDaoFactory().hasExistingURI(conceptUri)) {
-                                                    concept.addProperty(RDF.type, model.getResource("http://www.w3.org/2004/02/skos/core#Concept"));
-                                                    concept.addLiteral(RDFS.label, keyword.value);
-                                                }
-
-                                                concept.addProperty(model.getProperty("http://vivoweb.org/ontology/core#researchAreaOf"), profile);
-                                                profile.addProperty(model.getProperty("http://vivoweb.org/ontology/core#hasResearchArea"), concept);
+                                                profile.addLiteral(model.getProperty("http://vivoweb.org/ontology/core#freetextKeyword"), splitKeyword);
                                             }
                                         }
                                     }
@@ -213,7 +205,7 @@ public class OrcidAuthController extends FreemarkerHttpServlet {
                                     if (!StringUtils.isEmpty(orcidBio.orcidProfile.orcidBio.contactDetails.address.country.value)) {
                                         String countryUri = findCountryFor(vreq.getRDFService(), orcidBio.orcidProfile.orcidBio.contactDetails.address.country.value);
                                         if (!StringUtils.isEmpty(countryUri)) {
-                                            profile.addProperty(model.getProperty("http://vivoweb.org/ontology/core#geographicFocus"), model.getResource(countryUri));
+                                            profile.addProperty(model.getProperty("http://purl.obolibrary.org/obo/RO_0001025"), model.getResource(countryUri));
                                         }
                                     }
                                 }
