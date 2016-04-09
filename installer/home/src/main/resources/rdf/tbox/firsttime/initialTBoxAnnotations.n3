@@ -225,7 +225,7 @@ vivo:assigneeFor
       vitro:offerCreateNewOptionAnnot
               "true"^^xsd:boolean ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:selectFromExistingAnnot
               "true"^^xsd:boolean ;
       vitro:inPropertyGroupAnnot
@@ -923,7 +923,7 @@ vivo:AttendeeRole
       vitro:hiddenFromPublishBelowRoleLevelAnnot
               <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> .
 
 
 vivo:invited
@@ -1197,7 +1197,7 @@ vivo:featuredIn
       vitro:offerCreateNewOptionAnnot
               "true"^^xsd:boolean ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:publicDescriptionAnnot
               "This relates a person to an information resource that contains a featured article on that person."^^xsd:string ;
       vitro:selectFromExistingAnnot
@@ -1219,7 +1219,7 @@ vivo:ClinicalRole
       vitro:hiddenFromPublishBelowRoleLevelAnnot
               <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> .
 
 geo:hasCurrency
       rdfs:label "has currency"@en-US ;
@@ -1309,7 +1309,7 @@ vivo:eligibleFor
       vitro:offerCreateNewOptionAnnot
               "true"^^xsd:boolean ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:publicDescriptionAnnot
               "Used for the situation where a credential has a prerequisite training or degree, as in becoming board eligible in a field of medicine"^^xsd:string ;
       vitro:selectFromExistingAnnot
@@ -1397,7 +1397,7 @@ vivo:Facility
               <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGrouplocations> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> .
 
 obo:IAO_0000007
       rdfs:label "Action Specification"@en-US .
@@ -1629,7 +1629,7 @@ vivo:Position
       vitro:hiddenFromPublishBelowRoleLevelAnnot
               <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> .
 
 obo:ERO_0001256
       rdfs:label "Material Storage Service"@en-US ;
@@ -1711,7 +1711,7 @@ obo:ARG_0000197
       vitro:hiddenFromPublishBelowRoleLevelAnnot
               <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:inPropertyGroupAnnot
               <http://vivoweb.org/ontology#vitroPropertyGroupidentifiers> .
 
@@ -1811,7 +1811,7 @@ vivo:TeacherRole
       vitro:hiddenFromPublishBelowRoleLevelAnnot
               <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> .
 
 vcard:hasGeo
       rdfs:label "has geo"@en-US .
@@ -2216,7 +2216,7 @@ vivo:PrincipalInvestigatorRole
       vitro:hiddenFromPublishBelowRoleLevelAnnot
               <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> .
 
 vivo:School
       rdfs:label "School"@en-US ;
@@ -2848,7 +2848,7 @@ vivo:freetextKeyword
       vitro:hiddenFromPublishBelowRoleLevelAnnot
               <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:inPropertyGroupAnnot
               <http://vivoweb.org/ontology#vitroPropertyGroupresearch> ;
       vitro:publicDescriptionAnnot
@@ -3708,7 +3708,7 @@ vivo:ReviewerRole
       vitro:hiddenFromPublishBelowRoleLevelAnnot
               <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> .
 
 vivo:StateOrProvince
       rdfs:label "State or Province"@en-US ;
@@ -4477,7 +4477,7 @@ vivo:AwardReceipt
       vitro:hiddenFromPublishBelowRoleLevelAnnot
               <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> .
 
 vivo:FacultyMentoringRelationship
       rdfs:label "Faculty Mentoring Relationship"@en-US ;
@@ -4521,7 +4521,7 @@ vivo:CoPrincipalInvestigatorRole
       vitro:hiddenFromPublishBelowRoleLevelAnnot
               <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> .
 
 vivo:licenseNumber
       rdfs:label "license number"@en-US ;
@@ -4925,7 +4925,7 @@ vivo:orcidId
       vitro:inPropertyGroupAnnot
               <http://vivoweb.org/ontology#vitroPropertyGroupidentifiers> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:publicDescriptionAnnot
               "ORCID (Open Researcher and Contributor ID) is a proposed nonproprietary alphanumeric code that would uniquely identify scientific and other academic authors."^^xsd:string .
 
@@ -5575,7 +5575,7 @@ vivo:EditorRole
       vitro:hiddenFromPublishBelowRoleLevelAnnot
               <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> .
 
 bibo:lccn
       rdfs:label "Library of Congress Control Number (LCCN)"@en-US ;
@@ -5752,7 +5752,7 @@ vivo:LeaderRole
       vitro:hiddenFromPublishBelowRoleLevelAnnot
               <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> .
 
 vivo:AdvisingProcess
       rdfs:label "Advising Process"@en-US .
@@ -5784,7 +5784,7 @@ vivo:InvestigatorRole
       vitro:hiddenFromPublishBelowRoleLevelAnnot
               <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> .
 
 bibo:BookSection
       rdfs:label "Book Section"@en-US ;
@@ -6285,7 +6285,7 @@ vivo:GeographicLocation
               <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGrouplocations> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> .
 
 obo:ARG_2000010
       rdfs:label "Topic Weight Measurement Process"@en-US .
@@ -6404,7 +6404,7 @@ vivo:ResearcherRole
       vitro:hiddenFromPublishBelowRoleLevelAnnot
               <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> .
 
 bibo:transcriptOf
       rdfs:label "transcript of"@en-US ;
@@ -6636,7 +6636,7 @@ vivo:MemberRole
       vitro:hiddenFromPublishBelowRoleLevelAnnot
               <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> .
 
 vcard:Work
       rdfs:label "Work"@en-US .
@@ -6840,7 +6840,7 @@ vivo:translatorOf
       vitro:hiddenFromPublishBelowRoleLevelAnnot
               <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:publicDescriptionAnnot
               "This relates something as the translator of an information resource."^^xsd:string ;
       vitro:selectFromExistingAnnot
@@ -7233,7 +7233,7 @@ vivo:PresenterRole
       vitro:hiddenFromPublishBelowRoleLevelAnnot
               <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> .
 
 vivo:PrimaryPosition
       rdfs:label "Primary Position"@en-US , "Primary Position"@en-US ;
@@ -7291,7 +7291,7 @@ obo:ERO_0000397
       vitro:hiddenFromPublishBelowRoleLevelAnnot
               <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:inPropertyGroupAnnot
               <http://vivoweb.org/ontology#vitroPropertyGroupoutreach> .
 
@@ -7725,7 +7725,7 @@ obo:ERO_0000037
       vitro:offerCreateNewOptionAnnot
               "true"^^xsd:boolean ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:selectFromExistingAnnot
               "true"^^xsd:boolean ;
       vitro:displayLimitAnnot
@@ -8160,7 +8160,7 @@ vivo:OutreachProviderRole
       vitro:hiddenFromPublishBelowRoleLevelAnnot
               <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> .
 
 obo:ARG_2000073
       rdfs:label "American Board of Neurological Surgery"@en-US .
@@ -8257,7 +8257,7 @@ vivo:OrganizerRole
       vitro:hiddenFromPublishBelowRoleLevelAnnot
               <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> .
 
 obo:ARG_2000074
       rdfs:label "American Board of Nuclear Medicine"@en-US .
