@@ -5131,13 +5131,13 @@ vivo:researcherId
       vitro:displayRankAnnot
               "20"^^xsd:int ;
       vitro:hiddenFromDisplayBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:hiddenFromPublishBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:inPropertyGroupAnnot
               <http://vivoweb.org/ontology#vitroPropertyGroupidentifiers> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:publicDescriptionAnnot
               "The identification number given to the profile created by a researcher in ResearcherID (http://isiwebofknowledge.com/researcherid/)."^^xsd:string .
 
@@ -7021,13 +7021,13 @@ vivo:eRACommonsId
       vitro:displayRankAnnot
               "15"^^xsd:int ;
       vitro:hiddenFromDisplayBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:hiddenFromPublishBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:inPropertyGroupAnnot
               <http://vivoweb.org/ontology#vitroPropertyGroupidentifiers> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> .
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
 
 vcard:Muse
       rdfs:label "Muse"@en-US .
@@ -8331,13 +8331,13 @@ vivo:scopusId
       vitro:displayRankAnnot
               "30"^^xsd:int ;
       vitro:hiddenFromDisplayBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:hiddenFromPublishBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:inPropertyGroupAnnot
               <http://vivoweb.org/ontology#vitroPropertyGroupidentifiers> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:publicDescriptionAnnot
               "The numeric digit assigned to an author in Scopus.  In Scopus it's call the \"Author Identifier\"."^^xsd:string .
 
