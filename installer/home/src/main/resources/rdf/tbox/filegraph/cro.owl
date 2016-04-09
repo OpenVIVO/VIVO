@@ -716,6 +716,12 @@
         <rdfs:subClassOf rdf:resource="http://vivoweb.org/ontology/core#Relationship"/>
         <rdfs:label>Contributorship</rdfs:label>
     </owl:Class>
+
+    <owl:Class rdf:about="http://purl.obolibrary.org/obo/cro.owl#CRO_9999999">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/cro.owl#CRO_0000000"/>
+        <obo:IAO_0000115>Support for free text entry of a role</obo:IAO_0000115>
+        <rdfs:label>Other Role</rdfs:label>
+    </owl:Class>
 </rdf:RDF>
 
 

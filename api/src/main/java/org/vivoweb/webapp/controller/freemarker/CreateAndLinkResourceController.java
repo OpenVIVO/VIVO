@@ -67,9 +67,6 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
     // Mappings for publication type to ontology types / classes
     private static final Map<String, String> typeToClassMap = new HashMap<String, String>();
 
-    // Mappings for contributor roles
-    private static final Map<String, ContributorRole> contributorRoleMap = new LinkedHashMap<String, ContributorRole>();
-
     // Providers for resolving ids in different resource providers (e.g. CrossRef, PubMed)
     private static final Map<String, CreateAndLinkResourceProvider> providers = new HashMap<String, CreateAndLinkResourceProvider>();
 
@@ -152,84 +149,6 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
         typeToClassMap.put("speech", "http://vivoweb.org/ontology/core#Speech");
         typeToClassMap.put("thesis", "http://purl.org/ontology/bibo/Thesis");
         typeToClassMap.put("webpage", "http://purl.org/ontology/bibo/Webpage");
-
-//        contributorRoleMap.put("CRO_0000001", new ContributorRole("CRO_0000001", "Author", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000001"));
-        contributorRoleMap.put("CRO_0000001", new ContributorRole(null, "Author", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000001"));
-            contributorRoleMap.put("CRO_0000019", new ContributorRole("CRO_0000019", "Writing Original Draft", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000019"));
-            contributorRoleMap.put("CRO_0000020", new ContributorRole("CRO_0000020", "Editing and Proofreading", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000020"));
-            contributorRoleMap.put("CRO_0000021", new ContributorRole("CRO_0000021", "Figure Development", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000021"));
-            contributorRoleMap.put("CRO_0000022", new ContributorRole("CRO_0000022", "Translator", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000022"));
-        contributorRoleMap.put("CRO_0000002", new ContributorRole("CRO_0000002", "Background and Literature Search", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000002"));
-        contributorRoleMap.put("CRO_0000003", new ContributorRole("CRO_0000003", "Conceptualization", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000003"));
-//        contributorRoleMap.put("CRO_0000004", new ContributorRole("CRO_0000004", "Preservation", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000004"));
-        contributorRoleMap.put("CRO_0000004", new ContributorRole(null, "Preservation", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000004"));
-            contributorRoleMap.put("CRO_0000023", new ContributorRole("CRO_0000023", "Archivist", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000023"));
-            contributorRoleMap.put("CRO_0000024", new ContributorRole("CRO_0000024", "Digital Preservation", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000024"));
-            contributorRoleMap.put("CRO_0000025", new ContributorRole("CRO_0000025", "Conservator", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000025"));
-//        contributorRoleMap.put("CRO_0000005", new ContributorRole("CRO_0000005", "Data", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000005"));
-        contributorRoleMap.put("CRO_0000005", new ContributorRole(null, "Data", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000005"));
-            contributorRoleMap.put("CRO_0000026", new ContributorRole("CRO_0000026", "Data Curation", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000026"));
-                contributorRoleMap.put("CRO_0000056", new ContributorRole("CRO_0000056", "Metadata Application", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000056"));
-            contributorRoleMap.put("CRO_0000027", new ContributorRole("CRO_0000027", "Data Entry", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000027"));
-            contributorRoleMap.put("CRO_0000028", new ContributorRole("CRO_0000028", "Data Visualization", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000028"));
-            contributorRoleMap.put("CRO_0000029", new ContributorRole("CRO_0000029", "Data Analysis", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000029"));
-                contributorRoleMap.put("CRO_0000057", new ContributorRole("CRO_0000057", "Statistical Data Analysis", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000057"));
-            contributorRoleMap.put("CRO_0000030", new ContributorRole("CRO_0000030", "Data Collection", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000030"));
-            contributorRoleMap.put("CRO_0000031", new ContributorRole("CRO_0000031", "Data Aggregation", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000031"));
-            contributorRoleMap.put("CRO_0000032", new ContributorRole("CRO_0000032", "Data Integration", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000032"));
-            contributorRoleMap.put("CRO_0000033", new ContributorRole("CRO_0000033", "Data Quality Assurance", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000033"));
-            contributorRoleMap.put("CRO_0000034", new ContributorRole("CRO_0000034", "Data Modeling", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000034"));
-            contributorRoleMap.put("CRO_0000035", new ContributorRole("CRO_0000035", "Data Standards Developer", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000035"));
-        contributorRoleMap.put("CRO_0000006", new ContributorRole("CRO_0000006", "Funding Acquisition", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000006"));
-        contributorRoleMap.put("CRO_0000007", new ContributorRole("CRO_0000007", "Study Investigation", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000007"));
-//        contributorRoleMap.put("CRO_0000008", new ContributorRole("CRO_0000008", "Methodology", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000008"));
-        contributorRoleMap.put("CRO_0000008", new ContributorRole(null, "Methodology", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000008"));
-            contributorRoleMap.put("CRO_0000036", new ContributorRole("CRO_0000036", "Technique Development", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000036"));
-            contributorRoleMap.put("CRO_0000037", new ContributorRole("CRO_0000037", "Protocol Creation", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000037"));
-            contributorRoleMap.put("CRO_0000038", new ContributorRole("CRO_0000038", "Guideline Development", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000038"));
-            contributorRoleMap.put("CRO_0000039", new ContributorRole("CRO_0000039", "Standard Operating Procedure Development", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000039"));
-            contributorRoleMap.put("CRO_0000040", new ContributorRole("CRO_0000040", "Study Design", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000040"));
-        contributorRoleMap.put("CRO_0000009", new ContributorRole("CRO_0000009", "Project Management", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000009"));
-        contributorRoleMap.put("CRO_0000010", new ContributorRole("CRO_0000010", "Team Management", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000010"));
-        contributorRoleMap.put("CRO_0000011", new ContributorRole("CRO_0000011", "Regulatory Administration", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000011"));
-        contributorRoleMap.put("CRO_0000012", new ContributorRole("CRO_0000012", "Policy Development", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000012"));
-        contributorRoleMap.put("CRO_0000013", new ContributorRole("CRO_0000013", "Resource Provider", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000013"));
-//        contributorRoleMap.put("CRO_0000014", new ContributorRole("CRO_0000014", "Communication", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000014"));
-        contributorRoleMap.put("CRO_0000014", new ContributorRole(null, "Communication", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000014"));
-            contributorRoleMap.put("CRO_0000041", new ContributorRole("CRO_0000041", "Marketing", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000041"));
-            contributorRoleMap.put("CRO_0000042", new ContributorRole("CRO_0000042", "Networking Facilitation", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000042"));
-            contributorRoleMap.put("CRO_0000043", new ContributorRole("CRO_0000043", "Graphic Design", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000043"));
-            contributorRoleMap.put("CRO_0000044", new ContributorRole("CRO_0000044", "Website Development", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000044"));
-            contributorRoleMap.put("CRO_0000045", new ContributorRole("CRO_0000045", "Documentation", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000045"));
-//        contributorRoleMap.put("CRO_0000015", new ContributorRole("CRO_0000015", "Software Developer", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000015"));
-        contributorRoleMap.put("CRO_0000015", new ContributorRole(null, "Software Developer", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000015"));
-            contributorRoleMap.put("CRO_0000046", new ContributorRole("CRO_0000046", "Software Architecture", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000046"));
-            contributorRoleMap.put("CRO_0000047", new ContributorRole("CRO_0000047", "Software Design", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000047"));
-            contributorRoleMap.put("CRO_0000048", new ContributorRole("CRO_0000048", "Computer Programming", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000048"));
-            contributorRoleMap.put("CRO_0000049", new ContributorRole("CRO_0000049", "Software Engineering", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000049"));
-            contributorRoleMap.put("CRO_0000050", new ContributorRole("CRO_0000050", "Software Testing", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000050"));
-            contributorRoleMap.put("CRO_0000051", new ContributorRole("CRO_0000051", "Software Project Management", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000051"));
-            contributorRoleMap.put("CRO_0000052", new ContributorRole("CRO_0000052", "Code Review", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000052"));
-            contributorRoleMap.put("CRO_0000053", new ContributorRole("CRO_0000053", "Technical Writing", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000053"));
-//        contributorRoleMap.put("CRO_0000016", new ContributorRole("CRO_0000016", "Information Technology Systems", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000016"));
-        contributorRoleMap.put("CRO_0000016", new ContributorRole(null, "Information Technology Systems", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000016"));
-//            contributorRoleMap.put("CRO_0000054", new ContributorRole("CRO_0000054", "Software Systems", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000054"));
-                contributorRoleMap.put("CRO_0000058", new ContributorRole("CRO_0000058", "System Administrator", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000058"));
-                contributorRoleMap.put("CRO_0000059", new ContributorRole("CRO_0000059", "Database Administrator", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000059"));
-            contributorRoleMap.put("CRO_0000055", new ContributorRole("CRO_0000055", "Hardware Systems", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000055"));
-        contributorRoleMap.put("CRO_0000017", new ContributorRole("CRO_0000017", "Supervision", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000017"));
-        contributorRoleMap.put("CRO_0000018", new ContributorRole("CRO_0000018", "Validation", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000018"));
-//        contributorRoleMap.put("CRO_0000060", new ContributorRole("CRO_0000060", "Research Instrumentation", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000060"));
-        contributorRoleMap.put("CRO_0000060", new ContributorRole(null, "Research Instrumentation", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000060"));
-            contributorRoleMap.put("CRO_0000066", new ContributorRole("CRO_0000066", "Device Development", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000066"));
-            contributorRoleMap.put("CRO_0000067", new ContributorRole("CRO_0000067", "Equipment Technician", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000067"));
-            contributorRoleMap.put("CRO_0000068", new ContributorRole("CRO_0000068", "Survey and Questionnaire", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000068"));
-//        contributorRoleMap.put("CRO_0000061", new ContributorRole("CRO_0000061", "Educational", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000061"));
-        contributorRoleMap.put("CRO_0000061", new ContributorRole(null, "Educational", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000061"));
-            contributorRoleMap.put("CRO_0000063", new ContributorRole("CRO_0000063", "Educational Program Development", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000063"));
-            contributorRoleMap.put("CRO_0000064", new ContributorRole("CRO_0000064", "Educational Material Development", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000064"));
-            contributorRoleMap.put("CRO_0000065", new ContributorRole("CRO_0000065", "Teaching", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000065"));
-        contributorRoleMap.put("CRO_0000062", new ContributorRole("CRO_0000062", "Intellectual Property Advisor", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000062"));
 
         /*
             Additional CSL-defined publication types that we might see, but not sure what to map them to
@@ -411,6 +330,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                             processRelationships(vreq, updatedModel, vivoUri, profileUri, vreq.getParameter("contributor" + externalId));
 
                             processRoles(vreq, updatedModel, vivoUri, profileUri, vreq.getParameterValues("role" + externalId));
+                            processFreeTextRoles(vreq, updatedModel, vivoUri, profileUri, vreq.getParameter("otherRoles" + externalId));
                         }
                     }
                 }
@@ -518,10 +438,6 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                 if (remainderIds.size() > 0) {
                     templateValues.put("remainderIds", StringUtils.join(remainderIds, "\n"));
                     templateValues.put("remainderCount", remainderIds.size());
-                }
-
-                if (contributorRoleMap != null && contributorRoleMap.size() > 0) {
-                    templateValues.put("contributorRoles", contributorRoleMap.values());
                 }
 
                 // Show the confirmation page for the processed identifiers
@@ -767,17 +683,31 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
     protected void processRoles(VitroRequest vreq, Model model, String vivoUri, String userUri, String[] roles) {
         if (roles != null && roles.length > 0) {
             for (String role : roles) {
-                ContributorRole contributorRole = contributorRoleMap.get(role);
-                if (contributorRole != null) {
-                    Resource contributorship = model.createResource(getUnusedUri(vreq));
-                    contributorship.addProperty(RDF.type, model.getResource(contributorRole.getUri()));
+                Resource contributorship = model.createResource(getUnusedUri(vreq));
+                contributorship.addProperty(RDF.type, model.getResource("http://purl.obolibrary.org/obo/cro.owl#" + role));
 
-                    contributorship.addProperty(model.createProperty(VIVO_RELATEDBY), model.getResource(vivoUri));
-                    model.getResource(vivoUri).addProperty(model.createProperty(VIVO_RELATES), contributorship);
+                contributorship.addProperty(model.createProperty(VIVO_RELATEDBY), model.getResource(vivoUri));
+                model.getResource(vivoUri).addProperty(model.createProperty(VIVO_RELATES), contributorship);
 
-                    contributorship.addProperty(model.createProperty(OBO_INHERES_IN), model.getResource(userUri));
-                    model.getResource(userUri).addProperty(model.createProperty(OBO_BEARER_OF), contributorship);
-                }
+                contributorship.addProperty(model.createProperty(OBO_INHERES_IN), model.getResource(userUri));
+                model.getResource(userUri).addProperty(model.createProperty(OBO_BEARER_OF), contributorship);
+            }
+        }
+    }
+
+    protected void processFreeTextRoles(VitroRequest vreq, Model model, String vivoUri, String userUri, String freetext) {
+        if (!StringUtils.isEmpty(freetext)) {
+            String[] roles = freetext.split("\\s*[,;]+\\s*");
+            for (String role : roles) {
+                Resource contributorship = model.createResource(getUnusedUri(vreq));
+                contributorship.addProperty(RDF.type, model.getResource("http://purl.obolibrary.org/obo/cro.owl#CRO_9999999"));
+                contributorship.addLiteral(RDFS.label, role);
+
+                contributorship.addProperty(model.createProperty(VIVO_RELATEDBY), model.getResource(vivoUri));
+                model.getResource(vivoUri).addProperty(model.createProperty(VIVO_RELATES), contributorship);
+
+                contributorship.addProperty(model.createProperty(OBO_INHERES_IN), model.getResource(userUri));
+                model.getResource(userUri).addProperty(model.createProperty(OBO_BEARER_OF), contributorship);
             }
         }
     }
@@ -1706,3 +1636,73 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
     }
 
 }
+/*
+        contributorRoleMap.put("CRO_0000001", new ContributorRole("CRO_0000001", "Author", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000001"));
+            contributorRoleMap.put("CRO_0000019", new ContributorRole("CRO_0000019", "Writing Original Draft", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000019"));
+            contributorRoleMap.put("CRO_0000020", new ContributorRole("CRO_0000020", "Editing and Proofreading", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000020"));
+            contributorRoleMap.put("CRO_0000021", new ContributorRole("CRO_0000021", "Figure Development", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000021"));
+            contributorRoleMap.put("CRO_0000022", new ContributorRole("CRO_0000022", "Translator", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000022"));
+        contributorRoleMap.put("CRO_0000002", new ContributorRole("CRO_0000002", "Background and Literature Search", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000002"));
+        contributorRoleMap.put("CRO_0000003", new ContributorRole("CRO_0000003", "Conceptualization", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000003"));
+        contributorRoleMap.put("CRO_0000004", new ContributorRole("CRO_0000004", "Preservation", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000004"));
+            contributorRoleMap.put("CRO_0000023", new ContributorRole("CRO_0000023", "Archivist", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000023"));
+            contributorRoleMap.put("CRO_0000024", new ContributorRole("CRO_0000024", "Digital Preservation", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000024"));
+            contributorRoleMap.put("CRO_0000025", new ContributorRole("CRO_0000025", "Conservator", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000025"));
+        contributorRoleMap.put("CRO_0000005", new ContributorRole("CRO_0000005", "Data", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000005"));
+            contributorRoleMap.put("CRO_0000026", new ContributorRole("CRO_0000026", "Data Curation", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000026"));
+                contributorRoleMap.put("CRO_0000056", new ContributorRole("CRO_0000056", "Metadata Application", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000056"));
+            contributorRoleMap.put("CRO_0000027", new ContributorRole("CRO_0000027", "Data Entry", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000027"));
+            contributorRoleMap.put("CRO_0000028", new ContributorRole("CRO_0000028", "Data Visualization", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000028"));
+            contributorRoleMap.put("CRO_0000029", new ContributorRole("CRO_0000029", "Data Analysis", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000029"));
+                contributorRoleMap.put("CRO_0000057", new ContributorRole("CRO_0000057", "Statistical Data Analysis", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000057"));
+            contributorRoleMap.put("CRO_0000030", new ContributorRole("CRO_0000030", "Data Collection", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000030"));
+            contributorRoleMap.put("CRO_0000031", new ContributorRole("CRO_0000031", "Data Aggregation", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000031"));
+            contributorRoleMap.put("CRO_0000032", new ContributorRole("CRO_0000032", "Data Integration", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000032"));
+            contributorRoleMap.put("CRO_0000033", new ContributorRole("CRO_0000033", "Data Quality Assurance", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000033"));
+            contributorRoleMap.put("CRO_0000034", new ContributorRole("CRO_0000034", "Data Modeling", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000034"));
+            contributorRoleMap.put("CRO_0000035", new ContributorRole("CRO_0000035", "Data Standards Developer", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000035"));
+        contributorRoleMap.put("CRO_0000006", new ContributorRole("CRO_0000006", "Funding Acquisition", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000006"));
+        contributorRoleMap.put("CRO_0000007", new ContributorRole("CRO_0000007", "Study Investigation", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000007"));
+        contributorRoleMap.put("CRO_0000008", new ContributorRole("CRO_0000008", "Methodology", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000008"));
+            contributorRoleMap.put("CRO_0000036", new ContributorRole("CRO_0000036", "Technique Development", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000036"));
+            contributorRoleMap.put("CRO_0000037", new ContributorRole("CRO_0000037", "Protocol Creation", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000037"));
+            contributorRoleMap.put("CRO_0000038", new ContributorRole("CRO_0000038", "Guideline Development", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000038"));
+            contributorRoleMap.put("CRO_0000039", new ContributorRole("CRO_0000039", "Standard Operating Procedure Development", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000039"));
+            contributorRoleMap.put("CRO_0000040", new ContributorRole("CRO_0000040", "Study Design", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000040"));
+        contributorRoleMap.put("CRO_0000009", new ContributorRole("CRO_0000009", "Project Management", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000009"));
+        contributorRoleMap.put("CRO_0000010", new ContributorRole("CRO_0000010", "Team Management", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000010"));
+        contributorRoleMap.put("CRO_0000011", new ContributorRole("CRO_0000011", "Regulatory Administration", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000011"));
+        contributorRoleMap.put("CRO_0000012", new ContributorRole("CRO_0000012", "Policy Development", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000012"));
+        contributorRoleMap.put("CRO_0000013", new ContributorRole("CRO_0000013", "Resource Provider", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000013"));
+        contributorRoleMap.put("CRO_0000014", new ContributorRole("CRO_0000014", "Communication", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000014"));
+            contributorRoleMap.put("CRO_0000041", new ContributorRole("CRO_0000041", "Marketing", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000041"));
+            contributorRoleMap.put("CRO_0000042", new ContributorRole("CRO_0000042", "Networking Facilitation", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000042"));
+            contributorRoleMap.put("CRO_0000043", new ContributorRole("CRO_0000043", "Graphic Design", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000043"));
+            contributorRoleMap.put("CRO_0000044", new ContributorRole("CRO_0000044", "Website Development", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000044"));
+            contributorRoleMap.put("CRO_0000045", new ContributorRole("CRO_0000045", "Documentation", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000045"));
+        contributorRoleMap.put("CRO_0000015", new ContributorRole("CRO_0000015", "Software Developer", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000015"));
+            contributorRoleMap.put("CRO_0000046", new ContributorRole("CRO_0000046", "Software Architecture", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000046"));
+            contributorRoleMap.put("CRO_0000047", new ContributorRole("CRO_0000047", "Software Design", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000047"));
+            contributorRoleMap.put("CRO_0000048", new ContributorRole("CRO_0000048", "Computer Programming", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000048"));
+            contributorRoleMap.put("CRO_0000049", new ContributorRole("CRO_0000049", "Software Engineering", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000049"));
+            contributorRoleMap.put("CRO_0000050", new ContributorRole("CRO_0000050", "Software Testing", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000050"));
+            contributorRoleMap.put("CRO_0000051", new ContributorRole("CRO_0000051", "Software Project Management", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000051"));
+            contributorRoleMap.put("CRO_0000052", new ContributorRole("CRO_0000052", "Code Review", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000052"));
+            contributorRoleMap.put("CRO_0000053", new ContributorRole("CRO_0000053", "Technical Writing", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000053"));
+        contributorRoleMap.put("CRO_0000016", new ContributorRole("CRO_0000016", "Information Technology Systems", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000016"));
+            contributorRoleMap.put("CRO_0000054", new ContributorRole("CRO_0000054", "Software Systems", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000054"));
+                contributorRoleMap.put("CRO_0000059", new ContributorRole("CRO_0000059", "Database Administrator", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000059"));
+            contributorRoleMap.put("CRO_0000055", new ContributorRole("CRO_0000055", "Hardware Systems", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000055"));
+        contributorRoleMap.put("CRO_0000017", new ContributorRole("CRO_0000017", "Supervision", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000017"));
+        contributorRoleMap.put("CRO_0000018", new ContributorRole("CRO_0000018", "Validation", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000018"));
+        contributorRoleMap.put("CRO_0000060", new ContributorRole("CRO_0000060", "Research Instrumentation", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000060"));
+            contributorRoleMap.put("CRO_0000066", new ContributorRole("CRO_0000066", "Device Development", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000066"));
+            contributorRoleMap.put("CRO_0000067", new ContributorRole("CRO_0000067", "Equipment Technician", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000067"));
+            contributorRoleMap.put("CRO_0000068", new ContributorRole("CRO_0000068", "Survey and Questionnaire", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000068"));
+        contributorRoleMap.put("CRO_0000061", new ContributorRole("CRO_0000061", "Educational", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000061"));
+            contributorRoleMap.put("CRO_0000063", new ContributorRole("CRO_0000063", "Educational Program Development", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000063"));
+            contributorRoleMap.put("CRO_0000064", new ContributorRole("CRO_0000064", "Educational Material Development", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000064"));
+            contributorRoleMap.put("CRO_0000065", new ContributorRole("CRO_0000065", "Teaching", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000065"));
+        contributorRoleMap.put("CRO_0000062", new ContributorRole("CRO_0000062", "Intellectual Property Advisor", "http://purl.obolibrary.org/obo/cro.owl#CRO_0000062"));
+
+ */

@@ -31,9 +31,6 @@
     .linked {
         font-style: italic;
     }
-    .role_group {
-        font-style: italic;
-    }
     .entryId {
         background-color: #3e8baa; /* #E0E0E0; */
         color: #ffffff;
@@ -49,9 +46,6 @@
         display: inline;
     }
     .radioWithLabel:checked + .labelForRadio {
-        font-weight: bold;
-    }
-    .checkboxWithLabel:checked + .labelForCheckbox {
         font-weight: bold;
     }
     .description {
@@ -186,18 +180,7 @@
             <#else>
                 <input type="radio" id="author${citation.externalId}" name="contributor${citation.externalId}" value="author" <#if !proposedAuthor>checked</#if> class="radioWithLabel" /><label for="author${citation.externalId}" class="labelForRadio"> Unlisted Author</label><br />
                 <input type="radio" id="editor${citation.externalId}" name="contributor${citation.externalId}" value="editor" class="radioWithLabel" /><label for="editor${citation.externalId}" class="labelForRadio"> Editor</label><br />
-                <#if contributorRoles??>
-                    <input type="radio" id="other${citation.externalId}" name="contributor${citation.externalId}" value="other" class="radioWithLabel" /><label for="other${citation.externalId}" class="labelForRadio"> Other Contribution</label><br />
-                    <span>Please indicate the contribution that you made to this work</span><br />
-                    <#list contributorRoles as contributorRole>
-                        <#if contributorRole.key??>
-                            <input type="checkbox" id="${contributorRole.key}${citation.externalId}" name="role${citation.externalId}" value="${contributorRole.key}" class="checkboxWithLabel" /><label for="${contributorRole.key}${citation.externalId}" class="labelForCheckbox"> ${contributorRole.label}</label>
-                        <#else>
-                            <br /><span class="role_group">${contributorRole.label}</span><br />
-                        </#if>
-                    </#list>
-                    <br /><br />
-                </#if>
+                <#include "createAndLinkResourceContributorRoles.ftl" />
                 <input type="radio" id="notmine${citation.externalId}" name="contributor${citation.externalId}" value="notmine" class="radioWithLabel" /><label for="notmine${citation.externalId}" class="labelForRadio"> This is not my work</label><br />
             </#if>
             <input type="hidden" name="externalResource${citation.externalId}" value="${citation.externalResource!}" />
