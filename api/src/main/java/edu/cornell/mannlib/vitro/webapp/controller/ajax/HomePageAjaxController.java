@@ -33,7 +33,13 @@ public class HomePageAjaxController extends VitroAjaxController {
 			}
 			else if ("getGeoFocusResearcherCount".equals(function)) {
 			    new GeoFocusResearcherCount(this, vreq, resp).processRequest();
-			} 
+			}
+			else if ("getGeoLocatedLocations".equals(function)) {
+				new GeoLocatedMapLocations(this, vreq, resp).processRequest();
+			}
+			else if ("getGeoLocatedResearcherCount".equals(function)) {
+				new GeoLocatedResearcherCount(this, vreq, resp).processRequest();
+			}
 			else {
 				resp.getWriter().write("[]");
 			}
