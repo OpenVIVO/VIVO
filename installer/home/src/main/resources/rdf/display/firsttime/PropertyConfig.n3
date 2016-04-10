@@ -86,6 +86,23 @@ local:personIsContributorConfig a :ObjectPropertyDisplayConfig ;
     vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupbibliographic> .
 
+local:informationReosurcehasContributorContext a :ConfigContext ;
+    :hasConfiguration local:informationReosurcehasContributorConfig ;
+    :configContextFor <http://vivoweb.org/ontology/core#relates> ;
+    :qualifiedByDomain  <http://purl.obolibrary.org/obo/IAO_0000030>  ;
+    :qualifiedBy      <http://purl.obolibrary.org/obo/cro.owl#CRO_0000000> .
+
+local:informationReosurcehasContributorConfig a :ObjectPropertyDisplayConfig ;
+    :listViewConfigFile "listViewConfig-informationResourceHasContribution.xml"^^xsd:string ;
+    rdfs:label "informationReosurcehasContributor"@en-US;
+    :displayName "has contribution" ;
+    vitro:collateBySubclassAnnot
+              "true"^^xsd:boolean;
+    vitro:displayRankAnnot 20;
+    vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
+    :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupoverview> .
+
 local:orgInAuthorshipContext a :ConfigContext ;
     :hasConfiguration local:orgInAuthorshipConfig ;
     :configContextFor vivo:relatedBy ;
