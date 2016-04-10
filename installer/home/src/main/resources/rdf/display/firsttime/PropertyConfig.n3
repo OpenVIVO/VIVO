@@ -69,6 +69,23 @@ local:authorInAuthorshipConfig a :ObjectPropertyDisplayConfig ;
     vitro:customEntryFormAnnot "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddPublicationToPersonGenerator"^^xsd:string ;
     :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupbibliographic> . 
 
+local:personIsContributorContext a :ConfigContext ;
+    :hasConfiguration local:personIsContributorConfig ;
+    :configContextFor <http://purl.obolibrary.org/obo/RO_0000053> ;
+    :qualifiedByDomain  <http://xmlns.com/foaf/0.1/Person>  ;
+    :qualifiedBy      <http://purl.obolibrary.org/obo/cro.owl#CRO_0000000> .
+
+local:personIsContributorConfig a :ObjectPropertyDisplayConfig ;
+    :listViewConfigFile "listViewConfig-personIsContributor.xml"^^xsd:string ;
+    rdfs:label "agentIsContributor"@en-US;
+    :displayName "contributor to" ;
+    vitro:collateBySubclassAnnot
+              "true"^^xsd:boolean;
+    vitro:displayRankAnnot 20;
+    vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
+    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:dbAdmin ;
+    :propertyGroup <http://vivoweb.org/ontology#vitroPropertyGroupbibliographic> .
+
 local:orgInAuthorshipContext a :ConfigContext ;
     :hasConfiguration local:orgInAuthorshipConfig ;
     :configContextFor vivo:relatedBy ;
