@@ -1103,24 +1103,27 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
         String formattedDate = null;
         String precision = null;
 
+        String dateUri = vreq.getUnfilteredWebappDaoFactory().getDefaultNamespace();
+        if (dateUri.endsWith("/")) {
+            dateUri += "date";
+        } else {
+            dateUri += "/date";
+        }
+
         if (date.month != null) {
             if (date.day != null) {
                 formattedDate = String.format("%04d-%02d-%02dT00:00:00", date.year, date.month, date.day);
                 precision = "http://vivoweb.org/ontology/core#dayPrecision";
+                dateUri += formattedDate.substring(0, 10);
             } else {
                 formattedDate = String.format("%04d-%02d-01T00:00:00", date.year, date.month);
                 precision = "http://vivoweb.org/ontology/core#monthPrecision";
+                dateUri += formattedDate.substring(0, 7);
             }
         } else {
             formattedDate = String.format("%04d-01-01T00:00:00", date.year);
             precision = "http://vivoweb.org/ontology/core#yearPrecision";
-        }
-
-        String dateUri = vreq.getUnfilteredWebappDaoFactory().getDefaultNamespace();
-        if (dateUri.endsWith("/")) {
-            dateUri += "date" + formattedDate;
-        } else {
-            dateUri += "/date" + formattedDate;
+            dateUri += formattedDate.substring(0, 4);
         }
 
         Resource dateResource = model.createResource(dateUri).addProperty(RDF.type, model.getResource("http://vivoweb.org/ontology/core#DateTimeValue"));
