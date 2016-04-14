@@ -453,6 +453,132 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
         return new TemplateResponseValues("createAndLinkResourceEnterID.ftl", templateValues);
     }
 
+    private String getFormattedProfileName(VitroRequest vreq, String profileUri) {
+        final Citation.Name name = new Citation.Name();
+
+        name.name = null;
+
+        String vcardQuery = "SELECT ?givenName ?familyName\n" +
+                "WHERE\n" +
+                "{\n" +
+                "  <" + profileUri + "> <" + OBO_HAS_CONTACT_INFO + "> ?vCard .\n" +
+                "  ?vCard <" + VCARD_HAS_NAME + "> ?vCardName .\n" +
+                "  ?vCardName <" + VCARD_FAMILYNAME + "> ?familyName .\n" +
+                "  OPTIONAL { ?vCardName <" + VCARD_GIVENNAME + "> ?givenName . }\n" +
+                "}\n";
+
+        if (StringUtils.isEmpty(name.name)) {
+            try {
+                // Process the query
+                vreq.getRDFService().sparqlSelectQuery(vcardQuery, new ResultSetConsumer() {
+                    @Override
+                    protected void processQuerySolution(QuerySolution qs) {
+                        // Get the name(s) from the result set
+                        Literal familyName = qs.contains("famileName") ? qs.getLiteral("familyName") : null;
+                        Literal givenName  = qs.contains("givenName") ? qs.getLiteral("givenName") : null;
+
+                        if (StringUtils.isEmpty(name.name)) {
+                            // If we have a first / last name, create a formatted author string
+                            if (familyName != null) {
+                                if (givenName != null) {
+                                    name.name = CreateAndLinkUtils.formatAuthorString(familyName.getString(), givenName.getString());
+                                } else {
+                                    name.name = CreateAndLinkUtils.formatAuthorString(familyName.getString(), null);
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (RDFServiceException e) {
+                e.printStackTrace();
+            }
+        }
+
+        String foafQuery = "SELECT ?givenName ?familyName\n" +
+                "WHERE\n" +
+                "{\n" +
+                "  <" + profileUri + "> <" + FOAF_LASTNAME + "> ?familyName .\n" +
+                "  OPTIONAL { <" + profileUri + "> <" + FOAF_FIRSTNAME + "> ?givenName . }\n" +
+                "}";
+
+        if (StringUtils.isEmpty(name.name)) {
+            try {
+                // Process the query
+                vreq.getRDFService().sparqlSelectQuery(foafQuery, new ResultSetConsumer() {
+                    @Override
+                    protected void processQuerySolution(QuerySolution qs) {
+                        // Get the name(s) from the result set
+                        Literal familyName = qs.contains("famileName") ? qs.getLiteral("familyName") : null;
+                        Literal givenName  = qs.contains("givenName") ? qs.getLiteral("givenName") : null;
+
+                        if (StringUtils.isEmpty(name.name)) {
+                            // If we have a first / last name, create a formatted author string
+                            if (familyName != null) {
+                                if (givenName != null) {
+                                    name.name = CreateAndLinkUtils.formatAuthorString(familyName.getString(), givenName.getString());
+                                } else {
+                                    name.name = CreateAndLinkUtils.formatAuthorString(familyName.getString(), null);
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (RDFServiceException e) {
+                e.printStackTrace();
+            }
+        }
+
+        String labelQuery = "SELECT ?label\n" +
+                "WHERE\n" +
+                "{\n" +
+                "  <" + profileUri + "> <" + RDFS_LABEL + "> ?label .\n" +
+                "}\n";
+
+        if (StringUtils.isEmpty(name.name)) {
+            try {
+                // Process the query
+                vreq.getRDFService().sparqlSelectQuery(labelQuery, new ResultSetConsumer() {
+                    @Override
+                    protected void processQuerySolution(QuerySolution qs) {
+                        // Get the name(s) from the result set
+                        Literal label      = qs.contains("label") ? qs.getLiteral("label") : null;
+
+                        String authorStr = null;
+                        if (label != null) {
+                            // If we have a formatted label, normalize it to last name, initials
+                            authorStr = label.getString();
+                            if (authorStr.indexOf(',') > -1) {
+                                int endIdx = authorStr.indexOf(',');
+                                while (endIdx < authorStr.length()) {
+                                    if (Character.isAlphabetic(authorStr.charAt(endIdx))) {
+                                        break;
+                                    }
+                                    endIdx++;
+                                }
+
+                                if (endIdx < authorStr.length()) {
+                                    authorStr = authorStr.substring(0, endIdx + 1);
+                                } else {
+                                    authorStr = authorStr.substring(0, authorStr.indexOf(','));
+                                }
+                            }
+                        }
+
+                        // If we have a formatted author string
+                        if (authorStr != null) {
+                            name.name = authorStr;
+                        }
+
+                    }
+                });
+            } catch (RDFServiceException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return name.name;
+    }
+
     /**
      * Method to find an author to propose for linking
      *
@@ -466,86 +592,25 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
             return;
         }
 
-        // Query to get the name of the user we are claiming for
-        String query = "SELECT ?givenName ?familyName ?label\n" +
-                "WHERE\n" +
-                "{\n" +
-                "  {\n" +
-                "  \t<" + profileUri + "> <" + RDFS_LABEL +"> ?label .\n" +
-                "  \t<" + profileUri + "> <" + FOAF_FIRSTNAME +"> ?givenName .\n" +
-                "  \t<" + profileUri + "> <" + FOAF_LASTNAME +"> ?familyName .\n" +
-                "  }\n" +
-                "}\n";
+        String authorStr = getFormattedProfileName(vreq, profileUri);
+        if (StringUtils.isEmpty(authorStr)) {
+            return;
+        }
 
+        // If we have a formatted author string
+        if (authorStr != null) {
+            String authorStrLwr = authorStr.toLowerCase();
 
-        try {
-            // Process the query
-            vreq.getRDFService().sparqlSelectQuery(query, new ResultSetConsumer() {
-                @Override
-                protected void processQuerySolution(QuerySolution qs) {
-                    // Get the name(s) from the result set
-                    Literal familyName = qs.contains("famileName") ? qs.getLiteral("familyName") : null;
-                    Literal givenName  = qs.contains("givenName") ? qs.getLiteral("givenName") : null;
-                    Literal label      = qs.contains("label") ? qs.getLiteral("label") : null;
-
-                    String authorStr = null;
-                    // If we have a first / last name, create a formatted author string
-                    if (familyName != null) {
-                        if (givenName != null) {
-                            authorStr = CreateAndLinkUtils.formatAuthorString(familyName.getString(), givenName.getString());
-                        } else {
-                            authorStr = CreateAndLinkUtils.formatAuthorString(familyName.getString(), null);
-                        }
-                    } else if (label != null) {
-                        // If we have a formatted label, normalize it to last name, initials
-                        authorStr = label.getString();
-                        if (authorStr.indexOf(',') > -1) {
-                            int endIdx = authorStr.indexOf(',');
-                            while (endIdx < authorStr.length()) {
-                                if (Character.isAlphabetic(authorStr.charAt(endIdx))) {
-                                    break;
-                                }
-                                endIdx++;
-                            }
-
-                            if (endIdx < authorStr.length()) {
-                                authorStr = authorStr.substring(0, endIdx + 1);
-                            } else {
-                                authorStr = authorStr.substring(0, authorStr.indexOf(','));
-                            }
-                        }
+            // Find a match for the author string in the resource
+            for (Citation.Name author : citation.authors) {
+                if (author.name != null) {
+                    String nameLwr = author.name.toLowerCase();
+                    if (nameLwr.startsWith(authorStrLwr) || authorStrLwr.startsWith(nameLwr)) {
+                        author.proposed = true;
+                        break;
                     }
-
-                    // If we have a formatted author string
-                    if (authorStr != null) {
-                        String authorStrLwr = authorStr.toLowerCase();
-                        String authorStrUpr = authorStr.toUpperCase();
-
-                        // Find a match for the author string in the resource
-                        for (Citation.Name author : citation.authors) {
-                            if (author.name != null) {
-                                if (author.name.startsWith(authorStr) || authorStr.startsWith(author.name)) {
-                                    author.proposed = true;
-                                    break;
-                                }
-
-                                if (author.name.startsWith(authorStrUpr) || authorStrUpr.startsWith(author.name)) {
-                                    author.proposed = true;
-                                    break;
-                                }
-
-                                if (author.name.startsWith(authorStrLwr) || authorStrLwr.startsWith(author.name)) {
-                                    author.proposed = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
                 }
-            });
-        } catch (RDFServiceException e) {
-            e.printStackTrace();
+            }
         }
     }
 
