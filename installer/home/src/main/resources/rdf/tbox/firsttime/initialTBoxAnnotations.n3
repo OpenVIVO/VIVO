@@ -471,7 +471,7 @@ bibo:pageStart
       vitro:inPropertyGroupAnnot
               <http://vivoweb.org/ontology#vitroPropertyGroupbibobscure> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:publicDescriptionAnnot
               "Starting page number within a continuous page range."^^xsd:string .
 
@@ -738,7 +738,7 @@ vivo:reproduces
       vitro:inPropertyGroupAnnot
               <http://vivoweb.org/ontology#vitroPropertyGroupbibobscure> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:offerCreateNewOptionAnnot
               "true"^^xsd:boolean ;
       vitro:selectFromExistingAnnot
@@ -1172,7 +1172,7 @@ vivo:features
       vitro:offerCreateNewOptionAnnot
               "true"^^xsd:boolean ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:publicDescriptionAnnot
               "This relates an information resource to a person it features."^^xsd:string ;
       vitro:selectFromExistingAnnot
@@ -1751,7 +1751,7 @@ bibo:presentedAt
       vitro:offerCreateNewOptionAnnot
               "true"^^xsd:boolean ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:publicDescriptionAnnot
               "Relates a document to an event; for example, a paper to a conference."^^xsd:string ;
       vitro:selectFromExistingAnnot
@@ -1932,7 +1932,7 @@ bibo:reproducedIn
       vitro:offerCreateNewOptionAnnot
               "true"^^xsd:boolean ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:selectFromExistingAnnot
               "true"^^xsd:boolean .
 
@@ -2179,7 +2179,7 @@ bibo:volume
       vitro:inPropertyGroupAnnot
               <http://vivoweb.org/ontology#vitroPropertyGroupbibobscure> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:publicDescriptionAnnot
               "A volume number."^^xsd:string .
 
@@ -2354,7 +2354,7 @@ bibo:issue
       vitro:inPropertyGroupAnnot
               <http://vivoweb.org/ontology#vitroPropertyGroupbibobscure> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> .
 
 obo:ARG_2000069
       rdfs:label "American Board of Emergency Medicine"@en-US .
@@ -2794,7 +2794,7 @@ vivo:hasSubjectArea
       vitro:offerCreateNewOptionAnnot
               "true"^^xsd:boolean ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:selectFromExistingAnnot
               "true"^^xsd:boolean .
 
@@ -3104,7 +3104,7 @@ obo:ERO_0000045
       vitro:hiddenFromPublishBelowRoleLevelAnnot
               <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:inPropertyGroupAnnot
               <http://vivoweb.org/ontology#vitroPropertyGroupoverview> .
  
@@ -3737,7 +3737,7 @@ bibo:pageEnd
       vitro:inPropertyGroupAnnot
               <http://vivoweb.org/ontology#vitroPropertyGroupbibobscure> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:publicDescriptionAnnot
               "Ending page number within a continuous page range."^^xsd:string .
 
@@ -3852,7 +3852,7 @@ vcard:honorificSuffix
       vitro:offerCreateNewOptionAnnot
               "true"^^xsd:boolean ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:publicDescriptionAnnot
               "A 'global citation frequency' is an entity referencing a distinct source, date, and value; include the value, source, and date in the label for clarity."^^xsd:string ;
       vitro:selectFromExistingAnnot
@@ -3882,7 +3882,7 @@ bibo:cites
       vitro:offerCreateNewOptionAnnot
               "true"^^xsd:boolean ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:selectFromExistingAnnot
               "true"^^xsd:boolean .
 
@@ -3967,7 +3967,7 @@ bibo:translationOf
       vitro:offerCreateNewOptionAnnot
               "true"^^xsd:boolean ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:publicDescriptionAnnot
               "Relates a translated document to the original document."^^xsd:string ;
       vitro:selectFromExistingAnnot
@@ -5156,7 +5156,7 @@ vivo:hasPublicationVenue
       vitro:offerCreateNewOptionAnnot
               "true"^^xsd:boolean ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:selectFromExistingAnnot
               "true"^^xsd:boolean .
 
@@ -5974,7 +5974,7 @@ bibo:translator
       vitro:offerCreateNewOptionAnnot
               "true"^^xsd:boolean ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:publicDescriptionAnnot
               "This relates an information resource to the translator of the written document from one language to another."^^xsd:string ;
       vitro:selectFromExistingAnnot
@@ -6032,7 +6032,7 @@ bibo:citedBy
       vitro:offerCreateNewOptionAnnot
               "true"^^xsd:boolean ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:selectFromExistingAnnot
               "true"^^xsd:boolean .
 
@@ -7097,7 +7097,7 @@ vivo:hasTranslation
       vitro:offerCreateNewOptionAnnot
               "true"^^xsd:boolean ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:publicDescriptionAnnot
               "Relates an original documents to a translation of that document."^^xsd:string ;
       vitro:selectFromExistingAnnot
@@ -7449,7 +7449,7 @@ obo:ERO_0001716
       vitro:inPropertyGroupAnnot
               <http://vivoweb.org/ontology#vitroPropertyGroupoverview> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:selectFromExistingAnnot
               "true"^^xsd:boolean ;
       vitro:offerCreateNewOptionAnnot
@@ -8584,7 +8584,7 @@ bibo:numPages
       vitro:inPropertyGroupAnnot
               <http://vivoweb.org/ontology#vitroPropertyGroupbibobscure> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> .
 
 vcard:familyName
       rdfs:label "has last name"@en-US ;
@@ -8835,7 +8835,7 @@ bibo:status
       vitro:inPropertyGroupAnnot
               <http://vivoweb.org/ontology#vitroPropertyGroupoverview> ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:selectFromExistingAnnot
               "true"^^xsd:boolean .
 
@@ -8943,7 +8943,7 @@ vivo:hasEquipment
       vitro:offerCreateNewOptionAnnot
               "true"^^xsd:boolean ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:selectFromExistingAnnot
               "true"^^xsd:boolean .
 
@@ -8962,7 +8962,7 @@ vivo:hasEquipment
       vitro:offerCreateNewOptionAnnot
               "true"^^xsd:boolean ;
       vitro:prohibitedFromUpdateBelowRoleLevelAnnot
-              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
+              <http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin> ;
       vitro:selectFromExistingAnnot
               "true"^^xsd:boolean .
 
