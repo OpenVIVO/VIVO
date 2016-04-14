@@ -563,6 +563,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
             String query =
                     "PREFIX vcard:    <http://www.w3.org/2006/vcard/ns#>\n" +
                     "PREFIX vivo:     <http://vivoweb.org/ontology/core#>\n" +
+                    "PREFIX obo:     <http://purl.obolibrary.org/obo/>\n" +
                     "\n" +
                     "CONSTRUCT\n" +
                     "{\n" +
@@ -571,7 +572,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                     "  ?sDateTime ?pDateTime ?oDateTime .\n" +
                     "  ?sRel ?pRel ?oRel .\n" +
                     "  ?sVCard a vcard:Individual .\n" +
-                    "  ?sVCard ?pVCard ?oVCard .\n" +
+                    "  ?sVCard vcard:hasName ?sVCardName .\n" +
                     "  ?sVCardName ?pVCardName ?oVCardName .\n" +
                     "  ?sPerson ?pPerson ?oPerson .\n" +
                     "}\n" +
@@ -601,6 +602,14 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                     "    ?relationship ?pRel ?sPerson .\n" +
                     "    ?sPerson ?pPerson ?oPerson .\n" +
                     "    FILTER (?sPerson != <" + uri + ">)\n" +
+                    "  }\n" +
+                    "  UNION\n" +
+                    "  {\n" +
+                    "    <" + uri + "> vivo:relatedBy ?relationship .\n" +
+                    "    ?relationship ?pRel ?sPerson .\n" +
+                    "    ?sPerson obo:ARG_2000028 ?sVCard .\n" +
+                    "    ?sVCard vcard:hasName ?sVCardName .\n" +
+                    "    ?sVCardName ?pVCardName ?oVCardName .\n" +
                     "  }\n" +
                     "  UNION\n" +
                     "  {\n" +
@@ -1479,12 +1488,26 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                                 Statement familyName = null;
                                 Statement givenName = null;
                                 if (isResourceOfType(authorResource, VCARD_INDIVIDUAL)) {
-                                    Statement vcardName = authorResource.getProperty(model.getProperty(VCARD_HAS_NAME));
-                                    if (vcardName != null) {
-                                        givenName = vcardName.getProperty(model.getProperty(VCARD_GIVENNAME));
-                                        familyName = vcardName.getProperty(model.getProperty(VCARD_FAMILYNAME));
+                                    if (authorResource.hasProperty(model.getProperty(VCARD_HAS_NAME))) {
+                                        Statement vcardName = authorResource.getProperty(model.getProperty(VCARD_HAS_NAME));
+                                        if (vcardName != null) {
+                                            givenName = vcardName.getProperty(model.getProperty(VCARD_GIVENNAME));
+                                            familyName = vcardName.getProperty(model.getProperty(VCARD_FAMILYNAME));
+                                        }
                                     }
-                                } else {
+                                } else if (authorResource.hasProperty(model.getProperty(OBO_HAS_CONTACT_INFO))) {
+                                    Resource vCard = authorResource.getProperty(model.getProperty(OBO_HAS_CONTACT_INFO)).getResource();
+                                    if (vCard.hasProperty(model.getProperty(VCARD_HAS_NAME))) {
+                                        Statement vcardName = vCard.getProperty(model.getProperty(VCARD_HAS_NAME));
+                                        if (vcardName != null) {
+                                            givenName = vcardName.getProperty(model.getProperty(VCARD_GIVENNAME));
+                                            familyName = vcardName.getProperty(model.getProperty(VCARD_FAMILYNAME));
+                                        }
+                                        linked = true;
+                                    }
+                                }
+
+                                if (givenName == null) {
                                     // It's a foaf person, which means it is already linked to a full profile in VIVO
                                     givenName = authorResource.getProperty(model.getProperty(FOAF_FIRSTNAME));
                                     familyName = authorResource.getProperty(model.getProperty(FOAF_LASTNAME));
@@ -1502,6 +1525,26 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
 
                                     // Record whether the author is a full profile, or just a VCARD
                                     newAuthor.linked = linked;
+                                } else {
+                                    Statement label = authorResource.getProperty(RDFS.label);
+                                    if (label != null) {
+                                        String name = label.getString();
+                                        if (name.contains(",")) {
+                                            String[] parts = name.split("\\s*,\\s*");
+                                            if (parts != null && parts.length > 1) {
+                                                name = CreateAndLinkUtils.formatAuthorString(parts[0], parts[parts.length - 1]);
+                                            }
+                                        } else {
+                                            String[] parts = name.split("\\s*");
+                                            if (parts != null && parts.length > 1) {
+                                                name = CreateAndLinkUtils.formatAuthorString(parts[parts.length - 1], parts[0]);
+                                            }
+                                        }
+
+                                        newAuthor = new Citation.Name();
+                                        newAuthor.name = name;
+                                        newAuthor.linked = linked;
+                                    }
                                 }
                             }
 
