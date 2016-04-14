@@ -117,7 +117,9 @@
             viewAllFaculty: '${i18n().view_all_faculty}',
             viewAllString: '${i18n().view_all}',
             viewAllDepartments: '${i18n().view_all_departments}',
-            noDepartmentsFound: '${i18n().no_departments_found}'
+            noDepartmentsFound: '${i18n().no_departments_found}',
+            viewAllOrganizations: '${i18n().view_all_organizations}',
+            noOrganizationsFound: '${i18n().no_organizations_found}'
         };
         // set the 'limmit search' text and alignment
         if  ( $('input.search-homepage').css('text-align') == "right" ) {       

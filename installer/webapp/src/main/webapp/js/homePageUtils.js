@@ -120,7 +120,7 @@ $(document).ready(function(){
         
         if ( deptNbr == 0 ) {
             html = "<ul style='list-style:none'><p><li style='padding-top:0.3em'>"
-                   + i18nStrings.noDepartmentsFound + "</li></p></ul>";
+                   + i18nStrings.noOrganizationsFound + "</li></p></ul>";
         }
         else if ( deptNbr > 6 ) {
         	//if there are more than 6 departments, we want to choose a random subset and display
@@ -155,8 +155,8 @@ $(document).ready(function(){
             html += "</ul><ul style='list-style:none'>"
                     + "<li style='font-size:0.9em;text-align:right;padding: 6px 16px 0 0'><a href='" 
                     + urlsBase 
-                    + "/organizations#http://vivoweb.org/ontology/core#AcademicDepartment' alt='" 
-                    + i18nStrings.viewAllDepartments + "'>" 
+                    + "/organizations#http://xmlns.com/foaf/0.1/Organization' alt='"
+                    + i18nStrings.viewAllOrganizations + "'>"
                     + i18nStrings.viewAllString + "</a></li></ul>";
         }
         $('div#academic-depts').html(html);
