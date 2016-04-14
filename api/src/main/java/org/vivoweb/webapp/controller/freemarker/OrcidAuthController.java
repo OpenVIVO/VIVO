@@ -171,9 +171,21 @@ public class OrcidAuthController extends FreemarkerHttpServlet {
 
                     Resource profile = model.createResource(profileUri);
                     profile.addProperty(RDF.type, model.getResource("http://xmlns.com/foaf/0.1/Person"));
+
+                    Resource contactDetails = model.createResource(getUnusedUri(vreq));
+                    contactDetails.addProperty(RDF.type, model.getResource("http://www.w3.org/2006/vcard/ns#Individual"));
+                    contactDetails.addProperty(model.getProperty("http://purl.obolibrary.org/obo/ARG_2000029"), profile);
+                    profile.addProperty(model.getProperty("http://purl.obolibrary.org/obo/ARG_2000028"), contactDetails);
+
                     if (!StringUtils.isEmpty(familyName)) {
+                        Resource contactName = model.createResource(getUnusedUri(vreq));
+                        contactName.addProperty(RDF.type, model.getResource("http://www.w3.org/2006/vcard/ns#Name"));
+                        contactDetails.addProperty(model.getProperty("http://www.w3.org/2006/vcard/ns#hasName"), contactName);
+
+                        contactName.addLiteral(model.getProperty("http://www.w3.org/2006/vcard/ns#familyName"), familyName);
                         profile.addLiteral(model.getProperty("http://xmlns.com/foaf/0.1/lastName"), familyName);
                         if (!StringUtils.isEmpty(givenName)) {
+                            contactName.addLiteral(model.getProperty("http://www.w3.org/2006/vcard/ns#givenName"), givenName);
                             profile.addLiteral(model.getProperty("http://xmlns.com/foaf/0.1/firstName"), givenName);
                             profile.addProperty(RDFS.label, familyName + ", " + givenName);
                         } else {
@@ -211,11 +223,6 @@ public class OrcidAuthController extends FreemarkerHttpServlet {
                                 }
 
                                 if (orcidBio.orcidProfile.orcidBio.contactDetails.email != null || orcidBio.orcidProfile.orcidBio.researcherUrls != null) {
-                                    Resource contactDetails = model.createResource(getUnusedUri(vreq));
-                                    contactDetails.addProperty(RDF.type, model.getResource("http://www.w3.org/2006/vcard/ns#Individual"));
-                                    contactDetails.addProperty(model.getProperty("http://purl.obolibrary.org/obo/ARG_2000029"), profile);
-                                    profile.addProperty(model.getProperty("http://purl.obolibrary.org/obo/ARG_2000028"), contactDetails);
-
                                     if (orcidBio.orcidProfile.orcidBio.contactDetails.email != null) {
                                         for (OrcidResponse.OrcidProfile.OrcidBio.ContactDetails.Email email : orcidBio.orcidProfile.orcidBio.contactDetails.email) {
                                             if (!StringUtils.isEmpty(email.value)) {
