@@ -37,7 +37,7 @@
 #
 
 :jaiImageProcessor 
-    a   <java:edu.cornell.mannlib.vitro.webapp.imageprocessor.jai.JaiImageProcessor> ,
+    a   <java:edu.cornell.mannlib.vitro.webapp.imageprocessor.TwelveMonkeysImageProcessor> ,
         <java:edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor> .
 
 # ----------------------------
