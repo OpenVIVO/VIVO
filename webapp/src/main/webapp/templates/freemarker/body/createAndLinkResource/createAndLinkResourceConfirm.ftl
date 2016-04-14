@@ -158,19 +158,21 @@
                 </#if>
                 <#if citation.authors??>
                     <#list citation.authors as author>
-                        <span class="citation_author">
-                            <#if citation.alreadyClaimed>
-                                <span>${author.name!}</span>
-                            <#else>
-                                <#if !author.linked>
-                                    <input type="radio" id="author${citation.externalId}-${author?counter}" name="contributor${citation.externalId}" value="author${author?counter}" <#if author.proposed>checked</#if> class="radioWithLabel" />
-										<label for="author${citation.externalId}-${author?counter}" class="labelForRadio">${author.name!}</label>
-                                    <#if author.proposed><#assign proposedAuthor=true /></#if>
+                        <#if author??>
+                            <span class="citation_author">
+                                <#if citation.alreadyClaimed>
+                                    <span>${author.name!}</span>
                                 <#else>
-                                    <span class="linked">${author.name!}</span>
+                                    <#if !author.linked>
+                                        <input type="radio" id="author${citation.externalId}-${author?counter}" name="contributor${citation.externalId}" value="author${author?counter}" <#if author.proposed>checked</#if> class="radioWithLabel" />
+										<label for="author${citation.externalId}-${author?counter}" class="labelForRadio">${author.name!}</label>
+                                        <#if author.proposed><#assign proposedAuthor=true /></#if>
+                                    <#else>
+                                        <span class="linked">${author.name!}</span>
+                                    </#if>
                                 </#if>
-                            </#if>
 							</span>
+                        </#if>
                         <#sep>; </#sep>
                     </#list><br />
                 </#if>
