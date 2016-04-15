@@ -4,10 +4,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.annotations.JsonAdapter;
 import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
 import org.apache.axis.utils.StringUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -15,12 +18,15 @@ import org.vivoweb.webapp.createandlink.Citation;
 import org.vivoweb.webapp.createandlink.CreateAndLinkResourceProvider;
 import org.vivoweb.webapp.createandlink.ExternalIdentifiers;
 import org.vivoweb.webapp.createandlink.ResourceModel;
+import org.vivoweb.webapp.createandlink.utils.StringArrayAdapter;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 
 public class PubMedCreateAndLinkResourceProvider implements CreateAndLinkResourceProvider {
+    protected final Log logger = LogFactory.getLog(getClass());
+
     public final static String PUBMED_ID_API = "http://www.ncbi.nlm.nih.gov/pmc/utils/idconv/v1.0/?format=json&ids=";
     public final static String PUBMED_SUMMARY_API = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&tool=my_tool&email=my_email@example.com&id=";
 
@@ -52,39 +58,44 @@ public class PubMedCreateAndLinkResourceProvider implements CreateAndLinkResourc
 
     @Override
     public String findInExternal(String id, Citation citation) {
-        String json = readUrl(PUBMED_SUMMARY_API + id);
+        try {
+            String json = readUrl(PUBMED_SUMMARY_API + id);
 
-        Gson gson = new Gson();
-        JsonParser parser = new JsonParser();
-        JsonElement tree = parser.parse(json);
-        if (tree != null) {
-            JsonObject object = tree.getAsJsonObject();
-            JsonObject result = object.getAsJsonObject("result");
-            JsonObject data = result.getAsJsonObject(id);
+            Gson gson = new Gson();
+            JsonParser parser = new JsonParser();
+            JsonElement tree = parser.parse(json);
+            if (tree != null) {
+                JsonObject object = tree.getAsJsonObject();
+                JsonObject result = object.getAsJsonObject("result");
+                JsonObject data = result.getAsJsonObject(id);
 
-            PubMedSummaryResponse response = gson.fromJson(data, PubMedSummaryResponse.class);
-            if (response != null) {
-                citation.title = response.title;
-                citation.authors = new Citation.Name[response.authors.length];
-                for (int idx = 0; idx < response.authors.length; idx++) {
-                    citation.authors[idx] = new Citation.Name();
-                    citation.authors[idx].name = normalizeAuthorName(response.authors[idx].name);
+                PubMedSummaryResponse response = gson.fromJson(data, PubMedSummaryResponse.class);
+                if (response != null) {
+                    citation.title = response.title;
+                    citation.authors = new Citation.Name[response.authors.length];
+                    for (int idx = 0; idx < response.authors.length; idx++) {
+                        citation.authors[idx] = new Citation.Name();
+                        citation.authors[idx].name = normalizeAuthorName(response.authors[idx].name);
+                    }
+                    citation.journal = response.fulljournalname;
+                    citation.volume = response.volume;
+                    citation.issue = response.issue;
+                    citation.pagination = response.pages;
+                    if (!StringUtils.isEmpty(response.pubdate) && response.pubdate.length() >= 4) {
+                        citation.publicationYear = Integer.parseInt(response.pubdate.substring(0, 4), 10);
+                    }
+
+                    citation.type = getCiteprocTypeForPubType(response.pubtype);
+
+                    return json;
                 }
-                citation.journal = response.fulljournalname;
-                citation.volume = response.volume;
-                citation.issue = response.issue;
-                citation.pagination = response.pages;
-                if (!StringUtils.isEmpty(response.pubdate) && response.pubdate.length() >= 4) {
-                    citation.publicationYear = Integer.parseInt(response.pubdate.substring(0, 4), 10);
-                }
-
-                citation.type = getCiteprocTypeForPubType(response.pubtype);
-
-                return json;
             }
-        }
 
-        return null;
+            return null;
+        } catch (Exception e) {
+            logger.error("[PMID] Error resolving PMID " + id + ", cause "+ e.getMessage());
+            return null;
+        }
     }
 
     @Override
@@ -281,16 +292,19 @@ public class PubMedCreateAndLinkResourceProvider implements CreateAndLinkResourc
         public String volume;
         public String issue;
         public String pages;
+        @JsonAdapter(StringArrayAdapter.class)
         public String[] lang;
         //public String nlmuniqueid;
         public String issn;
         public String eissn;
+        @JsonAdapter(StringArrayAdapter.class)
         public String[] pubtype;
         //public String recordstatus;
         public String pubstatus;
         public ArticleID[] articleids;
         public History[] history;
         //public String[] references;
+        @JsonAdapter(StringArrayAdapter.class)
         public String[] attributes;
         //public Integer pmcrefcount;
         public String fulljournalname;

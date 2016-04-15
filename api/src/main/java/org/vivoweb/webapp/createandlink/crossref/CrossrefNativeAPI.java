@@ -1,6 +1,7 @@
 package org.vivoweb.webapp.createandlink.crossref;
 
 import com.google.gson.Gson;
+import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
 import org.apache.commons.io.IOUtils;
@@ -12,6 +13,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.vivoweb.webapp.createandlink.Citation;
 import org.vivoweb.webapp.createandlink.CreateAndLinkUtils;
 import org.vivoweb.webapp.createandlink.ResourceModel;
+import org.vivoweb.webapp.createandlink.utils.StringArrayAdapter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -284,15 +286,18 @@ public class CrossrefNativeAPI {
 
         public static class ResponseModel {
             public String DOI;
+            @JsonAdapter(StringArrayAdapter.class)
             public String[] ISSN;
             public String URL;
 
             @SerializedName("alternative-id")
+            @JsonAdapter(StringArrayAdapter.class)
             public String[] alternativeId;
 
             public Author[] author;
 
             @SerializedName("container-title")
+            @JsonAdapter(StringArrayAdapter.class)
             public String[] containerTitle;
             public DateField created;
             public DateField deposited;
@@ -317,14 +322,18 @@ public class CrossrefNativeAPI {
             @SerializedName("reference-count")
             public Integer referenceCount;
             public Double score;
+            @JsonAdapter(StringArrayAdapter.class)
             public String[] subject;
+            @JsonAdapter(StringArrayAdapter.class)
             public String[] subtitle;
+            @JsonAdapter(StringArrayAdapter.class)
             public String[] title;
             public String type;
             public String volume;
 
 
             public static class Author {
+                @JsonAdapter(StringArrayAdapter.class)
                 public String[] affiliation;
                 public String family;
                 public String given;

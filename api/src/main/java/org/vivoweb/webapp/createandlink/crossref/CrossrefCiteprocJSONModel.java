@@ -1,8 +1,17 @@
 package org.vivoweb.webapp.createandlink.crossref;
 
+import com.google.gson.TypeAdapter;
+import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import com.google.gson.stream.JsonWriter;
+import org.vivoweb.webapp.createandlink.utils.StringArrayAdapter;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Note that ISSN and ISBN are arrays in Crossref, whereas Citeproc defines them to be a single value.
@@ -11,7 +20,9 @@ import java.util.Date;
 public class CrossrefCiteprocJSONModel {
     // Crossref Specific Fields
 
+    @JsonAdapter(StringArrayAdapter.class)
     public String[] ISSN;
+    @JsonAdapter(StringArrayAdapter.class)
     public String[] ISBN;
 
     public DateField created;
@@ -33,8 +44,9 @@ public class CrossrefCiteprocJSONModel {
 //    @SerializedName("reference-count")
 //    public Integer referenceCount;
     public Double score;
+    @JsonAdapter(StringArrayAdapter.class)
     public String[] subject;
-    public String[] subtitle;
+//    public String[] subtitle;
 
     // Standard Citeproc fields
 

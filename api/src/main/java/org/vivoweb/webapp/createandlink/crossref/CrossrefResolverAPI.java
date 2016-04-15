@@ -5,6 +5,8 @@ import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -22,6 +24,8 @@ import java.util.List;
  * Interface to the CrossRef resolver
  */
 public class CrossrefResolverAPI {
+    protected final Log logger = LogFactory.getLog(getClass());
+
     // Base URL for the resolver
     private static final String CROSSREF_RESOLVER = "http://dx.doi.org/";
 
@@ -33,56 +37,61 @@ public class CrossrefResolverAPI {
      * @return
      */
     public String findInExternal(String id, Citation citation) {
-        // Read JSON from the resolver
-        String json = readJSON(CROSSREF_RESOLVER + id);
+        try {
+            // Read JSON from the resolver
+            String json = readJSON(CROSSREF_RESOLVER + id);
 
-        if (StringUtils.isEmpty(json)) {
-             return null;
-        }
-
-        // Use GSON to parse the JSON into a Java object
-        Gson gson = new Gson();
-        CrossrefCiteprocJSONModel jsonModel = gson.fromJson(json, CrossrefCiteprocJSONModel.class);
-        if (jsonModel == null) {
-            return null;
-        }
-
-        // Ensure that we have the correct resource
-        if (!id.equalsIgnoreCase(jsonModel.DOI)) {
-            return null;
-        }
-
-        // Map the fields of the resolver response to the citation object
-
-        citation.DOI = id;
-        citation.type = normalizeType(jsonModel.type);
-        citation.title = jsonModel.title;
-        citation.journal = jsonModel.containerTitle;
-
-        if (jsonModel.author != null) {
-            List<Citation.Name> authors = new ArrayList<>();
-            for (CrossrefCiteprocJSONModel.NameField author : jsonModel.author) {
-                splitNameLiteral(author);
-                Citation.Name citationAuthor = new Citation.Name();
-                citationAuthor.name = CreateAndLinkUtils.formatAuthorString(author.family, author.given);
-                authors.add(citationAuthor);
+            if (StringUtils.isEmpty(json)) {
+                return null;
             }
-            citation.authors = authors.toArray(new Citation.Name[authors.size()]);
-        }
 
-        citation.volume = jsonModel.volume;
-        citation.issue = jsonModel.issue;
-        citation.pagination = jsonModel.page;
-        if (citation.pagination == null) {
-            citation.pagination = jsonModel.articleNumber;
-        }
+            // Use GSON to parse the JSON into a Java object
+            Gson gson = new Gson();
+            CrossrefCiteprocJSONModel jsonModel = gson.fromJson(json, CrossrefCiteprocJSONModel.class);
+            if (jsonModel == null) {
+                return null;
+            }
 
-        citation.publicationYear = extractYearFromDateField(jsonModel.publishedPrint);
-        if (citation.publicationYear == null) {
-            citation.publicationYear = extractYearFromDateField(jsonModel.publishedOnline);
-        }
+            // Ensure that we have the correct resource
+            if (!id.equalsIgnoreCase(jsonModel.DOI)) {
+                return null;
+            }
 
-        return json;
+            // Map the fields of the resolver response to the citation object
+
+            citation.DOI = id;
+            citation.type = normalizeType(jsonModel.type);
+            citation.title = jsonModel.title;
+            citation.journal = jsonModel.containerTitle;
+
+            if (jsonModel.author != null) {
+                List<Citation.Name> authors = new ArrayList<>();
+                for (CrossrefCiteprocJSONModel.NameField author : jsonModel.author) {
+                    splitNameLiteral(author);
+                    Citation.Name citationAuthor = new Citation.Name();
+                    citationAuthor.name = CreateAndLinkUtils.formatAuthorString(author.family, author.given);
+                    authors.add(citationAuthor);
+                }
+                citation.authors = authors.toArray(new Citation.Name[authors.size()]);
+            }
+
+            citation.volume = jsonModel.volume;
+            citation.issue = jsonModel.issue;
+            citation.pagination = jsonModel.page;
+            if (citation.pagination == null) {
+                citation.pagination = jsonModel.articleNumber;
+            }
+
+            citation.publicationYear = extractYearFromDateField(jsonModel.publishedPrint);
+            if (citation.publicationYear == null) {
+                citation.publicationYear = extractYearFromDateField(jsonModel.publishedOnline);
+            }
+
+            return json;
+        } catch (Exception e) {
+            logger.error("[CREF] Error resolving DOI " + id + ", cause "+ e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -236,15 +245,22 @@ public class CrossrefResolverAPI {
      * @param author
      */
     private void splitNameLiteral(CrossrefCiteprocJSONModel.NameField author) {
-        if (StringUtils.isEmpty(author.family) && StringUtils.isEmpty(author.given)) {
+        if (StringUtils.isEmpty(author.family)) {
+            String given = null;
             if (!StringUtils.isEmpty(author.literal)) {
                 if (author.literal.contains(",")) {
                     author.family = author.literal.substring(0, author.literal.indexOf(','));
-                    author.given = author.literal.substring(author.literal.indexOf(',') + 1);
+                    given = author.literal.substring(author.literal.indexOf(',') + 1);
                 } else if (author.literal.lastIndexOf(' ') > -1) {
                     author.family = author.literal.substring(author.literal.lastIndexOf(' ') + 1);
-                    author.given = author.literal.substring(0, author.literal.lastIndexOf(' '));
+                    given = author.literal.substring(0, author.literal.lastIndexOf(' '));
+                } else {
+                    author.family = author.literal;
                 }
+            }
+
+            if (StringUtils.isEmpty(author.given)) {
+                author.given = given;
             }
         }
     }

@@ -4,6 +4,10 @@ import org.apache.commons.lang.StringUtils;
 
 public class CreateAndLinkUtils {
     public static String formatAuthorString(String familyName, String givenName) {
+        if (StringUtils.isEmpty(familyName)) {
+            return null;
+        }
+
         StringBuilder authorBuilder = new StringBuilder(familyName);
 
         if (!StringUtils.isEmpty(givenName)) {
