@@ -8,6 +8,8 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import edu.cornell.mannlib.orcidclient.context.OrcidClientContext;
@@ -166,41 +168,68 @@ public class OrcidAuthController extends FreemarkerHttpServlet {
                 }
 
                 profileUri = defaultNamespace + "orcid" + orcidToken.orcid;
-                if (!profileExists(vreq, profileUri)) {
-                    Model model = ModelFactory.createDefaultModel();
+                Model existingModel = getExistingProfile(vreq, profileUri);
+                Model model = ModelFactory.createDefaultModel();
+                model.add(existingModel);
 
-                    Resource profile = model.createResource(profileUri);
+                Resource profile = model.getResource(profileUri);
+                if (!profile.hasProperty(RDF.type)) {
                     profile.addProperty(RDF.type, model.getResource("http://xmlns.com/foaf/0.1/Person"));
+                }
 
-                    Resource contactDetails = model.createResource(getUnusedUri(vreq));
+                Resource contactDetails;
+
+                if (profile.hasProperty(model.getProperty("http://purl.obolibrary.org/obo/ARG_2000028"))) {
+                    contactDetails = profile.getPropertyResourceValue(model.getProperty("http://purl.obolibrary.org/obo/ARG_2000028"));
+                } else {
+                    contactDetails = model.createResource(getUnusedUri(vreq));
                     contactDetails.addProperty(RDF.type, model.getResource("http://www.w3.org/2006/vcard/ns#Individual"));
                     contactDetails.addProperty(model.getProperty("http://purl.obolibrary.org/obo/ARG_2000029"), profile);
                     profile.addProperty(model.getProperty("http://purl.obolibrary.org/obo/ARG_2000028"), contactDetails);
+                }
 
+                if (!contactDetails.hasProperty(model.getProperty("http://www.w3.org/2006/vcard/ns#hasName"))) {
                     if (!StringUtils.isEmpty(familyName)) {
                         Resource contactName = model.createResource(getUnusedUri(vreq));
                         contactName.addProperty(RDF.type, model.getResource("http://www.w3.org/2006/vcard/ns#Name"));
                         contactDetails.addProperty(model.getProperty("http://www.w3.org/2006/vcard/ns#hasName"), contactName);
 
                         contactName.addLiteral(model.getProperty("http://www.w3.org/2006/vcard/ns#familyName"), familyName);
-                        profile.addLiteral(model.getProperty("http://xmlns.com/foaf/0.1/lastName"), familyName);
+
+                        if (!profile.hasProperty(model.getProperty("http://xmlns.com/foaf/0.1/lastName"))) {
+                            profile.addLiteral(model.getProperty("http://xmlns.com/foaf/0.1/lastName"), familyName);
+                        }
+
                         if (!StringUtils.isEmpty(givenName)) {
                             contactName.addLiteral(model.getProperty("http://www.w3.org/2006/vcard/ns#givenName"), givenName);
-                            profile.addLiteral(model.getProperty("http://xmlns.com/foaf/0.1/firstName"), givenName);
-                            profile.addProperty(RDFS.label, familyName + ", " + givenName);
-                        } else {
-                            profile.addProperty(RDFS.label, familyName);
-                        }
-                    }
 
-                    if (orcidBio.orcidProfile != null) {
-                        if (orcidBio.orcidProfile.orcidBio != null) {
-                            if (orcidBio.orcidProfile.orcidBio.biography != null && !StringUtils.isEmpty(orcidBio.orcidProfile.orcidBio.biography.value)) {
-                                profile.addLiteral(model.getProperty("http://vivoweb.org/ontology/core#overview"), orcidBio.orcidProfile.orcidBio.biography.value);
+                            if (!profile.hasProperty(model.getProperty("http://xmlns.com/foaf/0.1/firstName"))) {
+                                profile.addLiteral(model.getProperty("http://xmlns.com/foaf/0.1/firstName"), givenName);
                             }
 
-                            if (orcidBio.orcidProfile.orcidBio.keywords != null) {
-                                if (orcidBio.orcidProfile.orcidBio.keywords.keyword != null) {
+                            if (!profile.hasProperty(RDFS.label)) {
+                                profile.addProperty(RDFS.label, familyName + ", " + givenName);
+                            }
+                        } else {
+                            if (!profile.hasProperty(RDFS.label)) {
+                                profile.addProperty(RDFS.label, familyName);
+                            }
+                        }
+                    }
+                }
+
+
+                if (orcidBio.orcidProfile != null) {
+                    if (orcidBio.orcidProfile.orcidBio != null) {
+                        if (orcidBio.orcidProfile.orcidBio.biography != null && !StringUtils.isEmpty(orcidBio.orcidProfile.orcidBio.biography.value)) {
+                            if (!profile.hasProperty(model.getProperty("http://vivoweb.org/ontology/core#overview"))) {
+                                profile.addLiteral(model.getProperty("http://vivoweb.org/ontology/core#overview"), orcidBio.orcidProfile.orcidBio.biography.value);
+                            }
+                        }
+
+                        if (orcidBio.orcidProfile.orcidBio.keywords != null) {
+                            if (orcidBio.orcidProfile.orcidBio.keywords.keyword != null) {
+                                if (!profile.hasProperty(model.getProperty("http://vivoweb.org/ontology/core#freetextKeyword"))) {
                                     for (VisibilityString keyword : orcidBio.orcidProfile.orcidBio.keywords.keyword) {
                                         if (!StringUtils.isEmpty(keyword.value)) {
                                             String[] splitKeywords = keyword.value.split("\\s*,\\s*");
@@ -211,18 +240,22 @@ public class OrcidAuthController extends FreemarkerHttpServlet {
                                     }
                                 }
                             }
+                        }
 
-                            if (orcidBio.orcidProfile.orcidBio.contactDetails != null) {
-                                if (orcidBio.orcidProfile.orcidBio.contactDetails.address != null && orcidBio.orcidProfile.orcidBio.contactDetails.address.country != null) {
-                                    if (!StringUtils.isEmpty(orcidBio.orcidProfile.orcidBio.contactDetails.address.country.value)) {
-                                        String countryUri = findCountryFor(vreq.getRDFService(), orcidBio.orcidProfile.orcidBio.contactDetails.address.country.value);
-                                        if (!StringUtils.isEmpty(countryUri)) {
+                        if (orcidBio.orcidProfile.orcidBio.contactDetails != null) {
+                            if (orcidBio.orcidProfile.orcidBio.contactDetails.address != null && orcidBio.orcidProfile.orcidBio.contactDetails.address.country != null) {
+                                if (!StringUtils.isEmpty(orcidBio.orcidProfile.orcidBio.contactDetails.address.country.value)) {
+                                    String countryUri = findCountryFor(vreq.getRDFService(), orcidBio.orcidProfile.orcidBio.contactDetails.address.country.value);
+                                    if (!StringUtils.isEmpty(countryUri)) {
+                                        if (!profile.hasProperty(model.getProperty("http://purl.obolibrary.org/obo/RO_0001025"))) {
                                             profile.addProperty(model.getProperty("http://purl.obolibrary.org/obo/RO_0001025"), model.getResource(countryUri));
                                         }
                                     }
                                 }
+                            }
 
-                                if (orcidBio.orcidProfile.orcidBio.contactDetails.email != null || orcidBio.orcidProfile.orcidBio.researcherUrls != null) {
+                            if (orcidBio.orcidProfile.orcidBio.contactDetails.email != null || orcidBio.orcidProfile.orcidBio.researcherUrls != null) {
+                                if (!contactDetails.hasProperty(model.getProperty("http://www.w3.org/2006/vcard/ns#hasEmail"))) {
                                     if (orcidBio.orcidProfile.orcidBio.contactDetails.email != null) {
                                         for (OrcidResponse.OrcidProfile.OrcidBio.ContactDetails.Email email : orcidBio.orcidProfile.orcidBio.contactDetails.email) {
                                             if (!StringUtils.isEmpty(email.value)) {
@@ -237,7 +270,9 @@ public class OrcidAuthController extends FreemarkerHttpServlet {
                                             }
                                         }
                                     }
+                                }
 
+                                if (!contactDetails.hasProperty(model.getProperty("http://www.w3.org/2006/vcard/ns#hasURL"))) {
                                     if (orcidBio.orcidProfile.orcidBio.researcherUrls != null && orcidBio.orcidProfile.orcidBio.researcherUrls.researcherUrl != null) {
                                         for (OrcidResponse.OrcidProfile.OrcidBio.ResearcherUrls.ResearcherUrl researcherUrl : orcidBio.orcidProfile.orcidBio.researcherUrls.researcherUrl) {
                                             if (researcherUrl.url != null && !StringUtils.isEmpty(researcherUrl.url.value)) {
@@ -257,8 +292,10 @@ public class OrcidAuthController extends FreemarkerHttpServlet {
                                 }
                             }
                         }
+                    }
 
-                        if (orcidBio.orcidProfile.orcidIdentifier != null) {
+                    if (orcidBio.orcidProfile.orcidIdentifier != null) {
+                        if (!profile.hasProperty(model.getProperty("http://vivoweb.org/ontology/core#orcidId"))) {
                             if (!StringUtils.isEmpty(orcidBio.orcidProfile.orcidIdentifier.uri)) {
                                 Resource orcid = model.createResource(orcidBio.orcidProfile.orcidIdentifier.uri);
                                 orcid.addProperty(RDF.type, model.getProperty("http://www.w3.org/2002/07/owl#Thing"));
@@ -266,10 +303,9 @@ public class OrcidAuthController extends FreemarkerHttpServlet {
                                 profile.addProperty(model.getProperty("http://vivoweb.org/ontology/core#orcidId"), orcid);
                             }
                         }
-
                     }
 
-                    writeChanges(vreq.getRDFService(), null, model);
+                    writeChanges(vreq.getRDFService(), existingModel, model);
                 }
 
                 if (userAccount == null) {
@@ -665,6 +701,29 @@ public class OrcidAuthController extends FreemarkerHttpServlet {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         m.write(out, "N3");
         return new ByteArrayInputStream(out.toByteArray());
+    }
+
+    /**
+     * Check that the resource is declared to be of a particular type
+     *
+     * @param resource
+     * @param typeUri
+     * @return
+     */
+    protected boolean isResourceOfType(Resource resource, String typeUri) {
+        if (resource == null) {
+            return false;
+        }
+
+        StmtIterator iter = resource.listProperties(RDF.type);
+        while (iter.hasNext()) {
+            Statement stmt = iter.next();
+            if (typeUri.equals(stmt.getResource().getURI())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private class OrcidTokenResponse {
