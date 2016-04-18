@@ -603,7 +603,7 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
 
             // Find a match for the author string in the resource
             for (Citation.Name author : citation.authors) {
-                if (author.name != null) {
+                if (author != null && author.name != null) {
                     String nameLwr = author.name.toLowerCase();
                     if (nameLwr.startsWith(authorStrLwr) || authorStrLwr.startsWith(nameLwr)) {
                         author.proposed = true;
@@ -1611,6 +1611,9 @@ public class CreateAndLinkResourceController extends FreemarkerHttpServlet {
                                         newAuthor.linked = linked;
                                     }
                                 }
+                            } else {
+                                newAuthor = new Citation.Name();
+                                newAuthor.name = "Deleted Author";
                             }
 
                             // If we have an author
