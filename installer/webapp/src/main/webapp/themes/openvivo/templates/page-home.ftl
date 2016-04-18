@@ -67,7 +67,7 @@
         <#if user.loggedIn>
         <#else>
             <section id="login-orcid" class="">
-                <h2>Log in</h2>
+                <h2>Create a Profile / Log in</h2>
                 <form role="form" id="login-orcid-form" action="${urls.base}/orcidAuth" method="get" name="login-orcid-form" _lpchecked="1">
                     <div>
                         <p>

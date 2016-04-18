@@ -157,7 +157,7 @@ public class OrcidAuthController extends FreemarkerHttpServlet {
             }
 
             if (profileUri == null) {
-                if (orcidBio == null) {
+                if (orcidBio == null || StringUtils.isEmpty(familyName)) {
                     return new TemplateResponseValues("noProfile.ftl");
                 }
 
