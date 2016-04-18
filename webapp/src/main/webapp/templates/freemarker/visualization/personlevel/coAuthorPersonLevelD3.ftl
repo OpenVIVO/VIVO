@@ -95,99 +95,134 @@ $(document).ready(function(){
 
             }
         });
-                    
+
+    render_chord();
+});
+
 // RENDER CHORD
 
     var labels = [];
-    var uris   = [];
+    var uris = [];
     var matrix = [];
 
-    var matrixX = 0;
-    <#list coAuthorshipData.collaborationMatrix as row>
-        matrix[matrixX] = [];
-        <#list row as cell>
-            matrix[matrixX].push(${cell?c});
-        </#list>
-        matrixX++;
-    </#list>
-    <#list coAuthorshipData.collaborators as collaborator>
-        labels.push("${collaborator.collaboratorName}");
-        uris.push("${collaborator.collaboratorURI}");
-    </#list>
-
-    var chord = d3.layout.chord()
-            .padding(0.05)
-            .sortSubgroups(d3.descending)
-            .matrix(matrix);
-
-    var width  = 725;
+    var width = 725;
     var height = 725;
     var padding = 175;
-    var inner_radius = Math.min(width, height) * 0.37;
-    var outer_radius = Math.min(width, height) * 0.39;
+    var svg;
 
-    var fill = d3.scale.category10();
+    function render_chord() {
+        var showVCards = $("#vcards").is(':checked');
+        vcards = [];
+        labels = [];
+        uris = [];
+        matrix = [];
 
-    var svg = d3.select('#chord').append('svg')
-            .attr('width', width+padding)
-            .attr('height', height+padding)
-            .append('g').attr('transform', 'translate(' + (width+padding) / 2 + ',' + (height+padding) / 2 +')');
+        var matrixX = 0;
+        <#list coAuthorshipData.collaborators as collaborator>
+            <#if collaborator.isVCard>
+                vcards.push(true);
+                $("#vcardstoggle").show();
+            <#else>
+                vcards.push(false);
+            </#if>
+            if (showVCards || !vcards[vcards.length-1]) {
+                labels.push("${collaborator.collaboratorName}");
+                uris.push("${collaborator.collaboratorURI}");
+            }
+        </#list>
+        <#list coAuthorshipData.collaborationMatrix as row>
+            if (showVCards || !vcards[${row_index}]) {
+                matrix[matrixX] = [];
+                <#list row as cell>
+                    matrix[matrixX].push(${cell?c});
+                </#list>
+                matrixX++;
+            }
+        </#list>
 
-    svg.append('g').selectAll('path').data(chord.groups).enter()
-            .append('path').style('fill', function(val) { return val.index == 0 ? "#000000" : fill(val.index); })
-            .style('stroke', function(val) { return val.index == 0 ? "#000000" : fill(val.index); })
-            .attr('d', d3.svg.arc().innerRadius(inner_radius).outerRadius(outer_radius))
-            .on('click', chord_click())
-            .on("mouseover", chord_hover(.05))
-            .on("mouseout", chord_hover(.8));
+        $( "#chord" ).empty();
 
-    var group_ticks = function (d) {
-        var k = (d.endAngle - d.startAngle) / d.value;
-        return d3.range(d.value / 2, d.value, d.value / 2).map(function (v) {
-            return {
-                angle: v * k + d.startAngle,
-                label: Math.round(d.value)
-            };
-        });
-    };
+        var chord = d3.layout.chord()
+                .padding(0.05)
+                .sortSubgroups(d3.descending)
+                .matrix(matrix);
 
-    var chord_ticks = svg.append('g')
-            .selectAll('g')
-            .data(chord.groups)
-            .enter().append('g')
-            .selectAll('g')
-            .data(group_ticks)
-            .enter().append('g')
-            .attr('transform', function (d) {
-                return 'rotate(' + (d.angle * 180 / Math.PI - 90) + ') translate(' + outer_radius + ',0)';
+        var inner_radius = Math.min(width, height) * 0.37;
+        var outer_radius = Math.min(width, height) * 0.39;
+
+        var fill = d3.scale.category10();
+
+        svg = d3.select('#chord').append('svg')
+                .attr('width', width + padding)
+                .attr('height', height + padding)
+                .append('g').attr('transform', 'translate(' + (width + padding) / 2 + ',' + (height + padding) / 2 + ')');
+
+        svg.append('g').selectAll('path').data(chord.groups).enter()
+                .append('path').style('fill', function (val) {
+                    return val.index == 0 ? "#000000" : fill(val.index);
+                })
+                .style('stroke', function (val) {
+                    return val.index == 0 ? "#000000" : fill(val.index);
+                })
+                .attr('d', d3.svg.arc().innerRadius(inner_radius).outerRadius(outer_radius))
+                .on('click', chord_click())
+                .on("mouseover", chord_hover(.05))
+                .on("mouseout", chord_hover(.8));
+
+        var group_ticks = function (d) {
+            var k = (d.endAngle - d.startAngle) / d.value;
+            return d3.range(d.value / 2, d.value, d.value / 2).map(function (v) {
+                return {
+                    angle: v * k + d.startAngle,
+                    label: Math.round(d.value)
+                };
             });
+        };
 
-    svg.append('g')
-            .attr('class', 'chord')
-            .selectAll('path')
-            .data(chord.chords)
-            .enter().append('path')
-            .style('fill', function (d) { return fill(d.target.index); })
-            .attr('d', d3.svg.chord().radius(inner_radius))
-            .style('opacity', .8);
+        var chord_ticks = svg.append('g')
+                .selectAll('g')
+                .data(chord.groups)
+                .enter().append('g')
+                .selectAll('g')
+                .data(group_ticks)
+                .enter().append('g')
+                .attr('transform', function (d) {
+                    return 'rotate(' + (d.angle * 180 / Math.PI - 90) + ') translate(' + outer_radius + ',0)';
+                });
 
-    svg.append("g").selectAll(".arc")
-            .data(chord.groups)
-            .enter().append("svg:text")
-            .attr("dy", ".35em")
-            .attr("style", function(d) { return d.index == 0 ? "font-size: .75em; font-weight: bold;" : "font-size: .70em;"; } )
-            .attr("text-anchor", function(d) { return ((d.startAngle + d.endAngle) / 2) > Math.PI ? "end" : null; })
-            .attr("transform", function(d) {
-                return "rotate(" + (((d.startAngle + d.endAngle) / 2) * 180 / Math.PI - 90) + ")"
-                        + "translate(" + (height *.40) + ")"
-                        + (((d.startAngle + d.endAngle) / 2) > Math.PI ? "rotate(180)" : "");
-            })
-            .text(function(d) {
-                return labels[d.index];
-            })
-            .on('click', chord_click())
-            .on("mouseover", chord_hover(.05))
-            .on("mouseout", chord_hover(.8));
+        svg.append('g')
+                .attr('class', 'chord')
+                .selectAll('path')
+                .data(chord.chords)
+                .enter().append('path')
+                .style('fill', function (d) {
+                    return fill(d.target.index);
+                })
+                .attr('d', d3.svg.chord().radius(inner_radius))
+                .style('opacity', .8);
+
+        svg.append("g").selectAll(".arc")
+                .data(chord.groups)
+                .enter().append("svg:text")
+                .attr("dy", ".35em")
+                .attr("style", function (d) {
+                    return d.index == 0 ? "font-size: .75em; font-weight: bold;" : (vcards[d.index] ? "font-size: .65em; font-style: italic;" : "font-size: .70em;");
+                })
+                .attr("text-anchor", function (d) {
+                    return ((d.startAngle + d.endAngle) / 2) > Math.PI ? "end" : null;
+                })
+                .attr("transform", function (d) {
+                    return "rotate(" + (((d.startAngle + d.endAngle) / 2) * 180 / Math.PI - 90) + ")"
+                            + "translate(" + (height * .40) + ")"
+                            + (((d.startAngle + d.endAngle) / 2) > Math.PI ? "rotate(180)" : "");
+                })
+                .text(function (d) {
+                    return labels[d.index];
+                })
+                .on('click', chord_click())
+                .on("mouseover", chord_hover(.05))
+                .on("mouseout", chord_hover(.8));
+    }
 
     function chord_hover(opacity) {
         return function(g, i) {
@@ -205,7 +240,7 @@ $(document).ready(function(){
                 if (i > 0) {
                     hoverMsg += matrix[i][0] + " Joint ${i18n().publication_s_capitalized}<br/>";
                 } else {
-                    hoverMsg += "${coAuthorshipData.collaboratorsCount} ${i18n().co_author_s_capitalized}<br/>";
+                    hoverMsg += "${coAuthorshipData.collaboratorsCount - 1} ${i18n().co_author_s_capitalized}<br/>";
                 }
 
                 chordInfoDiv.html(hoverMsg);
@@ -239,7 +274,6 @@ $(document).ready(function(){
             }
         };
     }
-});
 </script>
 
 <div id="body">
@@ -274,6 +308,9 @@ $(document).ready(function(){
     <#if (numOfCoAuthorShips?? && numOfCoAuthorShips > 0) || (numOfAuthors?? && numOfAuthors > 0) >
     
         <div id="bodyPannel">
+            <form id="vcardstoggle" method="get" style="float: right; display: none;">
+                <label for="vcards">include unconfirmed co-authors <input type="checkbox" id="vcards" onclick="render_chord();" /></label>
+            </form>
             <div id="chord" style="float: right;"></div>
         </div>
     </#if>
