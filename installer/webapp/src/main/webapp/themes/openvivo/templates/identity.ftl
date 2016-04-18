@@ -30,9 +30,10 @@
                                 <ul class="sub_menu">
                                      <#if user.hasProfile>
                                          <li role="listitem"><a href="${user.profileUrl}" title="${i18n().identity_myprofile}">${i18n().identity_myprofile}</a></li>
-                                     </#if>
-                                     <#if urls.myAccount??>
-                                         <li role="listitem"><a href="${urls.myAccount}" title="${i18n().identity_myaccount}">${i18n().identity_myaccount}</a></li>
+                                     <#else>
+                                         <#if urls.myAccount??>
+                                             <li role="listitem"><a href="${urls.myAccount}" title="${i18n().identity_myaccount}">${i18n().identity_myaccount}</a></li>
+                                         </#if>
                                      </#if>
                                      <li role="listitem"><a href="${urls.logout}" title="${i18n().menu_logout}">${i18n().menu_logout}</a></li>
                                 </ul>
