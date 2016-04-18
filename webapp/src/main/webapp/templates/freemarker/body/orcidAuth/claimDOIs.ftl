@@ -25,5 +25,11 @@
         <input type="submit" class="submit" value="Claim these works" /> <a href="${profileUrl(profileUri)}">Cancel</a>
     </form>
 <#else>
+    <#if newAccount>
+        <p>OpenVIVO can automatically populate your account with any public works in your ORCiD profile that have a DOI.</p>
+        <p>We did not find any works to import at this time.</p>
+        <p>If you have works that you would like to have imported, please ensure that they have DOIs, and are set to public. Then log in to OpenVIVO again.</p>
+        <p>You can also claim additional works by DOI or PubMed ID at any time by using the claim buttons on your profile.</p>
+    </#if>
     <a href="${profileUrl(profileUri)}">Go To My Profile</a>
 </#if>

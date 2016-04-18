@@ -147,7 +147,7 @@ public class OrcidAuthController extends FreemarkerHttpServlet {
             String familyName = null;
             String givenName = null;
 
-            if (orcidBio.orcidProfile != null && orcidBio.orcidProfile.orcidBio != null && orcidBio.orcidProfile.orcidBio.personalDetails != null) {
+            if (orcidBio != null && orcidBio.orcidProfile != null && orcidBio.orcidProfile.orcidBio != null && orcidBio.orcidProfile.orcidBio.personalDetails != null) {
                 if (orcidBio.orcidProfile.orcidBio.personalDetails.familyName != null) {
                     familyName = orcidBio.orcidProfile.orcidBio.personalDetails.familyName.value;
                 }
