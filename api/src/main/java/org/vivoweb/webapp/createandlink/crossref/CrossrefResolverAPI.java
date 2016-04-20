@@ -129,6 +129,10 @@ public class CrossrefResolverAPI {
             return null;
         }
 
+        if (StringUtils.isEmpty(jsonModel.DOI)) {
+            return null;
+        }
+
         // Map the fields of the Java object to the resource model
 
         ResourceModel model = new ResourceModel();

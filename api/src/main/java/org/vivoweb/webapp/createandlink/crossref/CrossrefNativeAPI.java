@@ -134,6 +134,10 @@ public class CrossrefNativeAPI {
             return null;
         }
 
+        if (StringUtils.isEmpty(response.message.DOI)) {
+            return null;
+        }
+
         // Map the fields from the CrossRef response to the resource model
 
         ResourceModel model = new ResourceModel();
