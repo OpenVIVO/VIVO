@@ -13,6 +13,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.vivoweb.webapp.createandlink.Citation;
 import org.vivoweb.webapp.createandlink.CreateAndLinkUtils;
 import org.vivoweb.webapp.createandlink.ResourceModel;
+import org.vivoweb.webapp.createandlink.utils.HttpReader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -378,14 +379,7 @@ public class CrossrefResolverAPI {
             request.setHeader("Accept", "application/vnd.citationstyles.csl+json;q=1.0");
 
             HttpResponse response = client.execute(request);
-            switch (response.getStatusLine().getStatusCode()) {
-                case 200:
-                    try (InputStream in = response.getEntity().getContent()) {
-                        StringWriter writer = new StringWriter();
-                        IOUtils.copy(in, writer, "UTF-8");
-                        return writer.toString();
-                    }
-            }
+            return HttpReader.fromResponse(response);
         } catch (IOException e) {
         }
 

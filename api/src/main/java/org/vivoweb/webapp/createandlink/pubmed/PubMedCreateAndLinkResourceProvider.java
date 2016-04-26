@@ -18,6 +18,7 @@ import org.vivoweb.webapp.createandlink.Citation;
 import org.vivoweb.webapp.createandlink.CreateAndLinkResourceProvider;
 import org.vivoweb.webapp.createandlink.ExternalIdentifiers;
 import org.vivoweb.webapp.createandlink.ResourceModel;
+import org.vivoweb.webapp.createandlink.utils.HttpReader;
 import org.vivoweb.webapp.createandlink.utils.StringArrayAdapter;
 
 import java.io.IOException;
@@ -249,14 +250,7 @@ public class PubMedCreateAndLinkResourceProvider implements CreateAndLinkResourc
             HttpClient client = HttpClientFactory.getHttpClient();
             HttpGet request = new HttpGet(url);
             HttpResponse response = client.execute(request);
-            switch (response.getStatusLine().getStatusCode()) {
-                case 200:
-                    try (InputStream in = response.getEntity().getContent()) {
-                        StringWriter writer = new StringWriter();
-                        IOUtils.copy(in, writer, "UTF-8");
-                        return writer.toString();
-                    }
-            }
+            return HttpReader.fromResponse(response);
         } catch (IOException e) {
         }
 

@@ -7,12 +7,15 @@ import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.util.EntityUtils;
 import org.vivoweb.webapp.createandlink.Citation;
 import org.vivoweb.webapp.createandlink.CreateAndLinkUtils;
 import org.vivoweb.webapp.createandlink.ResourceModel;
+import org.vivoweb.webapp.createandlink.utils.HttpReader;
 import org.vivoweb.webapp.createandlink.utils.StringArrayAdapter;
 
 import java.io.IOException;
@@ -260,14 +263,7 @@ public class CrossrefNativeAPI {
             HttpClient client = HttpClientFactory.getHttpClient();
             HttpGet request = new HttpGet(url);
             HttpResponse response = client.execute(request);
-            switch (response.getStatusLine().getStatusCode()) {
-                case 200:
-                    try (InputStream in = response.getEntity().getContent()) {
-                        StringWriter writer = new StringWriter();
-                        IOUtils.copy(in, writer, "UTF-8");
-                        return writer.toString();
-                    }
-            }
+            return HttpReader.fromResponse(response);
         } catch (IOException e) {
         }
 
