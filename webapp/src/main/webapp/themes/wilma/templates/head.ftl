@@ -3,6 +3,7 @@
 <meta charset="utf-8" />
 <!-- Google Chrome Frame open source plug-in brings Google Chrome's open web technologies and speedy JavaScript engine to Internet Explorer-->
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="generator" content="VIVO ${version.label}" />
 
 <title>${(title?html)!siteName!}</title>
 
@@ -21,6 +22,10 @@
 <link rel="stylesheet" href="${urls.theme}/css/screen.css" />
 
 <#include "headScripts.ftl">
+
+<#if metaTags??>
+    ${metaTags.list()}
+</#if>
 
 <!--[if (gte IE 6)&(lte IE 8)]>
 <script type="text/javascript" src="${urls.base}/js/selectivizr.js"></script>

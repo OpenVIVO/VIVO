@@ -48,8 +48,13 @@
   <listener>
     <listener-class>edu.cornell.mannlib.vitro.webapp.startup.StartupManager</listener-class>
   </listener>
-  
-  
+
+  <!-- TwelveMonkeys ImageIO listener -->
+  <listener>
+    <display-name>ImageIO service provider loader/unloader</display-name>
+    <listener-class>com.twelvemonkeys.servlet.image.IIOProviderContextListener</listener-class>
+  </listener>
+
   <!-- Filters ********************************************************** -->
   <!-- in 2.4 spec, filter chain order is first by filter-mapping <url-pattern> order in web.xml,
 	 then filter-mapping <servlet-name> order in web.xml -->
@@ -321,7 +326,7 @@
   
   <servlet>
     <servlet-name>SiteAdminController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.SiteAdminController</servlet-class>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.VIVOSiteAdminController</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>SiteAdminController</servlet-name>
@@ -1351,6 +1356,21 @@
     <url-pattern>/orcidAuth/*</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <description>SiteMap support</description>
+    <servlet-name>SiteMapServlet</servlet-name>
+    <servlet-class>org.vivoweb.webapp.sitemap.SiteMapServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SiteMapServlet</servlet-name>
+    <url-pattern>/robots.txt</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>SiteMapServlet</servlet-name>
+    <url-pattern>/sitemap.xml</url-pattern>
+  </servlet-mapping>
+
+    
   <!-- ============================== servlet-mappings ======================== -->
    <servlet-mapping>
     <servlet-name>mailusers</servlet-name>

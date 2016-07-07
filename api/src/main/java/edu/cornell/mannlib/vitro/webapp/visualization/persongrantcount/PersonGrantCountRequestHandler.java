@@ -5,7 +5,9 @@ package edu.cornell.mannlib.vitro.webapp.visualization.persongrantcount;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
+import edu.cornell.mannlib.vitro.webapp.visualization.visutils.QueryRunner;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 
@@ -21,7 +23,6 @@ import edu.cornell.mannlib.vitro.webapp.visualization.exceptions.MalformedQueryP
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Activity;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.SparklineData;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.SubEntity;
-import edu.cornell.mannlib.vitro.webapp.visualization.visutils.SelectOnModelUtilities;
 import edu.cornell.mannlib.vitro.webapp.visualization.visutils.UtilityFunctions;
 import edu.cornell.mannlib.vitro.webapp.visualization.visutils.VisualizationRequestHandler;
 
@@ -55,15 +56,19 @@ public class PersonGrantCountRequestHandler implements VisualizationRequestHandl
 									personURI,
 									UtilityFunctions.getIndividualLabelFromDAO(vitroRequest, personURI));
 		
-		Map<String, Activity> grantsToURI = SelectOnModelUtilities.getGrantsForPerson(vitroRequest.getRDFService(), person, false);
-		
-		
+		QueryRunner<Set<Activity>> queryManager = new PersonGrantCountQueryRunner(
+				personURI,
+				vitroRequest.getRDFService(),
+				log);
+
+		Set<Activity> authorGrants = queryManager.getQueryResult();
+
 		/*
-    	 * Create a map from the year to number of grants. Use the Grant's
-    	 * parsedGrantYear to populate the data.
-    	 * */
-    	Map<String, Integer> yearToGrantCount = 
-			UtilityFunctions.getYearToActivityCount(grantsToURI.values());
+		 * Create a map from the year to number of publications. Use the
+		 * BiboDocument's parsedPublicationYear to populate the data.
+		 */
+		Map<String, Integer> yearToGrantCount =
+				UtilityFunctions.getYearToActivityCount(authorGrants);
 	
     	return prepareDataResponse(person,
 				yearToGrantCount);
@@ -91,20 +96,21 @@ public class PersonGrantCountRequestHandler implements VisualizationRequestHandl
 		
 		String visContainer = vitroRequest
 				.getParameter(VisualizationFrameworkConstants.VIS_CONTAINER_KEY);
-		
-		SubEntity person = new SubEntity(
-				personURI,
-				UtilityFunctions.getIndividualLabelFromDAO(vitroRequest, personURI));
 
-		Map<String, Activity> grantsToURI = SelectOnModelUtilities.getGrantsForPerson(vitroRequest.getRDFService(), person, false);
-		
-    	/*
-    	 * Create a map from the year to number of grants. Use the Grant's
-    	 * parsedGrantYear to populate the data.
-    	 * */
-    	Map<String, Integer> yearToGrantCount = 
-			UtilityFunctions.getYearToActivityCount(grantsToURI.values());
-    	
+		QueryRunner<Set<Activity>> queryManager = new PersonGrantCountQueryRunner(
+				personURI,
+				vitroRequest.getRDFService(),
+				log);
+
+		Set<Activity> authorGrants = queryManager.getQueryResult();
+
+		/*
+		 * Create a map from the year to number of publications. Use the
+		 * BiboDocument's parsedPublicationYear to populate the data.
+		 */
+		Map<String, Integer> yearToGrantCount =
+				UtilityFunctions.getYearToActivityCount(authorGrants);
+
 
 		boolean shouldVIVOrenderVis = yearToGrantCount.size() > 0 ? true : false;
 			
@@ -142,19 +148,20 @@ public class PersonGrantCountRequestHandler implements VisualizationRequestHandl
 
 		String visContainer = vitroRequest
 				.getParameter(VisualizationFrameworkConstants.VIS_CONTAINER_KEY);
-		
-		SubEntity person = new SubEntity(
-				personURI,
-				UtilityFunctions.getIndividualLabelFromDAO(vitroRequest, personURI));
 
-		Map<String, Activity> grantsToURI = SelectOnModelUtilities.getGrantsForPerson(vitroRequest.getRDFService(), person, false);
-		
-    	/*
-    	 * Create a map from the year to number of grants. Use the Grant's
-    	 * parsedGrantYear to populate the data.
-    	 * */
-    	Map<String, Integer> yearToGrantCount = 
-			UtilityFunctions.getYearToActivityCount(grantsToURI.values());
+		QueryRunner<Set<Activity>> queryManager = new PersonGrantCountQueryRunner(
+				personURI,
+				vitroRequest.getRDFService(),
+				log);
+
+		Set<Activity> authorGrants = queryManager.getQueryResult();
+
+		/*
+		 * Create a map from the year to number of publications. Use the
+		 * BiboDocument's parsedPublicationYear to populate the data.
+		 */
+		Map<String, Integer> yearToGrantCount =
+				UtilityFunctions.getYearToActivityCount(authorGrants);
 	
     	/*
     	 * Computations required to generate HTML for the sparkline & related context.
@@ -192,9 +199,8 @@ public class PersonGrantCountRequestHandler implements VisualizationRequestHandl
 	/**
 	 * Provides response when csv file containing the grant count over the years
 	 * is requested.
-	 * @param investigator
-	 * @param yearToGrantCount
-	 * @return 
+	 * @param investigator Investigator entiry
+	 * @param yearToGrantCount Year / grant counts
 	 */
 	private Map<String, String> prepareDataResponse(
 						SubEntity investigator,
@@ -218,9 +224,8 @@ public class PersonGrantCountRequestHandler implements VisualizationRequestHandl
 	
 	/**
 	 * Provides response when an entire page dedicated to grant sparkline is requested.
-	 * @param vreq
-	 * @param valueObjectContainer
-	 * @return 
+	 * @param vreq Vitro Request
+	 * @param valueObjectContainer Sparkline data
 	 */
 	private TemplateResponseValues prepareStandaloneResponse(VitroRequest vreq,
 			SparklineData valueObjectContainer) {
@@ -238,10 +243,9 @@ public class PersonGrantCountRequestHandler implements VisualizationRequestHandl
 	/**
 	 * Provides response when the grant sparkline has to be rendered in already existing 
 	 * page, e.g. profile page.
-	 * @param vreq
-	 * @param valueObjectContainer
-	 * @param yearToGrantCount
-	 * @return 
+	 * @param vreq Vitro Request
+	 * @param valueObjectContainer Sparkline data
+	 * @param shouldVIVOrenderVis Flag to render visualization
 	 */
 	private TemplateResponseValues prepareDynamicResponse(
 			VitroRequest vreq,

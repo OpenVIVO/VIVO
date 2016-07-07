@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.visualization.model.OrganizationPeopleMap;
 import edu.cornell.mannlib.vitro.webapp.visualization.utilities.CounterUtils;
 import edu.cornell.mannlib.vitro.webapp.visualization.utilities.OrgUtils;
 import edu.cornell.mannlib.vitro.webapp.visualization.utilities.VisualizationCaches;
@@ -91,7 +92,7 @@ public class TemporalPublicationVisualizationRequestHandler implements
 		Map<String, Set<String>> subOrgMap               = VisualizationCaches.organizationSubOrgs.get(rdfService);
 		Map<String, String> orgMostSpecificLabelMap      = VisualizationCaches.organizationToMostSpecificLabel.get(rdfService);
 		Map<String, String> personMostSpecificLabelMap   = VisualizationCaches.personToMostSpecificLabel.get(rdfService);
-		Map<String, Set<String>> organisationToPeopleMap = VisualizationCaches.organisationToPeopleMap.get(rdfService);
+		OrganizationPeopleMap organisationToPeopleMap = VisualizationCaches.organisationToPeopleMap.get(rdfService);
 		Map<String, Set<String>> personToPublicationMap  = VisualizationCaches.personToPublication.get(rdfService).personToPublication;
 		Map<String, String>      publicationToYearMap    = VisualizationCaches.publicationToYear.get(rdfService);
 
@@ -100,13 +101,13 @@ public class TemporalPublicationVisualizationRequestHandler implements
 
 		Map<String, Set<String>> subOrgPublicationsMap = new HashMap<String, Set<String>>();
 
-		OrgUtils.getObjectMappingsForOrgAnSubOrgs(
+		OrgUtils.getObjectMappingsForOrgAndSubOrgs(
 				subjectEntityURI,
 				orgPublications,
 				orgPublicationsPeople,
 				subOrgPublicationsMap,
 				subOrgMap,
-				organisationToPeopleMap,
+				organisationToPeopleMap.organizationToPeople,
 				personToPublicationMap
 		);
 
@@ -193,6 +194,22 @@ public class TemporalPublicationVisualizationRequestHandler implements
 					csvFileContent.append("Organization");
 					csvFileContent.append("\n");
 
+				}
+
+				// For each person
+				for (String person : orgPublicationsPeople) {
+					csvFileContent.append(StringEscapeUtils.escapeCsv(personLabelMap.get(person)));
+					csvFileContent.append(", ");
+
+					if (personToPublicationMap.containsKey(person)) {
+						csvFileContent.append(personToPublicationMap.get(person).size());
+						csvFileContent.append(", ");
+					} else {
+						csvFileContent.append("0, ");
+					}
+
+					csvFileContent.append("Person");
+					csvFileContent.append("\n");
 				}
 
 				String outputFileName = UtilityFunctions.slugify(entityLabel) + "_publications-per-year" + ".csv";

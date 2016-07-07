@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.visualization.model.OrganizationPeopleMap;
 import edu.cornell.mannlib.vitro.webapp.visualization.utilities.CounterUtils;
 import edu.cornell.mannlib.vitro.webapp.visualization.utilities.OrgUtils;
 import edu.cornell.mannlib.vitro.webapp.visualization.utilities.VisualizationCaches;
@@ -152,7 +153,7 @@ public class TemporalGrantVisualizationRequestHandler implements
 		}
 
 		Map<String, Set<String>> subOrgMap               = VisualizationCaches.organizationSubOrgs.get(rdfService);
-		Map<String, Set<String>> organisationToPeopleMap = VisualizationCaches.organisationToPeopleMap.get(rdfService);
+		OrganizationPeopleMap organisationToPeopleMap = VisualizationCaches.organisationToPeopleMap.get(rdfService);
 		Map<String, String> orgMostSpecificLabelMap      = VisualizationCaches.organizationToMostSpecificLabel.get(rdfService);
 		Map<String, String> personMostSpecificLabelMap   = VisualizationCaches.personToMostSpecificLabel.get(rdfService);
 		Map<String, Set<String>> personToGrantMap        = VisualizationCaches.personToGrant.get(rdfService);
@@ -163,13 +164,13 @@ public class TemporalGrantVisualizationRequestHandler implements
 
 		Map<String, Set<String>> subOrgGrantsMap = new HashMap<String, Set<String>>();
 
-		OrgUtils.getObjectMappingsForOrgAnSubOrgs(
+		OrgUtils.getObjectMappingsForOrgAndSubOrgs(
 				subjectEntityURI,
 				orgGrants,
 				orgGrantsPeople,
 				subOrgGrantsMap,
 				subOrgMap,
-				organisationToPeopleMap,
+				organisationToPeopleMap.organizationToPeople,
 				personToGrantMap
 		);
 

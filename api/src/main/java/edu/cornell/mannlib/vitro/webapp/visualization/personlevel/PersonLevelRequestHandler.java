@@ -9,11 +9,9 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.visualization.collaborationutils.CoAuthorshipData;
 import edu.cornell.mannlib.vitro.webapp.visualization.collaborationutils.CoInvestigationData;
 import edu.cornell.mannlib.vitro.webapp.visualization.visutils.CollaborationDataViewHelper;
-import org.apache.axis.utils.StringUtils;
 import org.apache.commons.logging.Log;
 
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -23,7 +21,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.visualization.VisualizationFr
 import edu.cornell.mannlib.vitro.webapp.visualization.coauthorship.CoAuthorshipQueryRunner;
 import edu.cornell.mannlib.vitro.webapp.visualization.coauthorship.CoAuthorshipVisCodeGenerator;
 import edu.cornell.mannlib.vitro.webapp.visualization.collaborationutils.CollaborationData;
-import edu.cornell.mannlib.vitro.webapp.visualization.coprincipalinvestigator.CoPIGrantCountConstructQueryRunner;
 import edu.cornell.mannlib.vitro.webapp.visualization.coprincipalinvestigator.CoPIGrantCountQueryRunner;
 import edu.cornell.mannlib.vitro.webapp.visualization.coprincipalinvestigator.CoPIVisCodeGenerator;
 import edu.cornell.mannlib.vitro.webapp.visualization.exceptions.MalformedQueryParametersException;
@@ -31,10 +28,6 @@ import edu.cornell.mannlib.vitro.webapp.visualization.persongrantcount.PersonGra
 import edu.cornell.mannlib.vitro.webapp.visualization.personpubcount.PersonPublicationCountVisCodeGenerator;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.Activity;
 import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.SparklineData;
-import edu.cornell.mannlib.vitro.webapp.visualization.valueobjects.SubEntity;
-import edu.cornell.mannlib.vitro.webapp.visualization.visutils.ModelConstructor;
-import edu.cornell.mannlib.vitro.webapp.visualization.visutils.QueryRunner;
-import edu.cornell.mannlib.vitro.webapp.visualization.visutils.SelectOnModelUtilities;
 import edu.cornell.mannlib.vitro.webapp.visualization.visutils.UtilityFunctions;
 import edu.cornell.mannlib.vitro.webapp.visualization.visutils.VisualizationRequestHandler;
 
@@ -209,13 +202,8 @@ public class PersonLevelRequestHandler implements VisualizationRequestHandler {
 		
 		Map<String, Object> body = new HashMap<String, Object>();
 		
-        String	standaloneTemplate = "coAuthorPersonLevel.ftl";
-
-		String property = ConfigurationProperties.getBean(vitroRequest).getProperty("visualization.d3");
-		if (!"disabled".equalsIgnoreCase(property)) {
-			body.put("coAuthorshipData", new CollaborationDataViewHelper(coAuthorshipVO));
-			standaloneTemplate = "coAuthorPersonLevelD3.ftl";
-		}
+        String	standaloneTemplate = "coAuthorPersonLevelD3.ftl";
+		body.put("coAuthorshipData", new CollaborationDataViewHelper(coAuthorshipVO));
 
 		body.put("egoURIParam", egoURI);
         
@@ -271,13 +259,8 @@ public class PersonLevelRequestHandler implements VisualizationRequestHandler {
 			body.put("numOfCoInvestigations", coPIVO.getCollaborations().size());
 		}
 		
-        String	standaloneTemplate = "coPIPersonLevel.ftl";
-
-		String property = ConfigurationProperties.getBean(vitroRequest).getProperty("visualization.d3");
-		if (!"disabled".equalsIgnoreCase(property)) {
-			body.put("coInvestigatorData", new CollaborationDataViewHelper(coPIVO));
-			standaloneTemplate = "coPIPersonLevelD3.ftl";
-		}
+        String	standaloneTemplate = "coPIPersonLevelD3.ftl";
+		body.put("coInvestigatorData", new CollaborationDataViewHelper(coPIVO));
 
 		body.put("egoGrantSparklineVO", egoGrantSparklineVO);
 		body.put("uniqueCoInvestigatorsSparklineVO", uniqueCopisSparklineVO);        	
