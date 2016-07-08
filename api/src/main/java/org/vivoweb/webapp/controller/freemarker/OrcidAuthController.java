@@ -299,6 +299,7 @@ public class OrcidAuthController extends FreemarkerHttpServlet {
                             if (!StringUtils.isEmpty(orcidBio.orcidProfile.orcidIdentifier.uri)) {
                                 Resource orcid = model.createResource(orcidBio.orcidProfile.orcidIdentifier.uri);
                                 orcid.addProperty(RDF.type, model.getProperty("http://www.w3.org/2002/07/owl#Thing"));
+                                orcid.addProperty(model.getProperty("http://vivoweb.org/ontology/core#confirmedOrcidId"), profileUri);
 
                                 profile.addProperty(model.getProperty("http://vivoweb.org/ontology/core#orcidId"), orcid);
                             }
