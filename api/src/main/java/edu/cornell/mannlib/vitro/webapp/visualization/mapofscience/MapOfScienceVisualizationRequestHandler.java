@@ -11,6 +11,7 @@ import java.util.Set;
 
 import com.hp.hpl.jena.query.QuerySolution;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
@@ -450,7 +451,15 @@ public class MapOfScienceVisualizationRequestHandler implements VisualizationReq
 
 
         body.put("vivoDefaultNamespace", vreq.getWebappDaoFactory().getDefaultNamespace());
-        
+
+		ConfigurationProperties properties = ConfigurationProperties.getBean(vreq);
+		if (properties != null) {
+			String key = properties.getProperty("google.maps.key");
+			if (!StringUtils.isEmpty(key)) {
+				body.put("googleMapsKey", key);
+			}
+		}
+
         return new TemplateResponseValues(standaloneTemplate, body);
 	}
 

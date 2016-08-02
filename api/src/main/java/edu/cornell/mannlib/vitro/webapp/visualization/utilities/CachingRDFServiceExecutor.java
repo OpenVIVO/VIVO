@@ -5,20 +5,20 @@ package edu.cornell.mannlib.vitro.webapp.visualization.utilities;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Utilicy class that populates and returns a cache.
+ * Utility class that populates and returns a cache.
  * Once the cache is populated, it can return the cached results whilst refreshing in the background.
  *
  * @param <T>
@@ -30,7 +30,7 @@ public class CachingRDFServiceExecutor<T> {
     private T cachedResults;
     private long lastCacheTime;
 
-    private RDFServiceCallable<T> resultBuilder;
+    private final RDFServiceCallable<T> resultBuilder;
 
     /**
      * Background task tracker
@@ -82,7 +82,7 @@ public class CachingRDFServiceExecutor<T> {
                 }
             }
         } else {
-            // No cached results, so fetch the results using any availabe RDF service
+            // No cached results, so fetch the results using any available RDF service
             if (rdfService != null) {
                 startBackgroundTask(rdfService);
             } else if (backgroundRDFService != null) {
@@ -125,8 +125,8 @@ public class CachingRDFServiceExecutor<T> {
                 startBackgroundTask(backgroundRDFService);
                 completeBackgroundTaskAsync();
             } else if (rdfService != null) {
-                // No background service, so use the paassed RDF service, and wait for completion
-                startBackgroundTask(backgroundRDFService);
+                // No background service, so use the passed RDF service, and wait for completion
+                startBackgroundTask(rdfService);
                 completeBackgroundTask();
             }
         }
@@ -210,11 +210,7 @@ public class CachingRDFServiceExecutor<T> {
             backgroundCompletion = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        Thread.sleep(500);
-                        completeBackgroundTask(-1);
-                    } catch (InterruptedException e) {
-                    }
+                    completeBackgroundTask(-1);
                 }
             });
             backgroundCompletion.setDaemon(true);
@@ -258,11 +254,8 @@ public class CachingRDFServiceExecutor<T> {
             abortBackgroundTask();
         } catch (ExecutionException e) {
             // There was a problem inside the task, so abort and throw an exception
-            try {
-                abortBackgroundTask();
-            } finally {
-                throw new RuntimeException("Background RDF thread through an exception", e.getCause());
-            }
+            abortBackgroundTask();
+            throw new RuntimeException("Background RDF thread through an exception", e.getCause());
         } catch (TimeoutException e) {
             // Ignore a timeout waiting for the results
         }
@@ -312,7 +305,7 @@ public class CachingRDFServiceExecutor<T> {
 
         /**
          * Entry point for the background threads, ensuring the right start / cleanup is done
-         * @throws Exception
+         * @throws Exception Any exception
          */
         @Override
         final public T call() throws Exception {
@@ -348,7 +341,7 @@ public class CachingRDFServiceExecutor<T> {
         /**
          * Method for users to implement, to return the results
          * @param rdfService An RDFService
-         * @throws Exception
+         * @throws Exception Any exception
          */
         protected abstract T callWithService(RDFService rdfService) throws Exception;
 
@@ -386,26 +379,38 @@ public class CachingRDFServiceExecutor<T> {
      * Affinity class that serializes background processing for tasks given the same affinity
      */
     public static class Affinity {
-        private int maxThreads = 1;
+        private final int maxThreads = 1;
+
+        static class ThreadControl {
+            ThreadControl(long started, long expectedDuration) {
+                this.started = started;
+                this.expectedDuration = expectedDuration;
+            }
+
+            final long started;
+            final long expectedDuration;
+            final CountDownLatch latch = new CountDownLatch(1);
+        }
 
         // Map of executing threads, and the time they expect to need to execute
-        private Map<Thread, Long> threadToExecutionTime = new HashMap<>();
-        private Set<Thread> executingThreads = new HashSet<>();
+        private final Map<Thread, ThreadControl> threadToExecutionTime = new HashMap<>();
+        private final Set<Thread> executingThreads = new HashSet<>();
 
         /**
          * Called by a background thread to determine if it is allowed to start
-         * @param expectedExecutionTime time that the thread expects to take (usualling the last execution time)
+         * @param expectedExecutionTime time that the thread expects to take (usually the last execution time)
          */
         private void requestStart(long expectedExecutionTime) {
+            Thread executingThread = Thread.currentThread();
+
             // Ask if the task needs to be queued
-            if (queueThis(Thread.currentThread(), expectedExecutionTime)) {
-                // Synchronize the thread to call wait
-                synchronized (Thread.currentThread()) {
-                    try {
-                        // Make the thread wait until it is notified to continue
-                        Thread.currentThread().wait();
-                    } catch(InterruptedException e) {
-                    }
+            CountDownLatch latch = queueThis(executingThread, expectedExecutionTime);
+
+            // We got a latch from the queue, so wait for it to clear
+            if (latch != null) {
+                try {
+                    latch.await();
+                } catch (InterruptedException e) {
                 }
             }
         }
@@ -416,20 +421,22 @@ public class CachingRDFServiceExecutor<T> {
          * @param time start time of the thread
          * @return true if the thread needs to wait, false if it can continue
          */
-        private synchronized boolean queueThis(Thread thread, Long time) {
+        private synchronized CountDownLatch queueThis(Thread thread, Long time) {
             // If we have fewer that the max threads running
             if (executingThreads.size() < maxThreads) {
                 // Add thread to executing set
                 executingThreads.add(thread);
 
                 // Not queued - we can continue
-                return false;
+                return null;
             } else {
-                // Add the thread to the map
-                threadToExecutionTime.put(thread, time);
+                ThreadControl control = new ThreadControl(System.currentTimeMillis(), time);
 
-                // Let the caller know that we are queued
-                return true;
+                // Add the thread to the map
+                threadToExecutionTime.put(thread, control);
+
+                // Give the caller a handle to the latch for the queued thread
+                return control.latch;
             }
         }
 
@@ -446,26 +453,41 @@ public class CachingRDFServiceExecutor<T> {
                 // If there are still threads to execute, and we have not exhausted maximum threads
                 while (threadToExecutionTime.size() > 0 && executingThreads.size() < maxThreads) {
                     Thread nextToRelease = null;
-                    long executionTime = -1;
+                    ThreadControl nextToReleaseControl = null;
+                    long current = System.currentTimeMillis();
+                    boolean favourStartTime = false;
 
                     // Find the thread that expects to take the least time
                     for (Thread thread : threadToExecutionTime.keySet()) {
-                        long thisTime = threadToExecutionTime.get(thread);
+                        ThreadControl threadControl = threadToExecutionTime.get(thread);
+
+                        // If there are threads that have been waiting over 2 seconds, favour the oldest thread
+                        if (threadControl.started + 2000 < current) {
+                            favourStartTime = true;
+                        }
 
                         if (nextToRelease == null) {
                             nextToRelease = thread;
-                            executionTime = thisTime;
-                        } else if (thisTime < executionTime) {
-                            nextToRelease = thread;
-                            executionTime = thisTime;
+                            nextToReleaseControl = threadControl;
+                        } else {
+                            if (favourStartTime) {
+                                // Find the oldest thread
+                                if (threadControl.started < nextToReleaseControl.started) {
+                                    nextToRelease = thread;
+                                    nextToReleaseControl = threadControl;
+                                }
+                            } else if (threadControl.expectedDuration < nextToReleaseControl.expectedDuration) {
+                                nextToRelease = thread;
+                                nextToReleaseControl = threadControl;
+                            }
                         }
                     }
 
-                    // Synchronize on the thread we are releasing, and notify it to continue
-                    synchronized (nextToRelease) {
+                    // Notify the Thread we are releasing to continue
+                    if (nextToRelease != null) {
                         threadToExecutionTime.remove(nextToRelease);
                         executingThreads.add(nextToRelease);
-                        nextToRelease.notify();
+                        nextToReleaseControl.latch.countDown();
                     }
                 }
             }
