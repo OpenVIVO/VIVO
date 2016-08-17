@@ -6,6 +6,7 @@
 <#assign subjectUri = individual.controlPanelUrl()?split("=") >
 <#assign tabCount = 1 >
 <#assign sectionCount = 1 >
+<#assign doi = propertyGroups.pullProperty("http://purl.org/ontology/bibo/doi")!>
 <!-- ${propertyGroups.all?size} -->
 <ul class="propertyTabsList">
     <li  class="groupTabSpacer">&nbsp;</li>
@@ -31,6 +32,10 @@
 </#list>
 <#if (propertyGroups.all?size > 1) >
     <li  class="nonSelectedGroupTab clickable" groupName="viewAll">${i18n().view_all_capitalized}</li>
+    <li  class="groupTabSpacer">&nbsp;</li>
+</#if>
+<#if doi?contains("figshare")>
+    <li  class="nonSelectedGroupTab clickable" groupName="figshare">Figshare</li>
     <li  class="groupTabSpacer">&nbsp;</li>
 </#if>
 </ul>
@@ -62,6 +67,16 @@
         <#assign sectionCount = 2 >
     </#if>
 </#list>
+<#if doi?contains("figshare")>
+    <section id="figshare" class="property-group" role="region" style="<#if (sectionCount > 1) >display:none<#else>display:block</#if>">
+    <nav id="scroller" class="scroll-up hidden" role="navigation">
+        <a href="#branding" title="${i18n().scroll_to_menus}" >
+            <img src="${urls.images}/individual/scroll-up.gif" alt="${i18n().scroll_to_menus}" />
+        </a>
+    </nav>
+    <iframe src="https://widgets.figshare.com/articles/${doi?keep_after(".figshare.")?keep_before(".")}/embed?show_title=1" width="900" height="675" frameborder="0"></iframe>
+    </section>
+</#if>
 <script>
     var individualLocalName = "${individual.localName}";
 </script>
