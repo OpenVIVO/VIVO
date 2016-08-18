@@ -74,11 +74,35 @@
             <img src="${urls.images}/individual/scroll-up.gif" alt="${i18n().scroll_to_menus}" />
         </a>
     </nav>
-    <iframe src="https://widgets.figshare.com/articles/${doi?keep_after(".figshare.")?keep_before(".")}/embed?show_title=1" width="900" height="675" frameborder="0"></iframe>
+    <iframe data-src="https://widgets.figshare.com/articles/${doi?keep_after(".figshare.")?keep_before(".")}/embed?show_title=1" width="900" height="675" frameborder="0">
+        Loading...
+    </iframe>
     </section>
 </#if>
 <script>
     var individualLocalName = "${individual.localName}";
+
+    (function ($) {
+        $.each(['show', 'hide'], function (i, ev) {
+            var el = $.fn[ev];
+            $.fn[ev] = function () {
+                this.trigger(ev);
+                return el.apply(this, arguments);
+            };
+        });
+    })(jQuery);
+
+    // .on instead of .bind
+    // .prop instead of .attr
+    $('#figshare').bind('show', function () {
+        var iframe = $(this).find("iframe");
+        if (iframe.attr("src")) {
+        } else {
+            iframe.attr("src", function() {
+                return $(this).data("src");
+            });
+        }
+    });
 </script>
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/individual/individual-property-groups.css" />')}
