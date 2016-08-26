@@ -329,7 +329,7 @@ public class IndividualRdfAssembler {
 	}
 
 	private String figureBaseUrl() {
-		int cutHere = individualUri.indexOf("/individual");
+		int cutHere = individualUri.indexOf("/a");
 		return (cutHere > 0) ? individualUri.substring(0, cutHere)
 				: individualUri;
 	}
